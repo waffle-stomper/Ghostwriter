@@ -232,7 +232,14 @@ public class BookUtilities {
 		while (str.endsWith("\n") || str.endsWith(" ")){
 			str = str.substring(0, str.length() - 1);
 		}
-		return Arrays.asList(wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR));
+		//Split string at newline characters
+		String[] lines = str.split("\\n");
+		List<String> out = new ArrayList();
+		for (String line : lines){
+			out.addAll(Arrays.asList(wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR)));
+		}
+		//return Arrays.asList(wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR));
+		return out;
 	}
 	
 

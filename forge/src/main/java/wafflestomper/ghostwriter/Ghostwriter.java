@@ -30,7 +30,7 @@ import net.minecraft.item.Item;
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME)
 public class Ghostwriter{
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.7.10-1.5.1";
+    public static final String VERSION = "1.7.10-1.6.3";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
@@ -65,6 +65,7 @@ public class Ghostwriter{
     		//######################################################
     		//######################################################
             if (this.mc.currentScreen instanceof GuiScreenBook) {
+            	//printer.gamePrint("WARNING: Ghostwriter is disabled!");
             	EntityPlayerSP p = this.mc.thePlayer;
                 mc.displayGuiScreen(new GuiGhostwriterBook(p, p.getHeldItem(), p.getHeldItem().getItem().equals(Items.writable_book), this.clipboard));
             }

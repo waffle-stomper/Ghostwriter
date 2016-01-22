@@ -3,13 +3,22 @@
 package wafflestomper.ghostwriter;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.Writer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,10 +110,18 @@ public class FileHandler {
 	}
 	
 	public List<String> readFile(File path){
+		return readFile(path, "UTF-8");
+	}
+	
+	public List<String> readFile(File path, String encoding){
 		List<String> out = new ArrayList();
-		BufferedReader br;
+		BufferedReader br = null;
+		
+		CharsetDecoder decoder = Charset.forName(encoding).newDecoder();
+		decoder.onMalformedInput(CodingErrorAction.REPORT);
+		decoder.onUnmappableCharacter(CodingErrorAction.REPORT);
 		try {
-			br = new BufferedReader(new FileReader(path));
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(path), decoder));
 		} catch (FileNotFoundException e) {
 			this.printer.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
 			return null;
@@ -115,11 +132,28 @@ public class FileHandler {
 	        	out.add(line);
 	            line = br.readLine();
 	        }
-	    } catch (IOException e) {
+	    } 
+	    catch (CharacterCodingException e){
+	    	// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
+	    	if (encoding == "UTF-8"){
+	    		this.printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
+	    		// Try ISO-8859-1
+	    		try {
+					br.close();
+				} catch (IOException exc) {
+					e.printStackTrace();
+				}
+	    		return readFile(path, "ISO-8859-1");
+	    	}
+	    	this.printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
+	    	return null;
+	    }
+	    catch (IOException e) {
 			e.printStackTrace();
 			this.printer.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
 			return null;
-		} finally {
+		} 
+	    finally {
 	        try {
 				br.close();
 			} catch (IOException e) {
@@ -194,11 +228,21 @@ public class FileHandler {
 		//Write file
 		if (!failedFlag){
 			try {
-			    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
-			    for (String s : toWrite){
-			    	out.println(s);
-			    }
-			    out.close();
+				Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "UTF-8"));
+				try{
+					for (String s : toWrite){
+						out.write(s + '\n');
+					}
+				}
+				catch (IOException e){
+					failedFlag = true;
+					System.out.println("Ghostwriter: Write failed!");
+					System.out.println(e.getMessage());
+					return false;
+				}
+				finally{
+					out.close();
+				}
 			} 
 			catch (IOException e) {
 				failedFlag = true;
@@ -228,6 +272,7 @@ public class FileHandler {
 		//This was not a valid book
 		return false;
 	}
+	
 	
 	/**
 	 * Removes Java-style comments, whitespace preceding linebreak and pagebreak symbols, and newline characters (\n)
@@ -262,7 +307,7 @@ public class FileHandler {
 				if (line.length() >= 7){
 					book.title = cleanGHBString(line.substring(6)).trim();
 					if (line.contains("/*")){
-						concatFile += line.substring(line.indexOf("/*")) + "\n";
+						concatFile += line.substring(line.indexOf("/*")) + "\\n";
 					}
 				}
 			}
@@ -270,7 +315,7 @@ public class FileHandler {
 				if (line.length() >= 8){
 					book.author = cleanGHBString(line.substring(7)).trim();
 					if (line.contains("/*")){
-						concatFile += line.substring(line.indexOf("/*")) + "\n";
+						concatFile += line.substring(line.indexOf("/*")) + "\\n";
 					}
 				}
 			}
@@ -281,14 +326,14 @@ public class FileHandler {
 		concatFile = cleanGHBString(concatFile);
 		
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
-		concatFile = concatFile.replaceAll("##", "\n");
+		concatFile = concatFile.replaceAll("##", "\\\n");
+
 		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>>"));
-		
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
-		
 		return true;
 	}
+	
 	
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
 		this.printer.gamePrint(Printer.GRAY + "Saving book to file...");
@@ -299,11 +344,18 @@ public class FileHandler {
 		if (!author.isEmpty()){toWrite.add("author:" + author);}
 		toWrite.add("//=======================================");
 		for (int i=0; i<pages.size(); i++){
+			String pageAsString = pages.get(i);
+			//Strip the bizarre quote marks from the start and end of the string
+			while (pageAsString.startsWith("\"") && pageAsString.endsWith("\"")){
+				pageAsString = pageAsString.substring(1, pageAsString.length()-1);
+			}
+			//convert all escaped newline characters to real newline characters
+			pageAsString = pageAsString.replaceAll("\\\\n", "\\\n");
 			//Split the string into 116 pixel maximum lines
-			List<String> currPage = BookUtilities.splitStringIntoLines(pages.get(i));
+			List<String> currPage = BookUtilities.splitStringIntoLines(pageAsString);
+			// Replace newline characters with double hashes and add the double hashes to the end of each line
 			for (String line : currPage){
-				//then add ## before any newline character
-				toWrite.add(line.replaceAll("\n", "##"));
+				toWrite.add(line.replaceAll("\\n", "##") + "##");
 			}
 			//Add pagebreaks
 			if (i < pages.size()-1){
@@ -323,30 +375,6 @@ public class FileHandler {
 		}
 	}
 	
-	@Deprecated
-	public boolean saveOldGhostwriterBook(String title, String author, List<String> pages) {
-		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-		String fileName = title + "_" + author + "_" + getUTC() + ".txt";
-		String fullPath = this.defaultPath + File.separator + fileName;
-		this.printer.gamePrint(Printer.GOLD + "Saving book to file...");
-		try {
-		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(fullPath, true)));
-		    out.println("$Title$\n" + title + "\n");
-		    out.println("$Author$\n" + author + "\n");
-		    for (String page : pages){
-		    	out.println("$Page$\n" + page + "\n");
-		    }
-		    out.close();
-		} catch (IOException e) {
-			this.printer.gamePrint(printer.YELLOW + "WRITING BOOK TO DISK FAILED!");
-			System.out.println("GHOSTWRITER: WRITING BOOK TO DISK FAILED!");
-			System.out.println(e.getMessage());
-			return false;
-		}
-		this.printer.gamePrint(Printer.GREEN + "Book saved to: " + fullPath);
-		return true;
-	}
 	
 	public String getUTC(){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
