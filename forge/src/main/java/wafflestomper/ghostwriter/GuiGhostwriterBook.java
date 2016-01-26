@@ -207,7 +207,7 @@ import com.google.gson.JsonParseException;
 
 @SideOnly(Side.CLIENT)
 public class GuiGhostwriterBook extends GuiScreen
-{
+{	
     private static final Logger logger = LogManager.getLogger();
     private static final ResourceLocation bookGuiTextures = new ResourceLocation("textures/gui/book.png");
     /** The player editing the book */
@@ -230,10 +230,17 @@ public class GuiGhostwriterBook extends GuiScreen
     private String bookAuthor = "";
     private List field_175386_A;
     private int field_175387_B = -1;
+    private boolean viewAsUnsigned = false;
     
     private Printer printer = new Printer();
 	private Clipboard clipboard;
 	private FileHandler fileHandler;
+	
+	private Clipboard autoReloadBookClipboard;
+	private boolean autoReloadBookEnabled = false;
+	private File autoReloadBookPath = null;
+	private long autoReloadLastModified = 0;
+	private long autoReloadLastCheck = 0;
     
     private GuiGhostwriterBook.NextPageButton buttonNextPage;
     private GuiGhostwriterBook.NextPageButton buttonPreviousPage;
@@ -252,9 +259,6 @@ public class GuiGhostwriterBook extends GuiScreen
 	private static final int BTN_LOAD_BOOK = 7;
 	private static final int BTN_COPY_BOOK = 10;
 	private static final int BTN_PASTE_BOOK = 11;
-	//Deprecated - using the copy & paste multiples for everything
-	//private static final int BTN_COPY_PAGE = 12;
-	//private static final int BTN_PASTE_PAGE = 13;
 	private static final int BTN_CUT_MULTIPLE_PAGES = 14;
 	private static final int BTN_SELECT_PAGE_A = 15;
 	private static final int BTN_SELECT_PAGE_B = 16;
@@ -264,6 +268,8 @@ public class GuiGhostwriterBook extends GuiScreen
 	private static final int BTN_COLLAPSE_TOP = 20;
 	private static final int BTN_ADD_SIGNATURE_PAGES = 21;
 	private static final int BTN_REMOVE_SELECTED_PAGES = 22;
+	private static final int BTN_AUTO_RELOAD_BOOK = 23;
+	private static final int BTN_VIEW_AS_SIGNED_UNSIGNED = 24;
 	
 	private static final int BTN_BLACK = 50;
 	private static final int BTN_DARK_BLUE = 51;
@@ -304,11 +310,9 @@ public class GuiGhostwriterBook extends GuiScreen
     private GuiButton buttonCancel;
 	private GuiButton buttonSaveBook;
 	private GuiButton buttonLoadBook;
+	private GuiButton buttonAutoReloadBook;
 	private GuiButton buttonCopyBook;
 	private GuiButton buttonPasteBook;
-	//Deprecated - using the copy & paste multiples for everything
-	//private GuiButton buttonCopyPage;
-	//private GuiButton buttonPastePage;
 	private GuiButton buttonCutMultiplePages;
 	private GuiButton buttonSelectPageA;
 	private GuiButton buttonSelectPageB;
@@ -318,6 +322,7 @@ public class GuiGhostwriterBook extends GuiScreen
 	private GuiButton buttonCollapseTop;
 	private GuiButton buttonAddSignaturePages;
 	private GuiButton buttonRemoveSelectedPages;
+	private GuiButton buttonViewAsSignedUnsigned;
 	
 	private GuiButton buttonBlack;
 	private GuiButton buttonDarkBlue;
@@ -341,7 +346,6 @@ public class GuiGhostwriterBook extends GuiScreen
 	private GuiButton buttonUnderline;
 	private GuiButton buttonItalic;
 	private GuiButton buttonResetFormat;
-	//private GuiButton buttonCurrentFormat;
 	
 
     public GuiGhostwriterBook(EntityPlayer _editingPlayer, ItemStack _bookObj, boolean _bookIsUnsigned, Clipboard _clipboard) {
@@ -350,6 +354,8 @@ public class GuiGhostwriterBook extends GuiScreen
         this.editingPlayer = _editingPlayer;
         this.bookObj = _bookObj;
         this.bookIsUnsigned = _bookIsUnsigned;
+        this.autoReloadBookPath = null;
+        this.autoReloadBookEnabled = false;
 
         if (_bookObj.hasTagCompound()){
             NBTTagCompound nbttagcompound = _bookObj.getTagCompound();
@@ -388,6 +394,48 @@ public class GuiGhostwriterBook extends GuiScreen
     }
     
     
+    public void setupAutoReload(Clipboard initial_book_state, File path){
+    	this.autoReloadBookClipboard = initial_book_state;
+    	this.autoReloadBookPath = path;
+    	this.autoReloadBookEnabled = true;
+    	this.autoReloadLastModified = path.lastModified();
+    	this.autoReloadLastCheck = System.currentTimeMillis();
+    	this.clipboardToBook(this.autoReloadBookClipboard);
+    }
+    
+    
+    public void autoReloadCheck(){
+    	long elapsed = System.currentTimeMillis() - this.autoReloadLastCheck;
+    	if (elapsed < 1000){
+    		return;
+    	}
+    	this.autoReloadLastCheck = System.currentTimeMillis();
+    	System.out.println("Checking book...");
+    	long newModTime = this.autoReloadBookPath.lastModified();
+    	if (newModTime == 0){
+    		this.printer.gamePrint(Printer.RED + "It looks like the source file has disappeared! Disabling auto-reload.");
+			this.autoReloadBookEnabled = false;
+			this.autoReloadBookClipboard.clearBook();
+			this.autoReloadBookPath = null;
+			return;
+    	}
+    	if (newModTime > this.autoReloadLastModified){
+    		FileHandler fh = new FileHandler(this.autoReloadBookClipboard);
+    		fh.loadBook(this.autoReloadBookPath);
+    		if (!this.autoReloadBookClipboard.bookInClipboard){
+    			this.printer.gamePrint(Printer.RED + "Something went wrong while trying to reload the book. Disabling auto-reload.");
+    			this.autoReloadBookEnabled = false;
+    			this.autoReloadBookClipboard.clearBook();
+    			this.autoReloadBookPath = null;
+    			return;
+    		}
+    		this.autoReloadLastModified = newModTime;
+    		this.clipboardToBook(this.autoReloadBookClipboard);
+    		this.printer.gamePrint(Printer.DARK_GRAY + "Loaded updated book!");
+    	}
+    }
+    
+    
     private List<String> pagesAsList(){
     	List<String> pages = new ArrayList();
     	for (int i=0; i<this.bookTotalPages; i++){
@@ -395,6 +443,7 @@ public class GuiGhostwriterBook extends GuiScreen
     	}
     	return pages;
     }
+    
     
     private void addSignaturePages(){
     	Clipboard temp = new Clipboard();
@@ -417,11 +466,11 @@ public class GuiGhostwriterBook extends GuiScreen
 		this.clipboard.clone(temp);
     }
     
+    
     private void saveBook(){
-		//this.fileHandler.saveGhostwriterBook(this.bookTitle, this.bookAuthor, this.pagesAsList());
-    	System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ FINISH THE saveBook() function $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     	this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.pagesAsList());
     }
+    
     
     private void copyBook(){
 		this.clipboard.author = this.bookAuthor;
@@ -432,55 +481,37 @@ public class GuiGhostwriterBook extends GuiScreen
 		this.printer.gamePrint(Printer.GRAY + "Book copied");
 	}
     
-    private void pasteBook(){
-    	this.bookAuthor = this.clipboard.author;
-    	this.bookTitle = this.clipboard.title;
+    
+    /*
+     * Copies a book from the clipboard into the 'real' book
+     */
+    private void clipboardToBook(Clipboard fromBook){
+    	this.bookAuthor = fromBook.author;
+    	this.bookTitle = fromBook.title;
 		String pageNewText = "";
-		int maxPage = this.clipboard.pages.size();
+		int maxPage = fromBook.pages.size();
 		if (this.bookTotalPages > maxPage){maxPage = this.bookTotalPages;}
 		
 		for (int i=0; i<maxPage; i++){
 			if (i > this.bookTotalPages-1){addNewPage();}
-			if (i > (this.clipboard.pages.size()-1)){
+			if (i > (fromBook.pages.size()-1)){
 				pageNewText = "";
 			}
 			else{
-				pageNewText = this.clipboard.pages.get(i);
+				pageNewText = fromBook.pages.get(i);
 			}
-    		this.bookPages.set(i, new NBTTagString(pageNewText)); //func_150304_a
+    		this.bookPages.set(i, new NBTTagString(pageNewText));
     	}
 		this.bookModified = true;
+    }
+    
+    
+    private void pasteBook(){
+    	this.clipboardToBook(this.clipboard);
 		this.printer.gamePrint(Printer.GRAY + "Book pasted");
     }
     
-    //Deprecated - using copy and paste multiples for everything
-    /*
-    private void pastePage(){
-    	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    	//DEBUGGING
-    	for (String row : BookUtilities.stringToPages(this.clipboard.singlePage)){
-    		System.out.println(row);
-    	}
-    	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    	if (!this.getCurrentPageText().equals("")){
-        	if (this.addNewPage() == false){
-        		this.printer.gamePrint(Printer.RED + "New page couldn't be added. Paste aborted.");
-        		return;
-        	}
-        	//move all other pages one to the right
-        	for (int i=this.bookTotalPages-1; i>this.currPage; i--){
-        		String currPageText = this.bookPages.getStringTagAt(i-1);
-        		this.bookPages.func_150304_a(i, new NBTTagString(currPageText));
-        	}
-    	}
-    	//set the current page to the clipboard text
-    	this.bookPages.func_150304_a(this.currPage, new NBTTagString(this.clipboard.singlePage));
-        this.bookModified = true;
-        this.bookTotalPages = this.bookPages.tagCount();
-        this.printer.gamePrint(Printer.GRAY + "Page pasted");
-    }
-    */
-    
+       
     private void pasteMultiplePages(int startPos){
     	List<String> oldBook = this.pagesAsList();
     	int newBookSize = this.bookTotalPages + this.clipboard.miscPages.size();
@@ -520,6 +551,7 @@ public class GuiGhostwriterBook extends GuiScreen
     	}
     }
     
+    
     private void insertPage(int pos){
     	//generate at least one new page, and any other new pages if necessary
     	int i = this.bookTotalPages;
@@ -539,6 +571,7 @@ public class GuiGhostwriterBook extends GuiScreen
     	this.bookPages.set(pos, new NBTTagString("")); //func_150304_a
     }
     
+    
     private void cutMultiplePages(int from, int to){
     	if (from < 0){from = 0;}
     	if (to > this.bookTotalPages-1){to = this.bookTotalPages-1;}
@@ -555,6 +588,7 @@ public class GuiGhostwriterBook extends GuiScreen
 		this.printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " cut");
     }
     
+    
     /**
      * Called from the main game loop to update the screen.
      */
@@ -562,6 +596,7 @@ public class GuiGhostwriterBook extends GuiScreen
         super.updateScreen();
         ++this.updateCount;
     }
+    
     
     /**
      * Helper function for laying out the color buttons
@@ -572,6 +607,7 @@ public class GuiGhostwriterBook extends GuiScreen
     	return leftMost + 20 * (buttonNum-50);
     }
     
+    
     /**
      * Helper function for laying out the format buttons
      */
@@ -581,6 +617,7 @@ public class GuiGhostwriterBook extends GuiScreen
     	return leftMost + 20 * (buttonNum-66);
     }
 
+    
     /**
      * Adds the buttons (and other controls) to the screen
      */
@@ -596,23 +633,26 @@ public class GuiGhostwriterBook extends GuiScreen
 
         if (this.bookIsUnsigned){
         	/*
-        	//Original Sign, Done, Finalize, & Cancel buttons
+        	//Original Sign, Done, Finalize, & Cancel buttons (this is mostly so I know where they were on the screen)
             this.buttonList.add(this.buttonSign = new GuiButton(BTN_SIGN, this.width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.signButton", new Object[0])));
             this.buttonList.add(this.buttonDone = new GuiButton(BTN_DONE, this.width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.done", new Object[0])));
             this.buttonList.add(this.buttonFinalize = new GuiButton(BTN_FINALIZE, this.width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton", new Object[0])));
             this.buttonList.add(this.buttonCancel = new GuiButton(BTN_CANCEL, this.width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel", new Object[0])));
             */
-            this.buttonList.add(this.buttonSign = new GuiButton(BTN_SIGN, 5, 95, buttonWidth, buttonHeight, I18n.format("book.signButton", new Object[0])));
-            this.buttonList.add(this.buttonDone = new GuiButton(BTN_DONE, 5, 115, buttonWidth, buttonHeight, I18n.format("gui.done", new Object[0])));
+            this.buttonList.add(this.buttonSign = new GuiButton(BTN_SIGN, 5, 115, buttonWidth, buttonHeight, I18n.format("book.signButton", new Object[0])));
+            this.buttonList.add(this.buttonDone = new GuiButton(BTN_DONE, 5, 135, buttonWidth, buttonHeight, I18n.format("gui.done", new Object[0])));
             this.buttonList.add(this.buttonFinalize = new GuiButton(BTN_FINALIZE, this.width / 2 - 100, 4 + this.bookImageHeight, 98, 20, I18n.format("book.finalizeButton", new Object[0])));
             this.buttonList.add(this.buttonCancel = new GuiButton(BTN_CANCEL, this.width / 2 + 2, 4 + this.bookImageHeight, 98, 20, I18n.format("gui.cancel", new Object[0])));
+            
+            this.buttonList.add(this.buttonViewAsSignedUnsigned = new GuiButton(BTN_VIEW_AS_SIGNED_UNSIGNED, 5, 170, buttonWidth, buttonHeight, "View As Unsigned"));
         
             this.buttonList.add(this.buttonPasteBook = new GuiButton(BTN_PASTE_BOOK, rightXPos, 25, buttonWidth, buttonHeight, "Paste Book"));
       		this.buttonList.add(this.buttonPasteMultiplePages = new GuiButton(BTN_PASTE_MULTIPLE_PAGES, rightXPos, 130, buttonWidth, buttonHeight, "Paste Page"));
       		this.buttonList.add(this.buttonLoadBook = new GuiButton(BTN_LOAD_BOOK, 5, 25, buttonWidth, buttonHeight, "Load Book"));
+      		this.buttonList.add(this.buttonAutoReloadBook = new GuiButton(BTN_AUTO_RELOAD_BOOK, 5, 45, buttonWidth, buttonHeight, "AutoReload Book"));
       		this.buttonList.add(this.buttonInsertPage = new GuiButton(BTN_INSERT_PAGE, rightXPos, 155, buttonWidth, buttonHeight, "Insert Blank Page"));
       		this.buttonList.add(this.buttonCollapseTop = new GuiButton(BTN_COLLAPSE_TOP, rightXPos, 175, buttonWidth, buttonHeight, "Remove Top Space"));
-      		this.buttonList.add(this.buttonAddSignaturePages = new GuiButton(BTN_ADD_SIGNATURE_PAGES, 5, 60, buttonWidth, buttonHeight, "Add Signature Pages"));
+      		this.buttonList.add(this.buttonAddSignaturePages = new GuiButton(BTN_ADD_SIGNATURE_PAGES, 5, 80, buttonWidth, buttonHeight, "Add Signature Pages"));
 
       		
             //The horror...
@@ -646,16 +686,11 @@ public class GuiGhostwriterBook extends GuiScreen
         }
         
         
-        
         //Buttons on the left side
   		this.buttonList.add(this.buttonSaveBook = new GuiButton(BTN_SAVE_BOOK, 5, 5, buttonWidth, buttonHeight, "Save Book"));
   		
   		//Buttons on the right side
   		this.buttonList.add(this.buttonCopyBook = new GuiButton(BTN_COPY_BOOK, rightXPos, 5, buttonWidth, buttonHeight, "Copy Book"));
-  		
-  		//Deprecated - using the copy & paste multiples for everything
-  		//this.buttonList.add(this.buttonCopyPage = new GuiButton(BTN_COPY_PAGE, rightXPos, 50, buttonWidth, buttonHeight, "Copy Page"));
-  		//this.buttonList.add(this.buttonPastePage = new GuiButton(BTN_PASTE_PAGE, rightXPos, 70, buttonWidth, buttonHeight, "Paste Page"));
   		this.buttonList.add(this.buttonSelectPageA = new GuiButton(BTN_SELECT_PAGE_A, rightXPos, 50, buttonWidth/2, buttonHeight, "A"));
   		this.buttonList.add(this.buttonSelectPageB = new GuiButton(BTN_SELECT_PAGE_B, rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B"));
   		this.buttonList.add(this.buttonCopySelectedPages = new GuiButton(BTN_COPY_SELECTED_PAGES, rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page"));
@@ -676,7 +711,11 @@ public class GuiGhostwriterBook extends GuiScreen
      * Called when the screen is unloaded. Used to disable keyboard repeat events
      */
     public void onGuiClosed(){
-    	sendBookToServer(false);
+    	try {
+			sendBookToServer(false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         Keyboard.enableRepeatEvents(false);
     }
 
@@ -690,9 +729,11 @@ public class GuiGhostwriterBook extends GuiScreen
             this.buttonCancel.visible = this.inSigningMode;
             this.buttonFinalize.visible = this.inSigningMode;
             this.buttonFinalize.enabled = this.bookTitle.trim().length() > 0 && this.bookAuthor.trim().length() > 0;
+            this.buttonViewAsSignedUnsigned.visible = !this.inSigningMode;
             
         	this.buttonSaveBook.visible = !this.inSigningMode;
         	this.buttonLoadBook.visible = !this.inSigningMode;
+        	this.buttonAutoReloadBook.visible = !this.inSigningMode;
         	this.buttonCopyBook.visible = !this.inSigningMode;
         	this.buttonPasteBook.visible = !this.inSigningMode;
         	this.buttonCutMultiplePages.visible = !this.inSigningMode;
@@ -733,21 +774,25 @@ public class GuiGhostwriterBook extends GuiScreen
         	this.buttonRemoveSelectedPages.visible = false;
         }
     }
-
-    private void sendBookToServer(boolean signBook){
+    
+    
+    /**
+     * New sendBookToServer for 1.8 and beyond
+     */
+    private void sendBookToServer(boolean signBook) throws IOException{
         if (this.bookIsUnsigned && this.bookModified){
-        	System.out.println("Sending book to server...");
-        	this.bookModified = false;
             if (this.bookPages != null){
                 String s;
-
-                //Remove blank pages at the end of the book?
+                
+                // Remove blank pages at the end of the book
                 while (this.bookPages.tagCount() > 1){
                     s = this.bookPages.getStringTagAt(this.bookPages.tagCount() - 1);
-                    if (s.length() != 0){break;}
+                    if (s.length() != 0){
+                        break;
+                    }
                     this.bookPages.removeTag(this.bookPages.tagCount() - 1);
                 }
-
+                
                 if (this.bookObj.hasTagCompound()){
                     NBTTagCompound nbttagcompound = this.bookObj.getTagCompound();
                     nbttagcompound.setTag("pages", this.bookPages);
@@ -757,14 +802,18 @@ public class GuiGhostwriterBook extends GuiScreen
                 }
 
                 s = "MC|BEdit";
-
                 if (signBook){
                     s = "MC|BSign";
-                    if (this.bookAuthor.equals("")){
-                    	this.bookAuthor = this.editingPlayer.getCommandSenderEntity().getName();
-                    }
-                    this.bookObj.setTagInfo("author", new NBTTagString(this.bookAuthor.trim()));
+                    this.bookObj.setTagInfo("author", new NBTTagString(this.bookAuthor.trim())); // I'm reasonably sure this is no longer supported
                     this.bookObj.setTagInfo("title", new NBTTagString(this.bookTitle.trim()));
+
+                    for (int i = 0; i < this.bookPages.tagCount(); ++i){
+                        String s1 = this.bookPages.getStringTagAt(i);
+                        ChatComponentText chatcomponenttext = new ChatComponentText(s1);
+                        s1 = IChatComponent.Serializer.componentToJson(chatcomponenttext);
+                        this.bookPages.set(i, new NBTTagString(s1));
+                    }
+                    
                     this.bookObj.setItem(Items.written_book);
                 }
 
@@ -774,6 +823,7 @@ public class GuiGhostwriterBook extends GuiScreen
             }
         }
     }
+    
 
     protected void actionPerformed(GuiButton buttonPressed){
     	if (!buttonPressed.enabled){return;}
@@ -781,7 +831,11 @@ public class GuiGhostwriterBook extends GuiScreen
     	switch (buttonPressed.id){
     		case BTN_DONE:
     			this.mc.displayGuiScreen((GuiScreen)null);
-                this.sendBookToServer(false);
+				try {
+					this.sendBookToServer(false);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
     			break;
     			
     		case BTN_NEXT_PAGE:
@@ -816,9 +870,17 @@ public class GuiGhostwriterBook extends GuiScreen
     			
     		case BTN_FINALIZE:
     			if (this.inSigningMode){
-    	            this.sendBookToServer(true);
+    	            try {
+						this.sendBookToServer(true);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
     	            this.mc.displayGuiScreen((GuiScreen)null);
     	        }
+    			break;
+    			
+    		case BTN_VIEW_AS_SIGNED_UNSIGNED:
+    			this.viewAsUnsigned = !this.viewAsUnsigned;
     			break;
     			
     		case BTN_SAVE_BOOK:
@@ -827,6 +889,10 @@ public class GuiGhostwriterBook extends GuiScreen
     			
     		case BTN_LOAD_BOOK:
     			this.mc.displayGuiScreen(new GuiFileSelection(this));
+    			break;
+    			
+    		case BTN_AUTO_RELOAD_BOOK:
+    			this.mc.displayGuiScreen(new GuiFileSelection(this, true));
     			break;
     			
     		case BTN_COPY_BOOK:
@@ -990,6 +1056,7 @@ public class GuiGhostwriterBook extends GuiScreen
         }
     }
 
+    
     /**
      */
     private void keyTypedInBook(char character, int keycode){
@@ -1045,16 +1112,7 @@ public class GuiGhostwriterBook extends GuiScreen
             		this.titleSelected = !this.titleSelected;
             	}
             	return;
-                
-            /*
-            case Keyboard.KEY_RETURN:      //Enter
-            case Keyboard.KEY_NUMPADENTER: //Numpad enter
-                if (!this.bookTitle.isEmpty()){
-                    this.sendBookToServer(true);
-                    this.mc.displayGuiScreen((GuiScreen)null);
-                }
-                return;
-            */    
+            	
             default:
             	if (this.titleSelected){
 	                if (this.bookTitle.length() < 16 && ChatAllowedCharacters.isAllowedCharacter(character)){
@@ -1107,173 +1165,36 @@ public class GuiGhostwriterBook extends GuiScreen
         if (i <= 118 && s2.length() < 256){this.setCurrPageText(s2);}
     }
     
-    /**
-     * Helper function for drawing the components of the signing page
-     * I assume it's useless now too since we've moved to the new drawScreen method
-     */
-    @Deprecated
-    private void drawCenteredBookString(String str, int height, int color){
-    	int bookLeftSide = (this.width - this.bookImageWidth) / 2;
-        int strWidth = this.fontRendererObj.getStringWidth(str);
-        this.fontRendererObj.drawString(str, bookLeftSide + 36 + (116 - strWidth) / 2, height, color);
-    }
-
-    /**
-     * OLD DRAWSCREEN METHOD. No longer works properly. New one is below.
-     */
-    @Deprecated
-    public void drawScreen__OLD(int par1, int par2, float par3){
-    	if (this.bookIsUnsigned){
-            this.buttonPasteBook.enabled = this.clipboard.bookInClipboard;
-            
-            this.buttonPasteMultiplePages.enabled = (this.clipboard.miscPages.size() > 0);
-            if (this.buttonPasteMultiplePages.enabled){
-            	this.buttonPasteMultiplePages.displayString = "Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s");
-            }
-            else{
-            	this.buttonPasteMultiplePages.displayString = "Paste Multiple";
-            }
-    	}
-    	if (this.selectedPageA >= this.bookTotalPages || this.selectedPageB >= this.bookTotalPages){
-    		this.selectedPageA = -1;
-    		this.selectedPageB = -1;
-    	}
-    	if (this.selectedPageA != -1 && this.selectedPageB != -1 && this.selectedPageA >= 0 && 
-    			this.selectedPageA <= this.selectedPageB && this.selectedPageB < this.bookTotalPages){
-    		this.buttonCopySelectedPages.enabled = true;
-    		String xPages = ((this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
-    		this.buttonCopySelectedPages.displayString = "Copy " + xPages;
-    		this.buttonCutMultiplePages.displayString = "Cut " + xPages;
-    		this.buttonRemoveSelectedPages.displayString = "Remove " + xPages;
-    		this.buttonSelectPageA.displayString = "A: " + (this.selectedPageA+1);
-    		this.buttonSelectPageB.displayString = "B: " + (this.selectedPageB+1);
-    	}
-    	else if (this.selectedPageA != -1){
-    		this.buttonSelectPageA.displayString = "A: " + (this.selectedPageA+1);
-    		this.buttonCopySelectedPages.displayString = "Copy This Page";
-    		this.buttonCutMultiplePages.displayString = "Cut This Page";
-    		this.buttonRemoveSelectedPages.displayString = "Remove This Page";
-    	}
-    	else if (this.selectedPageB != -1){
-    		this.buttonSelectPageB.displayString = "B: " + (this.selectedPageB+1);
-    		this.buttonCopySelectedPages.displayString = "Copy This Page";
-    		this.buttonCutMultiplePages.displayString = "Cut This Page";
-    		this.buttonRemoveSelectedPages.displayString = "Remove This Page";
-    	}
-    	else{
-    		this.buttonCopySelectedPages.displayString = "Copy This Page";
-    		this.buttonCutMultiplePages.displayString = "Cut This Page";
-    		this.buttonRemoveSelectedPages.displayString = "Remove This Page";
-    		this.buttonSelectPageA.displayString = "A";
-    		this.buttonSelectPageB.displayString = "B";
-    	}
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(bookGuiTextures);
-        int bookLeftSide = (this.width - this.bookImageWidth) / 2;
-        byte b0 = 2;
-        this.drawTexturedModalRect(bookLeftSide, b0, 0, 0, this.bookImageWidth, this.bookImageHeight);
-        String s;
-        String s1;
-        int l;
-
-        if (this.inSigningMode){
-        	String cursor = "";
-            if (this.bookIsUnsigned){
-            	// Flashing cursor 
-                if (this.updateCount / 6 % 2 == 0){
-                	cursor = EnumChatFormatting.BLACK + "_";
-                }
-                else{
-                	cursor = EnumChatFormatting.GRAY + "_";
-                }
-            }
-            else{
-            	cursor = "";
-            }
-            
-            String titleLine = this.bookTitle;
-            String authorLine = this.bookAuthor;
-            
-            if (this.titleSelected){
-            	titleLine += cursor;
-            }
-            else{
-            	authorLine += cursor;
-            }
-                        
-            drawCenteredBookString("\u00A7lTitle:\u00A7r", 34, 0);
-            drawCenteredBookString(titleLine, 46, 0);
-            
-            drawCenteredBookString("\u00A7lAuthor:\u00A7r", 58, 0);
-            drawCenteredBookString(authorLine, 70, 0);
-            
-            
-            String s3 = I18n.format("book.finalizeWarning", new Object[0]);
-            this.fontRendererObj.drawSplitString(s3, bookLeftSide + 36, b0 + 100, 116, 0);
-        }
-        else{
-            s = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages)});
-            s1 = "";
-
-            if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount()){
-                s1 = this.bookPages.getStringTagAt(this.currPage);
-            }
-
-            if (this.bookIsUnsigned){
-                if (this.fontRendererObj.getBidiFlag()){
-                    s1 = s1 + "_";
-                }
-                else if (this.updateCount / 6 % 2 == 0){
-                    s1 = s1 + "" + EnumChatFormatting.BLACK + "_";
-                }
-                else{
-                    s1 = s1 + "" + EnumChatFormatting.GRAY + "_";
-                }
-            }
-
-            l = this.fontRendererObj.getStringWidth(s);
-            this.fontRendererObj.drawString(s, bookLeftSide - l + this.bookImageWidth - 44, b0 + 16, 0);
-            this.fontRendererObj.drawSplitString(s1, bookLeftSide + 36, b0 + 16 + 16, 116, 0);
-        }
-        super.drawScreen(par1, par2, par3);
-    }
     
-    
-    public IChatComponent func_175385_b(int p_175385_1_, int p_175385_2_)
-    {
-        if (this.field_175386_A == null)
-        {
+    /**
+     * I'm still not exactly sure what this is, but it takes Mouse X and Mouse Y as parameters
+     */
+    public IChatComponent func_175385_b(int mouseX, int mouseY){
+        if (this.field_175386_A == null){
             return null;
         }
-        else
-        {
-            int k = p_175385_1_ - (this.width - this.bookImageWidth) / 2 - 36;
-            int l = p_175385_2_ - 2 - 16 - 16;
+        else{
+            int k = mouseX - (this.width - this.bookImageWidth) / 2 - 36;
+            int l = mouseY - 2 - 16 - 16;
 
-            if (k >= 0 && l >= 0)
-            {
+            if (k >= 0 && l >= 0){
                 int i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
 
-                if (k <= 116 && l < this.mc.fontRendererObj.FONT_HEIGHT * i1 + i1)
-                {
+                if (k <= 116 && l < this.mc.fontRendererObj.FONT_HEIGHT * i1 + i1){
                     int j1 = l / this.mc.fontRendererObj.FONT_HEIGHT;
 
-                    if (j1 >= 0 && j1 < this.field_175386_A.size())
-                    {
+                    if (j1 >= 0 && j1 < this.field_175386_A.size()){
                         IChatComponent ichatcomponent = (IChatComponent)this.field_175386_A.get(j1);
                         int k1 = 0;
                         Iterator iterator = ichatcomponent.iterator();
 
-                        while (iterator.hasNext())
-                        {
+                        while (iterator.hasNext()){
                             IChatComponent ichatcomponent1 = (IChatComponent)iterator.next();
 
-                            if (ichatcomponent1 instanceof ChatComponentText)
-                            {
+                            if (ichatcomponent1 instanceof ChatComponentText){
                                 k1 += this.mc.fontRendererObj.getStringWidth(((ChatComponentText)ichatcomponent1).getChatComponentText_TextValue());
 
-                                if (k1 > k)
-                                {
+                                if (k1 > k){
                                     return ichatcomponent1;
                                 }
                             }
@@ -1282,17 +1203,26 @@ public class GuiGhostwriterBook extends GuiScreen
 
                     return null;
                 }
-                else
-                {
+                else{
                     return null;
                 }
             }
-            else
-            {
+            else{
                 return null;
             }
         }
     }
+    
+    
+    /** 
+     * Helper function for drawing centered strings on the screen
+     * @param str
+     */
+    private void drawCenteredString(String str, int yPos, int color, boolean dropShadow){
+    	int xPos = this.width/2 - this.fontRendererObj.getStringWidth(str)/2;
+    	this.fontRendererObj.drawString(str, xPos, yPos, color, dropShadow);
+    }
+    
     
     /**
      * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
@@ -1300,6 +1230,9 @@ public class GuiGhostwriterBook extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
     	if (this.bookIsUnsigned){
+    		if (this.autoReloadBookEnabled){
+    			this.autoReloadCheck();
+    		}
             this.buttonPasteBook.enabled = this.clipboard.bookInClipboard;
             
             this.buttonPasteMultiplePages.enabled = (this.clipboard.miscPages.size() > 0);
@@ -1308,6 +1241,12 @@ public class GuiGhostwriterBook extends GuiScreen
             }
             else{
             	this.buttonPasteMultiplePages.displayString = "Paste Multiple";
+            }
+            if (this.viewAsUnsigned){
+            	this.buttonViewAsSignedUnsigned.displayString = "View As Signed";
+            }
+            else{
+            	this.buttonViewAsSignedUnsigned.displayString = "View As Unsigned";
             }
     	}
     	if (this.selectedPageA >= this.bookTotalPages || this.selectedPageB >= this.bookTotalPages){
@@ -1345,31 +1284,15 @@ public class GuiGhostwriterBook extends GuiScreen
     	}
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(bookGuiTextures);
-        int k = (this.width - this.bookImageWidth) / 2;
-        byte b0 = 2;
-        this.drawTexturedModalRect(k, b0, 0, 0, this.bookImageWidth, this.bookImageHeight);
-        String s;
-        String s1;
+        int bookX = (this.width - this.bookImageWidth) / 2; // bookX formerly k
+        byte bookY = 2; // bookY formerly b0
+        this.drawTexturedModalRect(bookX, bookY, 0, 0, this.bookImageWidth, this.bookImageHeight);
+        
         int l;
         int i1;
 
         if (this.inSigningMode)
         {
-        	/*
-        	// Minecraft code (replaced below)
-            s = this.bookTitle;
-            if (this.bookIsUnsigned)
-            {
-                if (this.updateCount / 6 % 2 == 0)
-                {
-                    s = s + "" + EnumChatFormatting.BLACK + "_";
-                }
-                else
-                {
-                    s = s + "" + EnumChatFormatting.GRAY + "_";
-                }
-            }
-			*/
         	String cursor = "";
             if (this.bookIsUnsigned){
             	// Flashing cursor 
@@ -1397,42 +1320,75 @@ public class GuiGhostwriterBook extends GuiScreen
             // Draw the header 
             String signPageHeader = I18n.format("book.editTitle", new Object[0]);
             l = this.fontRendererObj.getStringWidth(signPageHeader);
-            this.fontRendererObj.drawString(signPageHeader, k + 36 + (116 - l) / 2, b0 + 16 + 16, 0);
+            this.fontRendererObj.drawString(signPageHeader, bookX + 36 + (116 - l) / 2, bookY + 16 + 16, 0);
             // Draw the title line
             i1 = this.fontRendererObj.getStringWidth(titleLine);
-            this.fontRendererObj.drawString(titleLine, k + 36 + (116 - i1) / 2, b0 + 48, 0);
+            this.fontRendererObj.drawString(titleLine, bookX + 36 + (116 - i1) / 2, bookY + 48, 0);
             // Draw the author line
             //String s2 = I18n.format("book.byAuthor", new Object[] {this.editingPlayer.getName()});
             int j1 = this.fontRendererObj.getStringWidth(authorLine);
-            this.fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY + authorLine, k + 36 + (116 - j1) / 2, b0 + 48 + 10, 0);
+            this.fontRendererObj.drawString(EnumChatFormatting.DARK_GRAY + authorLine, bookX + 36 + (116 - j1) / 2, bookY + 48 + 10, 0);
             // Draw the finalize warning
             String s3 = I18n.format("book.finalizeWarning", new Object[0]);
-            this.fontRendererObj.drawSplitString(s3, k + 36, b0 + 80, 116, 0);
+            this.fontRendererObj.drawSplitString(s3, bookX + 36, bookY + 80, 116, 0);
         }
         else
         {
-            s = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages)});
-            s1 = "";
+            String pageNum = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages)}); // pageNum formerly s
+            String pageText = ""; // pageText formerly s1
 
             if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount()){
-                s1 = this.bookPages.getStringTagAt(this.currPage);
+            	pageText = this.bookPages.getStringTagAt(this.currPage);
+            }
+            
+            if (this.bookIsUnsigned){
+	            // Add cursor
+	            if (this.fontRendererObj.getBidiFlag()){
+	            	pageText = pageText + "_";
+	            }
+	            else if (this.updateCount / 6 % 2 == 0){
+	            	pageText = pageText + "" + EnumChatFormatting.BLACK + "_";
+	            }
+	            else{
+	            	pageText = pageText + "" + EnumChatFormatting.GRAY + "_";
+	            }
+	            if (!this.viewAsUnsigned){
+		            // Convert to JSON
+	                ChatComponentText chatcomponenttext = new ChatComponentText(pageText);
+	                pageText = IChatComponent.Serializer.componentToJson(chatcomponenttext);
+	            }
+            }
+            else{
+            	// Add debugging GW to the bottom right of the signed book screen
+            	this.fontRendererObj.drawString("GW", this.width-12, this.height-8, 0xdddddd);
+            }
+            // I guess this is loading the current page into field_175386_A
+        	try{
+                IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(pageText);
+                this.field_175386_A = ichatcomponent != null ? GuiUtilRenderComponents.func_178908_a(ichatcomponent, 116, this.fontRendererObj, true, true) : null;
+                this.field_175387_B = this.currPage;
+        	}
+            catch (JsonParseException jsonparseexception){
+                this.field_175386_A = null;
+                this.field_175387_B = -1;
             }
 
+            /*
             if (this.bookIsUnsigned){
                 if (this.fontRendererObj.getBidiFlag()){
-                    s1 = s1 + "_";
+                	pageText = pageText + "_";
                 }
                 else if (this.updateCount / 6 % 2 == 0){
-                    s1 = s1 + "" + EnumChatFormatting.BLACK + "_";
+                	pageText = pageText + "" + EnumChatFormatting.BLACK + "_";
                 }
                 else{
-                    s1 = s1 + "" + EnumChatFormatting.GRAY + "_";
+                	pageText = pageText + "" + EnumChatFormatting.GRAY + "_";
                 }
             }
             else if (this.field_175387_B != this.currPage){
                 if (ItemEditableBook.validBookTagContents(this.bookObj.getTagCompound())){
                     try{
-                        IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(s1);
+                        IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(pageText);
                         this.field_175386_A = ichatcomponent != null ? GuiUtilRenderComponents.func_178908_a(ichatcomponent, 116, this.fontRendererObj, true, true) : null;
                     }
                     catch (JsonParseException jsonparseexception){
@@ -1444,20 +1400,28 @@ public class GuiGhostwriterBook extends GuiScreen
                     this.field_175386_A = Lists.newArrayList(chatcomponenttext);
                 }
                 this.field_175387_B = this.currPage;
-            }
-
-            l = this.fontRendererObj.getStringWidth(s);
-            this.fontRendererObj.drawString(s, k - l + this.bookImageWidth - 44, b0 + 16, 0);
-
-            if (this.field_175386_A == null){
-                this.fontRendererObj.drawSplitString(s1, k + 36, b0 + 16 + 16, 116, 0);
+            }*/
+            
+            // Draw page number
+            l = this.fontRendererObj.getStringWidth(pageNum);
+            this.fontRendererObj.drawString(pageNum, bookX - l + this.bookImageWidth - 44, bookY + 16, 0);
+            
+            // Draw page text
+            if (this.field_175386_A == null || this.viewAsUnsigned){
+            	// Render as an unsigned book
+            	this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
+            	this.drawCenteredString("Using unsigned book formatting", 186, 0xff0000, true);
             }
             else{
-                i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
+            	//Render as signed book
+            	if (this.bookIsUnsigned){
+            		this.drawCenteredString("Using signed book formatting", 186, 0xff0000, true);
+            	}
+            	i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
 
                 for (int k1 = 0; k1 < i1; ++k1){
                     IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
-                    this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), k + 36, b0 + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
+                    this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
                 }
 
                 IChatComponent ichatcomponent1 = this.func_175385_b(mouseX, mouseY);
@@ -1466,6 +1430,25 @@ public class GuiGhostwriterBook extends GuiScreen
                     this.func_175272_a(ichatcomponent1, mouseX, mouseY);
                 }
             }
+            /*
+            if (this.field_175386_A == null){
+                this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
+            }
+            else{
+                i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
+
+                for (int k1 = 0; k1 < i1; ++k1){
+                    IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
+                    this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
+                }
+
+                IChatComponent ichatcomponent1 = this.func_175385_b(mouseX, mouseY);
+
+                if (ichatcomponent1 != null){
+                    this.func_175272_a(ichatcomponent1, mouseX, mouseY);
+                }
+            }
+            */
         }
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

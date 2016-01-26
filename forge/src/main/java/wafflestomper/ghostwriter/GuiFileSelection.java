@@ -41,12 +41,24 @@ public class GuiFileSelection extends GuiScreen{
 	private String previewTitle = "";
 	private String previewAuthor = "";
 	private String previewPage = "";
+	
+	private File lastLoadedPath = null;
+	
+	private boolean autoReloadBook = false;
 
 
 	public GuiFileSelection(GuiGhostwriterBook _parentGui){
 		this.parentGui = _parentGui;
 		this.fileHandler = new FileHandler(this.tempClipboard);
 	}
+	
+	
+	public GuiFileSelection(GuiGhostwriterBook _parentGui, boolean _autoReload){
+		this.autoReloadBook = _autoReload;
+		this.parentGui = _parentGui;
+		this.fileHandler = new FileHandler(this.tempClipboard);
+	}
+	
 	
 	public void initGui(){
         this.fileHandler.currentPath = this.fileHandler.getDefaultPath();
@@ -65,6 +77,7 @@ public class GuiFileSelection extends GuiScreen{
         this.scrollList.registerScrollButtons(4, 5);
 	}
 	
+	
 	public void drawScreen(int par1, int par2, float par3){
 		this.displayPath = this.fileHandler.currentPath.getAbsolutePath();
 		this.btnLoad.enabled = this.tempClipboard.bookInClipboard;
@@ -79,11 +92,11 @@ public class GuiFileSelection extends GuiScreen{
 		}
     }
 	
+	
 	private void populateFileList(){
 		this.listItems = this.fileHandler.listFiles(this.fileHandler.currentPath);		
 	}
 	
-
 	
 	private void loadPreview(File file){
 		if(this.fileHandler.loadBook(file)){
@@ -99,9 +112,11 @@ public class GuiFileSelection extends GuiScreen{
 		}
 	}
 	
+	
 	private void goBackToParentGui(){
 		this.mc.displayGuiScreen(this.parentGui);
 	}
+	
 	
     /**
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
@@ -119,8 +134,14 @@ public class GuiFileSelection extends GuiScreen{
     	switch (buttonPressed.id){
     		case BTN_LOAD:
     			if (this.tempClipboard.bookInClipboard){
-        			this.parentGui.setClipboard(GuiFileSelection.this.tempClipboard);
-        			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+    				if (this.autoReloadBook == false){
+	        			this.parentGui.setClipboard(GuiFileSelection.this.tempClipboard);
+	        			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+    				}
+    				else{
+        				GuiFileSelection.this.parentGui.setupAutoReload(GuiFileSelection.this.tempClipboard, lastLoadedPath);
+        				new Printer().gamePrint(Printer.DARK_AQUA + "Loaded book and continuing to monitor...");
+        			}
         			Minecraft.getMinecraft().displayGuiScreen(GuiFileSelection.this.parentGui);
         		}
     			break;
@@ -137,6 +158,7 @@ public class GuiFileSelection extends GuiScreen{
     	}
     }
     
+    
     /**
      * Handles mouse input.
      */
@@ -148,6 +170,7 @@ public class GuiFileSelection extends GuiScreen{
     
     
     class ScrollList extends GuiSlot{
+    	
     	
     	private static final int SLOT_HEIGHT = 12;
     	
@@ -168,9 +191,11 @@ public class GuiFileSelection extends GuiScreen{
         	}
         }
         
+        
         protected int getSize(){
             return getPaddedSize();
         }
+        
 
         /**
          * The element in the slot that was clicked, boolean for whether it was double clicked or not
@@ -198,8 +223,14 @@ public class GuiFileSelection extends GuiScreen{
                 		//We've double-clicked on a file
                 		//It should already be loaded in if it's a real file
                 		if (GuiFileSelection.this.tempClipboard.bookInClipboard){
-                			GuiFileSelection.this.parentGui.setClipboard(GuiFileSelection.this.tempClipboard);
-                			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+                			if (GuiFileSelection.this.autoReloadBook == false){
+                				GuiFileSelection.this.parentGui.setClipboard(GuiFileSelection.this.tempClipboard);
+                				new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+                			}
+                			else{
+                				GuiFileSelection.this.parentGui.setupAutoReload(GuiFileSelection.this.tempClipboard, lastLoadedPath);
+                				new Printer().gamePrint(Printer.DARK_AQUA + "Loaded book and continuing to monitor...");
+                			}
                 			Minecraft.getMinecraft().displayGuiScreen(GuiFileSelection.this.parentGui);
                 		}
                 	}
@@ -210,12 +241,14 @@ public class GuiFileSelection extends GuiScreen{
             	File selectedFile = GuiFileSelection.this.listItems.get(slotClicked-1);
             	if (selectedFile.isFile() && !isSelected(slotClicked)){
             		GuiFileSelection.this.loadPreview(selectedFile);
+            		GuiFileSelection.this.lastLoadedPath = selectedFile;
             	}
             	else{
             		GuiFileSelection.this.previewTitle = "";
             		GuiFileSelection.this.previewAuthor = "";
             		GuiFileSelection.this.previewPage = "";
             		GuiFileSelection.this.tempClipboard.clearBook();
+            		GuiFileSelection.this.lastLoadedPath = null;
             	}
             }
             else{
@@ -225,9 +258,11 @@ public class GuiFileSelection extends GuiScreen{
         		GuiFileSelection.this.previewAuthor = "";
         		GuiFileSelection.this.previewPage = "";
         		GuiFileSelection.this.tempClipboard.clearBook();
+        		GuiFileSelection.this.lastLoadedPath = null;
         	}
             GuiFileSelection.this.slotSelected = slotClicked;
         }
+        
 
         /**
          * Returns true if the element passed in is currently selected
@@ -235,6 +270,7 @@ public class GuiFileSelection extends GuiScreen{
         protected boolean isSelected(int pos){
             return pos == GuiFileSelection.this.slotSelected;
         }
+        
 
         /**
          * Return the height of the content being scrolled
@@ -244,9 +280,11 @@ public class GuiFileSelection extends GuiScreen{
             return getPaddedSize() * SLOT_HEIGHT;
         }
 
+        
         protected void drawBackground(){
             GuiFileSelection.this.drawDefaultBackground();
         }
+
         
         protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY){
         	List<File> list= GuiFileSelection.this.listItems;
@@ -273,6 +311,4 @@ public class GuiFileSelection extends GuiScreen{
             GuiFileSelection.this.drawString(GuiFileSelection.this.fontRendererObj, s, slotX + 2, slotY + 1, color);
         }
     }
-		
-	
 }
