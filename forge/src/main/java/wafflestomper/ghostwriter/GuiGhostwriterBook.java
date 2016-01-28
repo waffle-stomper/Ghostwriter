@@ -1115,7 +1115,7 @@ public class GuiGhostwriterBook extends GuiScreen
             	
             default:
             	if (this.titleSelected){
-	                if (this.bookTitle.length() < 64 && ChatAllowedCharacters.isAllowedCharacter(character)){
+	                if (this.bookTitle.length() < 32 && ChatAllowedCharacters.isAllowedCharacter(character)){
 	                    this.bookTitle = this.bookTitle + Character.toString(character);
 	                }
             	}
