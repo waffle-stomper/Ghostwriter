@@ -806,7 +806,6 @@ public class GuiGhostwriterBook extends GuiScreen
                     s = "MC|BSign";
                     this.bookObj.setTagInfo("author", new NBTTagString(this.bookAuthor.trim())); // I'm reasonably sure this is no longer supported
                     this.bookObj.setTagInfo("title", new NBTTagString(this.bookTitle.trim()));
-
                     for (int i = 0; i < this.bookPages.tagCount(); ++i){
                         String s1 = this.bookPages.getStringTagAt(i);
                         ChatComponentText chatcomponenttext = new ChatComponentText(s1);
@@ -1109,13 +1108,14 @@ public class GuiGhostwriterBook extends GuiScreen
                 
             case Keyboard.KEY_TAB:
             	if (this.inSigningMode){
-            		this.titleSelected = !this.titleSelected;
+            		// Disabled since you can no longer set the author with the default server
+            		//this.titleSelected = !this.titleSelected;
             	}
             	return;
             	
             default:
             	if (this.titleSelected){
-	                if (this.bookTitle.length() < 16 && ChatAllowedCharacters.isAllowedCharacter(character)){
+	                if (this.bookTitle.length() < 64 && ChatAllowedCharacters.isAllowedCharacter(character)){
 	                    this.bookTitle = this.bookTitle + Character.toString(character);
 	                }
             	}
