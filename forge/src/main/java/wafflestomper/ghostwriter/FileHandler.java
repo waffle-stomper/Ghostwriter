@@ -137,13 +137,13 @@ public class FileHandler {
 	    	// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
 	    	if (encoding == "UTF-8"){
 	    		this.printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
-	    		// Try ISO-8859-1
+	    		// Try ISO-8859-15
 	    		try {
 					br.close();
 				} catch (IOException exc) {
 					e.printStackTrace();
 				}
-	    		return readFile(path, "ISO-8859-1");
+	    		return readFile(path, "ISO-8859-15");
 	    	}
 	    	this.printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
 	    	return null;

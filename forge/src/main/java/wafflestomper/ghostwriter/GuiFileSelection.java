@@ -99,7 +99,7 @@ public class GuiFileSelection extends GuiScreen{
 	
 	
 	private void loadPreview(File file){
-		if(this.fileHandler.loadBook(file)){
+		if(this.fileHandler.loadBook(file) && this.tempClipboard.pages.size() > 0){
 			this.previewAuthor = this.tempClipboard.author;
 			this.previewTitle = this.tempClipboard.title;
 			this.previewPage = BookUtilities.truncateStringPixels(this.tempClipboard.pages.get(0).replaceAll("\n", " "), "...", 200, false);
@@ -184,7 +184,8 @@ public class GuiFileSelection extends GuiScreen{
         	int minSlots = (int)Math.ceil(scrollHeight/SLOT_HEIGHT);
         	
         	if (GuiFileSelection.this.listItems.size() >= minSlots){
-        		return GuiFileSelection.this.listItems.size();
+        		//The extra slot is for the parent directory item (..)
+        		return GuiFileSelection.this.listItems.size() + 1;
         	}
         	else{
         		return minSlots;
@@ -307,7 +308,6 @@ public class GuiFileSelection extends GuiScreen{
     				color = 0x00FF00;
     			}
         	}
-        	
             GuiFileSelection.this.drawString(GuiFileSelection.this.fontRendererObj, s, slotX + 2, slotY + 1, color);
         }
     }
