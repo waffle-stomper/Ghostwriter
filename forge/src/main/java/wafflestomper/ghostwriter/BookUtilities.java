@@ -5,10 +5,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gson.JsonParseException;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ResourceLocation;
 
 public class BookUtilities {
@@ -310,4 +314,35 @@ public class BookUtilities {
 		return out;
 	}
 	
+	
+	/**
+	 * Converts the new JSON strings with their escaped quotation marks back into regular old strings
+	 * Hopefully this is just temporary.
+	 */
+	public static String deJSONify(String jsonIn){
+		/*
+		 //This is from the rendering algorithm and seems to produce usable results
+		 //It looks like it iterates through line by line, converting them and then printing them on the screen
+		 i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
+
+        for (int k1 = 0; k1 < i1; ++k1)
+        {
+            IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
+            this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), k + 36, b0 + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
+        }
+		 */
+		
+		try{
+    		IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(jsonIn);
+    		if (ichatcomponent != null){
+    			String out = ichatcomponent.getFormattedText();
+    			return(out);
+    		}
+        }
+        catch (JsonParseException jsonparseexception){
+        	//Do nothing for now
+            //jsonparseexception.printStackTrace();
+        }
+		return(jsonIn);
+	}
 }

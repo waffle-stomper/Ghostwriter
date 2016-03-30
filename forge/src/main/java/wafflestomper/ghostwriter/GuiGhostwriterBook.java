@@ -386,7 +386,7 @@ public class GuiGhostwriterBook extends GuiScreen
             this.bookPages = new NBTTagList();
             this.bookPages.appendTag(new NBTTagString(""));
             this.bookTotalPages = 1;
-        }
+        }       
     }
     
     public void setClipboard(Clipboard _clipboard){
@@ -439,7 +439,11 @@ public class GuiGhostwriterBook extends GuiScreen
     private List<String> pagesAsList(){
     	List<String> pages = new ArrayList();
     	for (int i=0; i<this.bookTotalPages; i++){
-    		pages.add(this.bookPages.getStringTagAt(i));
+            // Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings 
+            //  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
+            //  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+    		String pageText = BookUtilities.deJSONify(this.bookPages.getStringTagAt(i));
+    		pages.add(pageText);
     	}
     	return pages;
     }
@@ -780,6 +784,10 @@ public class GuiGhostwriterBook extends GuiScreen
      * New sendBookToServer for 1.8 and beyond
      */
     private void sendBookToServer(boolean signBook) throws IOException{
+    	// Quick sanity check to make sure we haven't been disconnected from the server
+    	if (this.mc.theWorld == null){
+    		return;
+    	}
         if (this.bookIsUnsigned && this.bookModified){
             if (this.bookPages != null){
                 String s;

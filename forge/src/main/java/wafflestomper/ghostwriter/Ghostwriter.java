@@ -28,7 +28,7 @@ import net.minecraft.launchwrapper.Launch;
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
 public class Ghostwriter{
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.8.0-1.7.4";
+    public static final String VERSION = "1.8.0-1.7.5";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
@@ -71,6 +71,7 @@ public class Ghostwriter{
 	 */
 	@SubscribeEvent
 	public void guiOpen(GuiOpenEvent event){
+		//if (System.currentTimeMillis() > 0){return;} // Uncomment this line to disable GW while testing
 		if (event.gui == null){return;}
 		if (event.gui instanceof GuiScreenBook){
 			EntityPlayerSP p = this.mc.thePlayer;
