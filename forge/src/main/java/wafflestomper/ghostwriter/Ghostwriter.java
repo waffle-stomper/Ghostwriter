@@ -1,21 +1,7 @@
 package wafflestomper.ghostwriter;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import org.lwjgl.input.Keyboard;
 
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
-import net.minecraftforge.client.event.GuiOpenEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreenBook;
@@ -23,12 +9,21 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
 public class Ghostwriter{
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.8.0-1.7.5";
+    public static final String VERSION = "1.8.0-1.7.6";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
@@ -79,6 +74,10 @@ public class Ghostwriter{
         	if (currStack != null){
         		Item currItem = currStack.getItem();
         		if (currItem != null){
+        			// If left shift is held down, let the standard Minecraft book GUI open
+        			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
+        				return;
+        			}
                     event.gui = new GuiGhostwriterBook(p, p.getHeldItem(), currItem.equals(Items.writable_book), this.clipboard);
         		}
         		else{
@@ -113,12 +112,13 @@ public class Ghostwriter{
     	if (event.phase == Phase.END && this.devEnv){
     		if (!this.connected){
     			if (connectWait-- <= 0){
-    				//FMLClientHandler.instance().connectToServerAtStartup("localhost", 25565);
+    				FMLClientHandler.instance().connectToServerAtStartup("localhost", 25565);
     	    		this.connected = true;
     			}
     		}
     	}
 	}
+    
 	
 	
 }
