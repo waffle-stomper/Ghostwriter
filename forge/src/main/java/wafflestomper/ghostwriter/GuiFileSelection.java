@@ -244,13 +244,6 @@ public class GuiFileSelection extends GuiScreen{
             		GuiFileSelection.this.loadPreview(selectedFile);
             		GuiFileSelection.this.lastLoadedPath = selectedFile;
             	}
-            	else{
-            		GuiFileSelection.this.previewTitle = "";
-            		GuiFileSelection.this.previewAuthor = "";
-            		GuiFileSelection.this.previewPage = "";
-            		GuiFileSelection.this.tempClipboard.clearBook();
-            		GuiFileSelection.this.lastLoadedPath = null;
-            	}
             }
             else{
             	//I am a hacker, in the worst sense of the word.

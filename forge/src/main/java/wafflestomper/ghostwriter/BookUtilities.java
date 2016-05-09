@@ -2,18 +2,13 @@ package wafflestomper.ghostwriter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import com.google.gson.JsonParseException;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
 public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 116;
@@ -333,9 +328,9 @@ public class BookUtilities {
 		 */
 		
 		try{
-    		IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(jsonIn);
-    		if (ichatcomponent != null){
-    			String out = ichatcomponent.getFormattedText();
+    		ITextComponent i = ITextComponent.Serializer.jsonToComponent(jsonIn);
+    		if (i != null){
+    			String out = i.getFormattedText();
     			return(out);
     		}
         }

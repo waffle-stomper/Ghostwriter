@@ -4,14 +4,15 @@ import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -23,7 +24,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
 public class Ghostwriter{
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.8.0-1.7.6";
+    public static final String VERSION = "1.9.0-1.7.8";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
@@ -54,11 +55,6 @@ public class Ghostwriter{
 		}
 	}
 	
-	@SubscribeEvent
-	public void useItem(PlayerUseItemEvent event){
-		System.out.println(event.toString());
-	}
-	
 	
 	/**
 	 * This glorious bastard swaps the default book GUI for the Ghostwriter screen before it even loads
@@ -67,10 +63,11 @@ public class Ghostwriter{
 	@SubscribeEvent
 	public void guiOpen(GuiOpenEvent event){
 		//if (System.currentTimeMillis() > 0){return;} // Uncomment this line to disable GW while testing
-		if (event.gui == null){return;}
-		if (event.gui instanceof GuiScreenBook){
+		GuiScreen eventGui = event.getGui();
+		if (eventGui == null){return;}
+		if (eventGui instanceof GuiScreenBook){
 			EntityPlayerSP p = this.mc.thePlayer;
-        	ItemStack currStack = p.getHeldItem();
+        	ItemStack currStack = p.getHeldItem(EnumHand.MAIN_HAND);
         	if (currStack != null){
         		Item currItem = currStack.getItem();
         		if (currItem != null){
@@ -78,7 +75,8 @@ public class Ghostwriter{
         			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
         				return;
         			}
-                    event.gui = new GuiGhostwriterBook(p, p.getHeldItem(), currItem.equals(Items.writable_book), this.clipboard);
+        			eventGui = new GuiGhostwriterBook(p, currStack, currItem.equals(Items.writable_book), this.clipboard);
+        			event.setGui(eventGui);
         		}
         		else{
             		rateLimitedDebugMessage("this.mc.thePlayer.getHeldItem().getItem() is null!");
