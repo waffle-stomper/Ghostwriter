@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
 public class Ghostwriter{
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.9.0-1.7.8";
+    public static final String VERSION = "1.9.4-1.7.9";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
@@ -62,7 +62,6 @@ public class Ghostwriter{
 	 */
 	@SubscribeEvent
 	public void guiOpen(GuiOpenEvent event){
-		//if (System.currentTimeMillis() > 0){return;} // Uncomment this line to disable GW while testing
 		GuiScreen eventGui = event.getGui();
 		if (eventGui == null){return;}
 		if (eventGui instanceof GuiScreenBook){
@@ -75,7 +74,7 @@ public class Ghostwriter{
         			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
         				return;
         			}
-        			eventGui = new GuiGhostwriterBook(p, currStack, currItem.equals(Items.writable_book), this.clipboard);
+        			eventGui = new GuiGhostwriterBook(p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
         			event.setGui(eventGui);
         		}
         		else{

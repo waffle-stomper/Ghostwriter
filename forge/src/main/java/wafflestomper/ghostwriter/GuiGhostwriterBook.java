@@ -210,7 +210,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiGhostwriterBook extends GuiScreen
 {	
     private static final Logger logger = LogManager.getLogger();
-    private static final ResourceLocation bookGuiTextures = new ResourceLocation("textures/gui/book.png");
+    private static final ResourceLocation BOOK_GUI_TEXTURES = new ResourceLocation("textures/gui/book.png");
     /** The player editing the book */
     private final EntityPlayer editingPlayer;
     private final ItemStack bookObj;
@@ -226,9 +226,11 @@ public class GuiGhostwriterBook extends GuiScreen
     private int bookImageHeight = 192;
     private int bookTotalPages = 1;
     private int currPage;
+    private int cachedPage = -1;
     private NBTTagList bookPages;
     private String bookTitle = "";
     private String bookAuthor = "";
+    private List<ITextComponent> cachedComponents;
     private List field_175386_A;
     private int field_175387_B = -1;
     private boolean viewAsUnsigned = false;
@@ -826,7 +828,8 @@ public class GuiGhostwriterBook extends GuiScreen
 
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
                 packetbuffer.writeItemStackToBuffer(this.bookObj);
-                this.mc.getNetHandler().addToSendQueue(new CPacketCustomPayload(s, packetbuffer));
+                //this.mc.getNetHandler().addToSendQueue(new CPacketCustomPayload(s, packetbuffer)); //From 1.9
+                this.mc.getConnection().sendPacket(new CPacketCustomPayload(s, packetbuffer));
             }
         }
     }
@@ -1187,20 +1190,22 @@ public class GuiGhostwriterBook extends GuiScreen
     ###########################################################################################################################
     ###########################################################################################################################
     */
-    public static String func_178909_a(String p_178909_0_, boolean p_178909_1_){
-        return !p_178909_1_ && !Minecraft.getMinecraft().gameSettings.chatColours ? TextFormatting.getTextWithoutFormattingCodes(p_178909_0_) : p_178909_0_;
+    public static String removeTextColorsIfConfigured(String text, boolean forceColor)
+    {
+        return !forceColor && !Minecraft.getMinecraft().gameSettings.chatColours ? TextFormatting.getTextWithoutFormattingCodes(text) : text;
     }
-    public static List<ITextComponent> splitText(ITextComponent p_178908_0_, int p_178908_1_, FontRenderer p_178908_2_, boolean p_178908_3_, boolean p_178908_4_)
+
+    public static List<ITextComponent> splitText(ITextComponent textComponent, int maxTextLenght, FontRenderer fontRendererIn, boolean p_178908_3_, boolean forceTextColor)
     {
         int i = 0;
         ITextComponent itextcomponent = new TextComponentString("");
         List<ITextComponent> list = Lists.<ITextComponent>newArrayList();
-        List<ITextComponent> list1 = Lists.newArrayList(p_178908_0_);
+        List<ITextComponent> list1 = Lists.newArrayList(textComponent);
 
         for (int j = 0; j < ((List)list1).size(); ++j)
         {
             ITextComponent itextcomponent1 = (ITextComponent)list1.get(j);
-            String s = itextcomponent1.getUnformattedTextForChat();
+            String s = itextcomponent1.getUnformattedComponentText();
             boolean flag = false;
 
             if (s.contains("\n"))
@@ -1209,27 +1214,27 @@ public class GuiGhostwriterBook extends GuiScreen
                 String s1 = s.substring(k + 1);
                 s = s.substring(0, k + 1);
                 TextComponentString textcomponentstring = new TextComponentString(s1);
-                textcomponentstring.setChatStyle(itextcomponent1.getChatStyle().createShallowCopy());
+                textcomponentstring.setStyle(itextcomponent1.getStyle().createShallowCopy());
                 list1.add(j + 1, textcomponentstring);
                 flag = true;
             }
 
-            String s4 = func_178909_a(itextcomponent1.getChatStyle().getFormattingCode() + s, p_178908_4_);
+            String s4 = removeTextColorsIfConfigured(itextcomponent1.getStyle().getFormattingCode() + s, forceTextColor);
             String s5 = s4.endsWith("\n") ? s4.substring(0, s4.length() - 1) : s4;
-            int i1 = p_178908_2_.getStringWidth(s5);
+            int i1 = fontRendererIn.getStringWidth(s5);
             TextComponentString textcomponentstring1 = new TextComponentString(s5);
-            textcomponentstring1.setChatStyle(itextcomponent1.getChatStyle().createShallowCopy());
+            textcomponentstring1.setStyle(itextcomponent1.getStyle().createShallowCopy());
 
-            if (i + i1 > p_178908_1_)
+            if (i + i1 > maxTextLenght)
             {
-                String s2 = p_178908_2_.trimStringToWidth(s4, p_178908_1_ - i, false);
+                String s2 = fontRendererIn.trimStringToWidth(s4, maxTextLenght - i, false);
                 String s3 = s2.length() < s4.length() ? s4.substring(s2.length()) : null;
 
                 if (s3 != null && !s3.isEmpty())
                 {
                     int l = s2.lastIndexOf(" ");
 
-                    if (l >= 0 && p_178908_2_.getStringWidth(s4.substring(0, l)) > 0)
+                    if (l >= 0 && fontRendererIn.getStringWidth(s4.substring(0, l)) > 0)
                     {
                         s2 = s4.substring(0, l);
 
@@ -1248,18 +1253,17 @@ public class GuiGhostwriterBook extends GuiScreen
                     //Note that this next line has been commented out to remove the Forge fix.
                     //s3 = FontRenderer.getFormatFromString(s2) + s3; //Forge: Fix chat formatting not surviving line wrapping.
                     TextComponentString textcomponentstring2 = new TextComponentString(s3);
-                    textcomponentstring2.setChatStyle(itextcomponent1.getChatStyle().createShallowCopy());
+                    textcomponentstring2.setStyle(itextcomponent1.getStyle().createShallowCopy());
                     list1.add(j + 1, textcomponentstring2);
-                    
                 }
 
-                i1 = p_178908_2_.getStringWidth(s2);
+                i1 = fontRendererIn.getStringWidth(s2);
                 textcomponentstring1 = new TextComponentString(s2);
-                textcomponentstring1.setChatStyle(itextcomponent1.getChatStyle().createShallowCopy());
+                textcomponentstring1.setStyle(itextcomponent1.getStyle().createShallowCopy());
                 flag = true;
             }
 
-            if (i + i1 <= p_178908_1_)
+            if (i + i1 <= maxTextLenght)
             {
                 i += i1;
                 itextcomponent.appendSibling(textcomponentstring1);
@@ -1283,6 +1287,7 @@ public class GuiGhostwriterBook extends GuiScreen
     
     
     
+    
     /** 
      * Helper function for drawing centered strings on the screen
      * @param str
@@ -1293,9 +1298,13 @@ public class GuiGhostwriterBook extends GuiScreen
     }
     
     
-    public ITextComponent func_175385_b(int p_175385_1_, int p_175385_2_)
+    /**
+     * @param p_175385_1_ --> Mouse X
+     * @param p_175385_2_ --> Mouse Y
+     */
+    public ITextComponent getClickedComponentAt(int p_175385_1_, int p_175385_2_)
     {
-        if (this.field_175386_A == null)
+        if (this.cachedComponents == null)
         {
             return null;
         }
@@ -1306,22 +1315,22 @@ public class GuiGhostwriterBook extends GuiScreen
 
             if (i >= 0 && j >= 0)
             {
-                int k = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
+                int k = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.cachedComponents.size());
 
                 if (i <= 116 && j < this.mc.fontRendererObj.FONT_HEIGHT * k + k)
                 {
                     int l = j / this.mc.fontRendererObj.FONT_HEIGHT;
 
-                    if (l >= 0 && l < this.field_175386_A.size())
+                    if (l >= 0 && l < this.cachedComponents.size())
                     {
-                        ITextComponent itextcomponent = (ITextComponent)this.field_175386_A.get(l);
+                        ITextComponent itextcomponent = (ITextComponent)this.cachedComponents.get(l);
                         int i1 = 0;
 
                         for (ITextComponent itextcomponent1 : itextcomponent)
                         {
                             if (itextcomponent1 instanceof TextComponentString)
                             {
-                                i1 += this.mc.fontRendererObj.getStringWidth(((TextComponentString)itextcomponent1).getChatComponentText_TextValue());
+                                i1 += this.mc.fontRendererObj.getStringWidth(((TextComponentString)itextcomponent1).getText());
 
                                 if (i1 > i)
                                 {
@@ -1347,7 +1356,7 @@ public class GuiGhostwriterBook extends GuiScreen
     
     
     /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
+     * Draws the screen and all the components in it.
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
@@ -1405,59 +1414,67 @@ public class GuiGhostwriterBook extends GuiScreen
     		this.buttonSelectPageB.displayString = "B";
     	}
     	
-    	
-    	
-    	
-    	GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(bookGuiTextures);
-        int bookX = (this.width - this.bookImageWidth) / 2; // bookX formerly i [1.9]
-        int bookY = 2; // bookY formerly j [1.9]
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.mc.getTextureManager().bindTexture(BOOK_GUI_TEXTURES);
+        int bookX = (this.width - this.bookImageWidth) / 2; //bookX formerly i [1.9.4]
+        int bookY = 2; //bookY formerly j [1.9.4]
         this.drawTexturedModalRect(bookX, bookY, 0, 0, this.bookImageWidth, this.bookImageHeight);
 
-        if (this.bookGettingSigned){
+        if (this.bookGettingSigned)
+        {
             String s = this.bookTitle;
 
-            if (this.bookIsUnsigned){
-                if (this.updateCount / 6 % 2 == 0){
+            if (this.bookIsUnsigned)
+            {
+            	//Add the cursor
+                if (this.updateCount / 6 % 2 == 0)
+                {
                     s = s + "" + TextFormatting.BLACK + "_";
                 }
-                else{
+                else
+                {
                     s = s + "" + TextFormatting.GRAY + "_";
                 }
             }
-
-            // Draw the header
+            
+            //Draw the header
             String signPageHeader = I18n.format("book.editTitle", new Object[0]);
             int k = this.fontRendererObj.getStringWidth(signPageHeader);
             this.fontRendererObj.drawString(signPageHeader, bookX + 36 + (116 - k) / 2, bookY + 16 + 16, 0);
-            // Draw the title line
+            //Draw the title line
             int l = this.fontRendererObj.getStringWidth(s);
             this.fontRendererObj.drawString(s, bookX + 36 + (116 - l) / 2, bookY + 48, 0);
-            // Draw the author line
+            //Draw the author line
             String s2 = I18n.format("book.byAuthor", new Object[] {this.editingPlayer.getName()});
             int i1 = this.fontRendererObj.getStringWidth(s2);
             this.fontRendererObj.drawString(TextFormatting.DARK_GRAY + s2, bookX + 36 + (116 - i1) / 2, bookY + 48 + 10, 0);
-            // Draw the finalize warning
+            //Draw the finalize warning
             String s3 = I18n.format("book.finalizeWarning", new Object[0]);
             this.fontRendererObj.drawSplitString(s3, bookX + 36, bookY + 80, 116, 0);
         }
-        else{
+        else
+        {
             String pageIndicator = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages)});
             String pageText = "";
 
-            if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount()){
+            if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount())
+            {
                 pageText = this.bookPages.getStringTagAt(this.currPage);
             }
 
-            if (this.bookIsUnsigned){
-            	// Add cursor
-                if (this.fontRendererObj.getBidiFlag()){
+            if (this.bookIsUnsigned)
+            {
+            	//Add cursor
+                if (this.fontRendererObj.getBidiFlag())
+                {
                     pageText = pageText + "_";
                 }
-                else if (this.updateCount / 6 % 2 == 0){
+                else if (this.updateCount / 6 % 2 == 0)
+                {
                     pageText = pageText + "" + TextFormatting.BLACK + "_";
                 }
-                else{
+                else
+                {
                     pageText = pageText + "" + TextFormatting.GRAY + "_";
                 }
                 if (!this.viewAsUnsigned){
@@ -1467,239 +1484,74 @@ public class GuiGhostwriterBook extends GuiScreen
 	            }
             }
             
-            // I guess this is loading the current page into field_175386_A
-            // It was wrapped in some other conditionals, but since we want to use it with unsigned books too, those have been removed
-            try{
+            // This was wrapped in some other conditionals, but since we want to use it with unsigned books too, those have been removed
+            try
+            {
                 ITextComponent itextcomponent = ITextComponent.Serializer.jsonToComponent(pageText);
-                //this.field_175386_A = itextcomponent != null ? GuiUtilRenderComponents.splitText(itextcomponent, 116, this.fontRendererObj, true, true) : null;
-                this.field_175386_A = itextcomponent != null ? this.splitText(itextcomponent, 116, this.fontRendererObj, true, true) : null;
-                this.field_175387_B = this.currPage;
+                // Note that we're using a local version of the splitText method with the format wrapping fix removed
+                this.cachedComponents = itextcomponent != null ? this.splitText(itextcomponent, 116, this.fontRendererObj, true, true) : null;
             }
-            catch (JsonParseException var13){
-                this.field_175386_A = null;
-                this.field_175387_B = -1;
+            catch (JsonParseException var13)
+            {
+                this.cachedComponents = null;
             }
-            
+
+            //Draw page indicator
             int pageIndWidth = this.fontRendererObj.getStringWidth(pageIndicator);
             this.fontRendererObj.drawString(pageIndicator, bookX - pageIndWidth + this.bookImageWidth - 44, bookY + 16, 0);
 
-            if (this.field_175386_A == null){
+            
+            if (this.cachedComponents == null)
+            {
             	// Render as an unsigned book
                 this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
                 this.drawCenteredString("Using unsigned book formatting", 186, 0xff0000, true);
             }
-            else{
+            else
+            {
             	//Render as signed book
             	if (this.bookIsUnsigned){
             		this.drawCenteredString("Using signed book formatting", 186, 0xff0000, true);
             	}
-                int k1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
+                int k1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.cachedComponents.size());
 
-                for (int l1 = 0; l1 < k1; ++l1){
-                    ITextComponent itextcomponent2 = (ITextComponent)this.field_175386_A.get(l1);
+                for (int l1 = 0; l1 < k1; ++l1)
+                {
+                    ITextComponent itextcomponent2 = (ITextComponent)this.cachedComponents.get(l1);
                     this.fontRendererObj.drawString(itextcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + l1 * this.fontRendererObj.FONT_HEIGHT, 0);
                 }
 
-                ITextComponent itextcomponent1 = this.func_175385_b(mouseX, mouseY);
+                ITextComponent itextcomponent1 = this.getClickedComponentAt(mouseX, mouseY);
 
-                if (itextcomponent1 != null){
+                if (itextcomponent1 != null)
+                {
                     this.handleComponentHover(itextcomponent1, mouseX, mouseY);
                 }
             }
         }
-        
+
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
-    
-    @Deprecated
-    public void old_drawscreen(int mouseX, int mouseY, float partialTicks){
-    	
-    	GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(bookGuiTextures);
-        int bookX = (this.width - this.bookImageWidth) / 2; // bookX formerly k [1.8] or i [1.9]
-        byte bookY = 2; // bookY formerly b0
-        this.drawTexturedModalRect(bookX, bookY, 0, 0, this.bookImageWidth, this.bookImageHeight);
         
-        int l;
-        int i1;
-
-        if (this.bookGettingSigned)
-        {
-        	String cursor = ""; 
-            if (this.bookIsUnsigned){
-            	// Flashing cursor 
-                if (this.updateCount / 6 % 2 == 0){
-                	cursor = ChatFormatting.BLACK + "_";
-                }
-                else{
-                	cursor = ChatFormatting.GRAY + "_";
-                }
-            }
-            else{
-            	cursor = "";
-            }
-            
-            String titleLine = this.bookTitle;
-            String authorLine = this.bookAuthor;
-            
-            if (this.titleSelected){
-            	titleLine += cursor;
-            }
-            else{
-            	authorLine += cursor;
-            }
-        	
-            // Draw the header 
-            String signPageHeader = I18n.format("book.editTitle", new Object[0]);
-            l = this.fontRendererObj.getStringWidth(signPageHeader);
-            this.fontRendererObj.drawString(signPageHeader, bookX + 36 + (116 - l) / 2, bookY + 16 + 16, 0);
-            // Draw the title line
-            i1 = this.fontRendererObj.getStringWidth(titleLine);
-            this.fontRendererObj.drawString(titleLine, bookX + 36 + (116 - i1) / 2, bookY + 48, 0);
-            // Draw the author line
-            //String s2 = I18n.format("book.byAuthor", new Object[] {this.editingPlayer.getName()});
-            int j1 = this.fontRendererObj.getStringWidth(authorLine);
-            this.fontRendererObj.drawString(ChatFormatting.DARK_GRAY + authorLine, bookX + 36 + (116 - j1) / 2, bookY + 48 + 10, 0);
-            // Draw the finalize warning
-            String s3 = I18n.format("book.finalizeWarning", new Object[0]);
-            this.fontRendererObj.drawSplitString(s3, bookX + 36, bookY + 80, 116, 0);
-        }
-        else
-        {
-            String pageNum = I18n.format("book.pageIndicator", new Object[] {Integer.valueOf(this.currPage + 1), Integer.valueOf(this.bookTotalPages)}); // pageNum formerly s
-            String pageText = ""; // pageText formerly s1
-
-            if (this.bookPages != null && this.currPage >= 0 && this.currPage < this.bookPages.tagCount()){
-            	pageText = this.bookPages.getStringTagAt(this.currPage);
-            }
-            
-            if (this.bookIsUnsigned){
-	            // Add cursor
-	            if (this.fontRendererObj.getBidiFlag()){
-	            	pageText = pageText + "_";
-	            }
-	            else if (this.updateCount / 6 % 2 == 0){
-	            	pageText = pageText + "" + ChatFormatting.BLACK + "_";
-	            }
-	            else{
-	            	pageText = pageText + "" + ChatFormatting.GRAY + "_";
-	            }
-	            if (!this.viewAsUnsigned){
-		            // Convert to JSON
-	                TextComponentString chatcomponenttext = new TextComponentString(pageText);
-	                pageText = ITextComponent.Serializer.componentToJson(chatcomponenttext);
-	            }
-            }
-            else{
-            	// Add debugging GW to the bottom right of the signed book screen
-            	this.fontRendererObj.drawString("GW", this.width-12, this.height-8, 0xdddddd);
-            }
-            // I guess this is loading the current page into field_175386_A
-        	try{
-                ITextComponent ichatcomponent = ITextComponent.Serializer.jsonToComponent(pageText);
-                this.field_175386_A = ichatcomponent != null ? GuiUtilRenderComponents.splitText(ichatcomponent, 116, this.fontRendererObj, true, true) : null;
-                this.field_175387_B = this.currPage;
-        	}
-            catch (JsonParseException jsonparseexception){
-                this.field_175386_A = null;
-                this.field_175387_B = -1;
-            }
-
-            /*
-            if (this.bookIsUnsigned){
-                if (this.fontRendererObj.getBidiFlag()){
-                	pageText = pageText + "_";
-                }
-                else if (this.updateCount / 6 % 2 == 0){
-                	pageText = pageText + "" + EnumChatFormatting.BLACK + "_";
-                }
-                else{
-                	pageText = pageText + "" + EnumChatFormatting.GRAY + "_";
-                }
-            }
-            else if (this.field_175387_B != this.currPage){
-                if (ItemEditableBook.validBookTagContents(this.bookObj.getTagCompound())){
-                    try{
-                        IChatComponent ichatcomponent = IChatComponent.Serializer.jsonToComponent(pageText);
-                        this.field_175386_A = ichatcomponent != null ? GuiUtilRenderComponents.func_178908_a(ichatcomponent, 116, this.fontRendererObj, true, true) : null;
-                    }
-                    catch (JsonParseException jsonparseexception){
-                        this.field_175386_A = null;
-                    }
-                }
-                else{
-                    ChatComponentText chatcomponenttext = new ChatComponentText(EnumChatFormatting.DARK_RED.toString() + "* Invalid book tag *");
-                    this.field_175386_A = Lists.newArrayList(chatcomponenttext);
-                }
-                this.field_175387_B = this.currPage;
-            }*/
-            
-            // Draw page number
-            l = this.fontRendererObj.getStringWidth(pageNum);
-            this.fontRendererObj.drawString(pageNum, bookX - l + this.bookImageWidth - 44, bookY + 16, 0);
-            
-            // Draw page text
-            if (this.field_175386_A == null || this.viewAsUnsigned){
-            	// Render as an unsigned book
-            	this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
-            	this.drawCenteredString("Using unsigned book formatting", 186, 0xff0000, true);
-            }
-            else{
-            	//Render as signed book
-            	if (this.bookIsUnsigned){
-            		this.drawCenteredString("Using signed book formatting", 186, 0xff0000, true);
-            	}
-            	i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
-
-                for (int k1 = 0; k1 < i1; ++k1){
-                    ITextComponent ichatcomponent2 = (ITextComponent)this.field_175386_A.get(k1);
-                    this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
-                }
-
-                ITextComponent ichatcomponent1 = this.func_175385_b(mouseX, mouseY);
-
-                if (ichatcomponent1 != null){
-                    this.handleComponentHover(ichatcomponent1, mouseX, mouseY);
-                }
-            }
-            /*
-            if (this.field_175386_A == null){
-                this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
-            }
-            else{
-                i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
-                for (int k1 = 0; k1 < i1; ++k1){
-                    IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
-                    this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
-                }
-                IChatComponent ichatcomponent1 = this.func_175385_b(mouseX, mouseY);
-                if (ichatcomponent1 != null){
-                    this.func_175272_a(ichatcomponent1, mouseX, mouseY);
-                }
-            }
-            */
-        }
-    }
     
-
     @SideOnly(Side.CLIENT)
     static class NextPageButton extends GuiButton{
-            private final boolean field_146151_o;
+            private final boolean isForward;
 
             public NextPageButton(int par1, int par2, int par3, boolean par4){
                 super(par1, par2, par3, 23, 13, "");
-                this.field_146151_o = par4;
+                this.isForward = par4;
             }
             
             public void drawButton(Minecraft mc, int p_146112_2_, int p_146112_3_){
                 if (this.visible){
                     boolean flag = p_146112_2_ >= this.xPosition && p_146112_3_ >= this.yPosition && p_146112_2_ < this.xPosition + this.width && p_146112_3_ < this.yPosition + this.height;
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                    mc.getTextureManager().bindTexture(GuiGhostwriterBook.bookGuiTextures);
+                    mc.getTextureManager().bindTexture(GuiGhostwriterBook.BOOK_GUI_TEXTURES);
                     int k = 0;
                     int l = 192;
                     if (flag){k += 23;}
-                    if (!this.field_146151_o){l += 13;}
+                    if (!this.isForward){l += 13;}
                     this.drawTexturedModalRect(this.xPosition, this.yPosition, k, l, 23, 13);
                 }
             }
