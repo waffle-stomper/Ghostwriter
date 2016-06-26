@@ -13,7 +13,6 @@ import net.minecraft.launchwrapper.Launch;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -23,19 +22,17 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
 public class Ghostwriter{
+	
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.9.4-1.7.9";
+    public static final String VERSION = "1.10.0-1.8.0";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
 	private Printer printer = new Printer();
 	public Clipboard clipboard = new Clipboard();
-	private int connectWait = 10;
-	private boolean connected = false;
-	private int firstGuiOpenWait = 20;
-	private boolean firstGuiOpen = false;
 	boolean devEnv = false;
 	private long lastMessage = 0;
+	
 	
 	public Ghostwriter(){
 		FMLCommonHandler.instance().bus().register(this);
@@ -86,36 +83,4 @@ public class Ghostwriter{
         	}
 		}
 	}
-	
-	
-    @SubscribeEvent
-    public void renderTick(RenderTickEvent event){
-    	if (event.phase == Phase.START){
-    		// Swap the default GuiScreenBook for Ghostwriter
-          
-            // THESE ARE USED IN TESTING ONLY!! DISABLE BEFORE RELEASE !!
-    		if (!firstGuiOpen && this.devEnv){
-    			if (firstGuiOpenWait-- <= 0){
-    				firstGuiOpen = true;
-    				//open the file selection gui
-    				//this.mc.displayGuiScreen(new GuiFileSelection(new GuiGhostwriterBook(this.mc.thePlayer, this.mc.thePlayer.getHeldItem(), this.mc.thePlayer.getHeldItem().getItem().equals(Items.writable_book), this.clipboard)));
-    				
-    				//just open the ghostwriter gui
-    				//this.mc.displayGuiScreen(new GuiGhostwriterBook(this.mc.thePlayer, this.mc.thePlayer.getHeldItem(), this.mc.thePlayer.getHeldItem().getItem().equals(Items.writable_book), this.clipboard));		
-    			}
-    		}
-    	}
-    	
-    	if (event.phase == Phase.END && this.devEnv){
-    		if (!this.connected){
-    			if (connectWait-- <= 0){
-    				FMLClientHandler.instance().connectToServerAtStartup("localhost", 25565);
-    	    		this.connected = true;
-    			}
-    		}
-    	}
-	}
-    
-	
-	
 }
