@@ -20,12 +20,12 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "1.10.2-1.8.1"
+version = "1.10.0-1.8.0"
 group= "wafflestomper" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Ghostwriter"
 
 minecraft {
-    version = "1.10.2-12.18.1.2014"
+    version = "1.10-12.18.0.1996-1.10.0"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
