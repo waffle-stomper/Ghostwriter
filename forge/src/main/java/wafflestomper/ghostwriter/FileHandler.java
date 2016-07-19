@@ -68,6 +68,10 @@ public class FileHandler {
 		return this.signaturePath;
 	}
 	
+	public File getSavePath(){
+		return this.bookSavePath;
+	}
+	
 	public List<File> listFiles(File path){
 		if (!path.getAbsolutePath().equals(this.lastCheckedPath)){
 			this.lastCheckedPath = path.getAbsolutePath();
@@ -261,11 +265,15 @@ public class FileHandler {
 	
 	
 	public boolean loadBook(File filePath){
+		// Handle bookwork books in .txt files
 		if (filePath.getName().endsWith(".txt")){
-			System.out.println("Loading bookworm book...");
+			System.out.println("Trying to load .txt as bookworm book...");
 			if (loadBookwormBook(filePath)){return true;}
+			System.out.println("Trying to load .txt as regular text file...");
+			if (loadPlainText(filePath)){return true;}
 		}
-		else if (filePath.getName().endsWith(".ghb")){
+		//Handle Ghostwriter books in .ghb
+		if (filePath.getName().endsWith(".ghb")){
 			System.out.println("Loading GHB book..." + filePath);
 			if (loadBookFromGHBFile(filePath)){return true;}
 		}
@@ -290,6 +298,24 @@ public class FileHandler {
 		return strIn;
 	}
 	
+	
+	public boolean loadPlainText(File filePath){
+		Clipboard book = new Clipboard();
+		List<String> rawFile = readFile(filePath);
+		if (rawFile == null || rawFile.isEmpty()){
+			//File was not read successfully
+			return false;
+		}
+		//Remove comments and anything else that can't be stored in a Minecraft book
+		String concatFile = "";
+		for (String line : rawFile){
+			concatFile += line + "\n";
+		}
+		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>><<<<>>>><<<<"));
+		book.bookInClipboard = true;
+		this.clipboard.clone(book);
+		return true;
+	}
 	
 	
 	public boolean loadBookFromGHBFile(File filePath){
@@ -335,11 +361,10 @@ public class FileHandler {
 	}
 	
 	
-	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
+	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		this.printer.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList();
-		String utcTime = getUTC();
-		toWrite.add("//Book saved in GHB format at " + utcTime);
+		toWrite.add("//Book saved in GHB format at " + getUTC());
 		if (!title.isEmpty()){toWrite.add("title:" + title);}
 		if (!author.isEmpty()){toWrite.add("author:" + author);}
 		toWrite.add("//=======================================");
@@ -362,17 +387,30 @@ public class FileHandler {
 				toWrite.add(">>>>");
 			}
 		}
-		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-		File saveFile = new File(this.bookSavePath, title + "_" + author + "_" + utcTime + ".ghb");
-		if (writeFile(toWrite, saveFile)){
-			this.printer.gamePrint(Printer.GREEN + "Book saved to: " + saveFile);
+		if (writeFile(toWrite, savePath)){
+			this.printer.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
 			return true;
 		}
 		else{
 			this.printer.gamePrint(printer.RED + "WRITING BOOK TO DISK FAILED!");
 			return false;
 		}
+	}
+	
+	
+	/**
+	 * This supports legacy type saving where the filename and path are automatically generated
+	 * @param title
+	 * @param author
+	 * @param pages
+	 * @return Success
+	 */
+	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
+		String utcTime = getUTC();
+		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
+		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
+		File saveFile = new File(this.bookSavePath, title + "_" + author + "_" + utcTime + ".ghb");
+		return(saveBookToGHBFile(title, author, pages, saveFile));
 	}
 	
 	

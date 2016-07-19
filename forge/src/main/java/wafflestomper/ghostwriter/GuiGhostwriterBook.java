@@ -474,11 +474,6 @@ public class GuiGhostwriterBook extends GuiScreen
     }
     
     
-    private void saveBook(){
-    	this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.pagesAsList());
-    }
-    
-    
     private void copyBook(){
 		this.clipboard.author = this.bookAuthor;
 		this.clipboard.title = this.bookTitle;
@@ -897,7 +892,7 @@ public class GuiGhostwriterBook extends GuiScreen
     		
     			
     		case BTN_SAVE_BOOK:
-    			saveBook();
+    			this.mc.displayGuiScreen(new GuiSaveAs(this, this.bookTitle, this.bookAuthor, this.pagesAsList()));
     			break;
     			
     		case BTN_LOAD_BOOK:
