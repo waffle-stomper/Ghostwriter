@@ -5,9 +5,10 @@ rootdir = os.getcwd()
 print('removing old jars in the root dir...')
 subprocess.call(['del','*.jar'], shell=True)
 
-print('removing old jars in build/libs')
-os.chdir('forge/build/libs')
-subprocess.call(['del','*.jar'], shell=True)
+print('cleaning build directory...')
+os.chdir(rootdir)
+os.chdir('forge')
+subprocess.call(['gradlew.bat','clean'])
 
 print('building...')
 os.chdir(rootdir)

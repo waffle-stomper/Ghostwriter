@@ -20,11 +20,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 
-@Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, canBeDeactivated = true)
+@Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, updateJSON = "https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json", canBeDeactivated = true)
 public class Ghostwriter{
 	
     public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.8.4";
+    public static final String VERSION = "1.8.5";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();
