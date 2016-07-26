@@ -3,7 +3,7 @@
   "promos":{
     "1.10-latest": "1.8.5",
     "1.10-recommended": "1.8.5"
-  }
+  },
   "1.10":{
     "1.8.5": "Added update notifications"
   }
