@@ -12,8 +12,6 @@ public class Clipboard {
 	/** Used for copying one or more pages (so we don't have to wipe out a book in the clipboard) */
 	public List<String> miscPages = new ArrayList();
 	
-	//Deprecated - using the copy & paste multiples for everything
-	//public String singlePage = "";
 	
 	public Clipboard(){
 		//Debugging
@@ -26,8 +24,6 @@ public class Clipboard {
 		this.pages.clear();
 		for (String page : _clipboard.pages){this.pages.add(page);}
 		this.bookInClipboard = _clipboard.bookInClipboard;
-		//Deprecated - using the copy & paste multiples for everything
-		//this.singlePage = _clipboard.singlePage;
 		this.miscPages.clear();
 		for (String page : _clipboard.miscPages){this.miscPages.add(page);}
 	}

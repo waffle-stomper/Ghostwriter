@@ -16,15 +16,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 
 @Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, updateJSON = "https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json", canBeDeactivated = true)
 public class Ghostwriter{
 	
-    public static final String MODID = "Ghostwriter";
-    public static final String VERSION = "1.8.5";
+    public static final String MODID = "ghostwriter";
+    public static final String VERSION = "1.8.7";
     public static final String NAME = "Ghostwriter";
 	
 	private Minecraft mc = Minecraft.getMinecraft();

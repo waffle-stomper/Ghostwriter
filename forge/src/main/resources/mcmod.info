@@ -1,6 +1,6 @@
 [
 {
-  "modid": "Ghostwriter",
+  "modid": "ghostwriter",
   "name": "Ghostwriter",
   "description": "Utility for dealing with books (backup, restore, copy, paste, etc.).",
   "version": "${version}",

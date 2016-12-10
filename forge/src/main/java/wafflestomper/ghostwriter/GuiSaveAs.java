@@ -2,27 +2,17 @@ package wafflestomper.ghostwriter;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
 	
@@ -250,23 +240,6 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
                 		GuiSaveAs.this.slotSelected = -1;
                 		this.setShowSelectionBox(false);
                 		return;
-                	}
-                	else{
-                		/*
-                		//We've double-clicked on a file
-                		//It should already be loaded in if it's a real file
-                		if (GuiSaveAs.this.tempClipboard.bookInClipboard){
-                			if (GuiSaveAs.this.autoReloadBook == false){
-                				GuiSaveAs.this.parentGui.setClipboard(GuiSaveAs.this.tempClipboard);
-                				new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
-                			}
-                			else{
-                				GuiSaveAs.this.parentGui.setupAutoReload(GuiSaveAs.this.tempClipboard, lastLoadedPath);
-                				new Printer().gamePrint(Printer.DARK_AQUA + "Loaded book and continuing to monitor...");
-                			}
-                			Minecraft.getMinecraft().displayGuiScreen(GuiSaveAs.this.parentGui);
-                		}
-                		*/
                 	}
                 }
             }
