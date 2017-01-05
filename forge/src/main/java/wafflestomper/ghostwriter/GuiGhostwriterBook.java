@@ -778,7 +778,7 @@ public class GuiGhostwriterBook extends GuiScreen
     
     private void sendBookToServer(boolean publish) throws IOException{
     	// Quick sanity check to make sure we haven't been disconnected from the server
-    	if (this.mc.theWorld == null){
+    	if (this.mc.world == null){
     		return;
     	}
         if (this.bookIsUnsigned && this.bookModified){
@@ -820,7 +820,7 @@ public class GuiGhostwriterBook extends GuiScreen
                 }
 
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
-                packetbuffer.writeItemStackToBuffer(this.bookObj);
+                packetbuffer.writeItemStack(this.bookObj);
                 this.mc.getConnection().sendPacket(new CPacketCustomPayload(s, packetbuffer));
             }
         }
@@ -1166,9 +1166,9 @@ public class GuiGhostwriterBook extends GuiScreen
         //Append the new text to it
         String s2 = s1 + textToAdd;
         //Add the cursor
-        int i = this.fontRendererObj.splitStringWidth(s2 + "" + ChatFormatting.BLACK + "_", 118);
+        int i = this.fontRendererObj.getWordWrappedHeight(s2 + "" + ChatFormatting.BLACK + "_", 118);
         //store it
-        if (i <= 118 && s2.length() < 256){this.setCurrPageText(s2);}
+        if (i <= 128 && s2.length() < 256){this.setCurrPageText(s2);}
     }
     
     

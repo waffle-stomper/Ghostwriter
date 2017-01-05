@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 
 public class Printer{
-	private Minecraft mc = Minecraft.getMinecraft();
+	private static Minecraft mc = Minecraft.getMinecraft();
 	
 	// I think we've already established that I'm a terrible person 
 	public static final ChatFormatting BLACK = ChatFormatting.BLACK;
@@ -36,7 +36,7 @@ public class Printer{
 	}
 	
 	public void gamePrint(String inStr){
-		this.mc.thePlayer.addChatMessage(new TextComponentString(inStr));
+		mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(inStr));
 	}
 	
 	public void print(String toPrint){
