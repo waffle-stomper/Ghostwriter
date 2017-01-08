@@ -1,11 +1,12 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.11.2-recommended": "1.8.9",
+    "1.11.2-recommended": "1.9.0",
     "1.11-recommended": "1.8.7",
     "1.10-recommended": "1.8.5"
   },
   "1.11.2":{
+    "1.9.0": "*Fix bug #7",
     "1.8.9": "*Update to 1.11.2"
   },
   "1.11":{

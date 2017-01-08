@@ -20,6 +20,7 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
 	private GuiSaveAs.ScrollList scrollList;
 	public int slotSelected = -1;
 	private GuiTextField filenameField;
+	private boolean directoryDirty = false;
 	
 	private GuiGhostwriterBook parentGui;
 	private Clipboard tempClipboard = new Clipboard();
@@ -101,7 +102,8 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
 	
 	
 	private void populateFileList(){
-		this.listItems = this.fileHandler.listFiles(this.fileHandler.currentPath);		
+		this.listItems = this.fileHandler.listFiles(this.fileHandler.currentPath, this.directoryDirty);
+		this.directoryDirty = false;
 	}
 	
 	
@@ -294,10 +296,14 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
         	}
         	else{
         		s = BookUtilities.truncateStringPixels(list.get(slotNum-1).getName(), "...", 200, false);
-        		if (list.get(slotNum-1).isFile()){
+        		if (!list.get(slotNum-1).exists()){
+        			color = 0x333333;
+        			GuiSaveAs.this.directoryDirty = true;
+        		}
+        		else if (list.get(slotNum-1).isFile()){
     				color = 0xFF0000;
     			}
-    			else{
+    			else if (list.get(slotNum-1).isDirectory()){
     				color = 0x00FF00;
     			}
         	}

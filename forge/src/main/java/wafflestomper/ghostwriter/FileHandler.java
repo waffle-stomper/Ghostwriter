@@ -69,8 +69,8 @@ public class FileHandler {
 		return this.bookSavePath;
 	}
 	
-	public List<File> listFiles(File path){
-		if (!path.getAbsolutePath().equals(this.lastCheckedPath)){
+	public List<File> listFiles(File path, boolean forceRefresh){
+		if (!path.getAbsolutePath().equals(this.lastCheckedPath) || forceRefresh){
 			this.lastCheckedPath = path.getAbsolutePath();
 			this.lastListing.clear();
 			File[] newList = path.listFiles();

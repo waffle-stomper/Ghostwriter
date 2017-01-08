@@ -16,6 +16,7 @@ public class GuiFileSelection extends GuiScreen{
 	private List<File> listItems;
 	private GuiFileSelection.ScrollList scrollList;
 	public int slotSelected = -1;
+	private boolean directoryDirty = false;
 	
 	private GuiGhostwriterBook parentGui;
 	private Clipboard tempClipboard = new Clipboard();
@@ -88,7 +89,8 @@ public class GuiFileSelection extends GuiScreen{
 	
 	
 	private void populateFileList(){
-		this.listItems = this.fileHandler.listFiles(this.fileHandler.currentPath);		
+		this.listItems = this.fileHandler.listFiles(this.fileHandler.currentPath, this.directoryDirty);
+		this.directoryDirty = false;
 	}
 	
 	
@@ -287,10 +289,14 @@ public class GuiFileSelection extends GuiScreen{
         	}
         	else{
         		s = BookUtilities.truncateStringPixels(list.get(slotNum-1).getName(), "...", 200, false);
-        		if (list.get(slotNum-1).isFile()){
+        		if (!list.get(slotNum-1).exists()){
+        			color = 0x333333;
+        			GuiFileSelection.this.directoryDirty = true;
+        		}
+        		else if (list.get(slotNum-1).isFile()){
     				color = 0xFF0000;
     			}
-    			else{
+    			else if (list.get(slotNum-1).isDirectory()){
     				color = 0x00FF00;
     			}
         	}
