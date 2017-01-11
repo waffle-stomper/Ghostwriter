@@ -13,6 +13,7 @@ import net.minecraft.util.text.ITextComponent;
 public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 116;
 	public static final char SPLIT_CHAR = '\u1337';
+	private static final Minecraft mc = Minecraft.getMinecraft();
 	
 	/**
 	 * Prefix and suffix are optional, but if they are set to anything other than a blank string, they will be counted
@@ -285,7 +286,6 @@ public class BookUtilities {
 				pages.add(wrapped.substring(lastSubstringEnd, wrapped.length()).replaceAll("" + SPLIT_CHAR, ""));
 			}
 		}
-		
 		return pages;
 	}
 	
@@ -306,7 +306,18 @@ public class BookUtilities {
 		for (String largePage : pageBroken){
 			out.addAll(stringToPages(largePage));
 		}
-		return out;
+		
+		// This is a quick hack to remove blank pages until I can figure out why they're
+		//   being inserted erroneously
+		// TODO: FIX THIS PROPERLY
+		List<String> cleanedOut = new ArrayList<String>();
+		for (String page : out){
+			if (page.replaceAll("[ \n\r\t]|(\\u00A7.)", "").length() > 0){
+				cleanedOut.add(page);
+			}
+		}
+		
+		return cleanedOut;
 	}
 	
 	
