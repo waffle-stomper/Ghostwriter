@@ -1164,7 +1164,7 @@ public class GuiGhostwriterBook extends GuiScreen
         //Append the new text to it
         String s2 = s1 + textToAdd;
         //Add the cursor
-        int i = this.fontRendererObj.getWordWrappedHeight(s2 + "" + ChatFormatting.BLACK + "_", 118);
+        int i = this.fontRenderer.getWordWrappedHeight(s2 + "" + ChatFormatting.BLACK + "_", 118);
         //store it
         if (i <= 128 && s2.length() < 256){this.setCurrPageText(s2);}
     }
@@ -1283,8 +1283,8 @@ public class GuiGhostwriterBook extends GuiScreen
      * @param str
      */
     private void drawCenteredString(String str, int yPos, int color, boolean dropShadow){
-    	int xPos = this.width/2 - this.fontRendererObj.getStringWidth(str)/2;
-    	this.fontRendererObj.drawString(str, xPos, yPos, color, dropShadow);
+    	int xPos = this.width/2 - this.fontRenderer.getStringWidth(str)/2;
+    	this.fontRenderer.drawString(str, xPos, yPos, color, dropShadow);
     }
     
     
@@ -1305,11 +1305,11 @@ public class GuiGhostwriterBook extends GuiScreen
 
             if (i >= 0 && j >= 0)
             {
-                int k = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.cachedComponents.size());
+                int k = Math.min(128 / this.fontRenderer.FONT_HEIGHT, this.cachedComponents.size());
 
-                if (i <= 116 && j < this.mc.fontRendererObj.FONT_HEIGHT * k + k)
+                if (i <= 116 && j < this.mc.fontRenderer.FONT_HEIGHT * k + k)
                 {
-                    int l = j / this.mc.fontRendererObj.FONT_HEIGHT;
+                    int l = j / this.mc.fontRenderer.FONT_HEIGHT;
 
                     if (l >= 0 && l < this.cachedComponents.size())
                     {
@@ -1320,7 +1320,7 @@ public class GuiGhostwriterBook extends GuiScreen
                         {
                             if (itextcomponent1 instanceof TextComponentString)
                             {
-                                i1 += this.mc.fontRendererObj.getStringWidth(((TextComponentString)itextcomponent1).getText());
+                                i1 += this.mc.fontRenderer.getStringWidth(((TextComponentString)itextcomponent1).getText());
 
                                 if (i1 > i)
                                 {
@@ -1426,18 +1426,18 @@ public class GuiGhostwriterBook extends GuiScreen
             
             //Draw the header
             String signPageHeader = I18n.format("book.editTitle", new Object[0]);
-            int k = this.fontRendererObj.getStringWidth(signPageHeader);
-            this.fontRendererObj.drawString(signPageHeader, bookX + 36 + (116 - k) / 2, bookY + 16 + 16, 0);
+            int k = this.fontRenderer.getStringWidth(signPageHeader);
+            this.fontRenderer.drawString(signPageHeader, bookX + 36 + (116 - k) / 2, bookY + 16 + 16, 0);
             //Draw the title line
-            int l = this.fontRendererObj.getStringWidth(s);
-            this.fontRendererObj.drawString(s, bookX + 36 + (116 - l) / 2, bookY + 48, 0);
+            int l = this.fontRenderer.getStringWidth(s);
+            this.fontRenderer.drawString(s, bookX + 36 + (116 - l) / 2, bookY + 48, 0);
             //Draw the author line
             String s2 = I18n.format("book.byAuthor", new Object[] {this.editingPlayer.getName()});
-            int i1 = this.fontRendererObj.getStringWidth(s2);
-            this.fontRendererObj.drawString(TextFormatting.DARK_GRAY + s2, bookX + 36 + (116 - i1) / 2, bookY + 48 + 10, 0);
+            int i1 = this.fontRenderer.getStringWidth(s2);
+            this.fontRenderer.drawString(TextFormatting.DARK_GRAY + s2, bookX + 36 + (116 - i1) / 2, bookY + 48 + 10, 0);
             //Draw the finalize warning
             String s3 = I18n.format("book.finalizeWarning", new Object[0]);
-            this.fontRendererObj.drawSplitString(s3, bookX + 36, bookY + 80, 116, 0);
+            this.fontRenderer.drawSplitString(s3, bookX + 36, bookY + 80, 116, 0);
         }
         else
         {
@@ -1452,7 +1452,7 @@ public class GuiGhostwriterBook extends GuiScreen
             if (this.bookIsUnsigned)
             {
             	//Add cursor
-                if (this.fontRendererObj.getBidiFlag())
+                if (this.fontRenderer.getBidiFlag())
                 {
                     pageText = pageText + "_";
                 }
@@ -1476,7 +1476,7 @@ public class GuiGhostwriterBook extends GuiScreen
             {
                 ITextComponent itextcomponent = ITextComponent.Serializer.jsonToComponent(pageText);
                 // Note that we're using a local version of the splitText method with the format wrapping fix removed
-                this.cachedComponents = itextcomponent != null ? this.splitText(itextcomponent, 116, this.fontRendererObj, true, true) : null;
+                this.cachedComponents = itextcomponent != null ? this.splitText(itextcomponent, 116, this.fontRenderer, true, true) : null;
             }
             catch (JsonParseException var13)
             {
@@ -1484,14 +1484,14 @@ public class GuiGhostwriterBook extends GuiScreen
             }
 
             //Draw page indicator
-            int pageIndWidth = this.fontRendererObj.getStringWidth(pageIndicator);
-            this.fontRendererObj.drawString(pageIndicator, bookX - pageIndWidth + this.bookImageWidth - 44, bookY + 16, 0);
+            int pageIndWidth = this.fontRenderer.getStringWidth(pageIndicator);
+            this.fontRenderer.drawString(pageIndicator, bookX - pageIndWidth + this.bookImageWidth - 44, bookY + 16, 0);
 
             
             if (this.cachedComponents == null)
             {
             	// Render as an unsigned book
-                this.fontRendererObj.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
+                this.fontRenderer.drawSplitString(pageText, bookX + 36, bookY + 16 + 16, 116, 0);
                 this.drawCenteredString("Using unsigned book formatting", 186, 0xff0000, true);
             }
             else
@@ -1500,12 +1500,12 @@ public class GuiGhostwriterBook extends GuiScreen
             	if (this.bookIsUnsigned){
             		this.drawCenteredString("Using signed book formatting", 186, 0xff0000, true);
             	}
-                int k1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.cachedComponents.size());
+                int k1 = Math.min(128 / this.fontRenderer.FONT_HEIGHT, this.cachedComponents.size());
 
                 for (int l1 = 0; l1 < k1; ++l1)
                 {
                     ITextComponent itextcomponent2 = (ITextComponent)this.cachedComponents.get(l1);
-                    this.fontRendererObj.drawString(itextcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + l1 * this.fontRendererObj.FONT_HEIGHT, 0);
+                    this.fontRenderer.drawString(itextcomponent2.getUnformattedText(), bookX + 36, bookY + 16 + 16 + l1 * this.fontRenderer.FONT_HEIGHT, 0);
                 }
 
                 ITextComponent itextcomponent1 = this.getClickedComponentAt(mouseX, mouseY);
@@ -1532,14 +1532,14 @@ public class GuiGhostwriterBook extends GuiScreen
             
             public void drawButton(Minecraft mc, int p_146112_2_, int p_146112_3_){
                 if (this.visible){
-                    boolean flag = p_146112_2_ >= this.xPosition && p_146112_3_ >= this.yPosition && p_146112_2_ < this.xPosition + this.width && p_146112_3_ < this.yPosition + this.height;
+                    boolean flag = p_146112_2_ >= this.x && p_146112_3_ >= this.y && p_146112_2_ < this.x + this.width && p_146112_3_ < this.y + this.height;
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                     mc.getTextureManager().bindTexture(GuiGhostwriterBook.BOOK_GUI_TEXTURES);
                     int k = 0;
                     int l = 192;
                     if (flag){k += 23;}
                     if (!this.isForward){l += 13;}
-                    this.drawTexturedModalRect(this.xPosition, this.yPosition, k, l, 23, 13);
+                    this.drawTexturedModalRect(this.x, this.y, k, l, 23, 13);
                 }
             }
         }

@@ -22,7 +22,7 @@ public class BookUtilities {
 	 * (i.e. that the opposite end should be removed).
 	 */
 	public static String truncateStringPixels(String strIn, String substituteChars, int maxWidth, boolean keepRightSide){
-		FontRenderer f = Minecraft.getMinecraft().fontRendererObj;
+		FontRenderer f = Minecraft.getMinecraft().fontRenderer;
 		if (f.getStringWidth(strIn) <= maxWidth){
 			return strIn;
 		}
@@ -166,7 +166,7 @@ public class BookUtilities {
                 case 32:
                     i1 = l;
                 default:
-                    k += Minecraft.getMinecraft().fontRendererObj.getCharWidth(c0);
+                    k += Minecraft.getMinecraft().fontRenderer.getCharWidth(c0);
 
                     if (flag)
                     {

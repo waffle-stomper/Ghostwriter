@@ -79,11 +79,11 @@ public class GuiFileSelection extends GuiScreen{
 		populateFileList();
 		this.scrollList.drawScreen(par1, par2, par3);
 		super.drawScreen(par1, par2, par3);
-		this.drawCenteredString(this.fontRendererObj, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
+		this.drawCenteredString(this.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
 		if (!this.previewAuthor.equals("") || !this.previewTitle.equals("") || !this.previewPage.equals("")){
-			this.drawCenteredString(this.fontRendererObj, "Author: " + this.previewAuthor, this.width / 2, this.height-50, 0xFFFFFF);
-			this.drawCenteredString(this.fontRendererObj, "Title: " + this.previewTitle, this.width / 2, this.height-40, 0xFFFFFF);
-			this.drawCenteredString(this.fontRendererObj, "Page 1: " + this.previewPage, this.width / 2, this.height-30, 0xFFFFFF);
+			this.drawCenteredString(this.fontRenderer, "Author: " + this.previewAuthor, this.width / 2, this.height-50, 0xFFFFFF);
+			this.drawCenteredString(this.fontRenderer, "Title: " + this.previewTitle, this.width / 2, this.height-40, 0xFFFFFF);
+			this.drawCenteredString(this.fontRenderer, "Page 1: " + this.previewPage, this.width / 2, this.height-30, 0xFFFFFF);
 		}
     }
 	
@@ -275,7 +275,7 @@ public class GuiFileSelection extends GuiScreen{
         }
 
         
-        protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY){
+        protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY, float p_192637_7_){
         	List<File> list= GuiFileSelection.this.listItems;
         	//Empty padding slots at the bottom
         	if (slotNum > list.size()){return;}
@@ -300,7 +300,8 @@ public class GuiFileSelection extends GuiScreen{
     				color = 0x00FF00;
     			}
         	}
-            GuiFileSelection.this.drawString(GuiFileSelection.this.fontRendererObj, s, slotX + 2, slotY + 1, color);
+            GuiFileSelection.this.drawString(GuiFileSelection.this.fontRenderer, s, slotX + 2, slotY + 1, color);
         }
+
     }
 }

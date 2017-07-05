@@ -67,7 +67,7 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
         populateFileList();
         this.scrollList = new ScrollList();
         this.scrollList.registerScrollButtons(4, 5);
-        this.filenameField = new GuiTextField(0, this.fontRendererObj, this.width/2-125, this.height-32, 250, 20);
+        this.filenameField = new GuiTextField(0, this.fontRenderer, this.width/2-125, this.height-32, 250, 20);
         this.filenameField.setMaxStringLength(100);
         String ftitle = this.bookTitle.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
 		String fauthor = this.bookAuthor.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
@@ -91,7 +91,7 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
 		populateFileList();
 		this.scrollList.drawScreen(par1, par2, par3);
 		super.drawScreen(par1, par2, par3);
-		this.drawCenteredString(this.fontRendererObj, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
+		this.drawCenteredString(this.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
 		this.filenameField.drawTextBox();
 	}
 	
@@ -282,7 +282,7 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
         }
 
         
-        protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY){
+        protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY, float p_192637_7_){
         	List<File> list= GuiSaveAs.this.listItems;
         	//Empty padding slots at the bottom
         	if (slotNum > list.size()){return;}
@@ -307,7 +307,7 @@ public class GuiSaveAs extends GuiScreen implements GuiYesNoCallback{
     				color = 0x00FF00;
     			}
         	}
-            GuiSaveAs.this.drawString(GuiSaveAs.this.fontRendererObj, s, slotX + 2, slotY + 1, color);
+            GuiSaveAs.this.drawString(GuiSaveAs.this.fontRenderer, s, slotX + 2, slotY + 1, color);
         }
     }
 }
