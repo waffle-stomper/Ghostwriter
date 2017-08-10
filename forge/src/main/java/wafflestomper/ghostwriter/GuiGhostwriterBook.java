@@ -1520,27 +1520,38 @@ public class GuiGhostwriterBook extends GuiScreen
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
         
-    
+
     @SideOnly(Side.CLIENT)
     static class NextPageButton extends GuiButton{
-            private final boolean isForward;
+        private final boolean isForward;
 
-            public NextPageButton(int par1, int par2, int par3, boolean par4){
-                super(par1, par2, par3, 23, 13, "");
-                this.isForward = par4;
-            }
-            
-            public void drawButton(Minecraft mc, int p_146112_2_, int p_146112_3_){
-                if (this.visible){
-                    boolean flag = p_146112_2_ >= this.x && p_146112_3_ >= this.y && p_146112_2_ < this.x + this.width && p_146112_3_ < this.y + this.height;
-                    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-                    mc.getTextureManager().bindTexture(GuiGhostwriterBook.BOOK_GUI_TEXTURES);
-                    int k = 0;
-                    int l = 192;
-                    if (flag){k += 23;}
-                    if (!this.isForward){l += 13;}
-                    this.drawTexturedModalRect(this.x, this.y, k, l, 23, 13);
+        public NextPageButton(int buttonId, int x, int y, boolean isForwardIn)
+        {
+            super(buttonId, x, y, 23, 13, "");
+            this.isForward = isForwardIn;
+        }
+
+        /**
+         * Draws this button to the screen.
+         */
+        public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks){
+            if (this.visible){
+                boolean flag = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                mc.getTextureManager().bindTexture(GuiGhostwriterBook.BOOK_GUI_TEXTURES);
+                int i = 0;
+                int j = 192;
+
+                if (flag){
+                    i += 23;
                 }
+
+                if (!this.isForward){
+                    j += 13;
+                }
+
+                this.drawTexturedModalRect(this.x, this.y, i, j, 23, 13);
             }
         }
+    }
 }
