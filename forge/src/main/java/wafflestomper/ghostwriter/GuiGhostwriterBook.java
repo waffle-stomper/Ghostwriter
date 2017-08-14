@@ -232,6 +232,7 @@ public class GuiGhostwriterBook extends GuiScreen
     private List field_175386_A;
     private int field_175387_B = -1;
     private boolean viewAsUnsigned = false;
+    private boolean sentBookToServer = false;
     
     private Printer printer = new Printer();
 	private Clipboard clipboard;
@@ -777,6 +778,10 @@ public class GuiGhostwriterBook extends GuiScreen
     
     
     private void sendBookToServer(boolean publish) throws IOException{
+    	if (this.sentBookToServer == true){
+    		return;
+    	}
+    	System.out.println("Sending book to server!");
     	// Quick sanity check to make sure we haven't been disconnected from the server
     	if (this.mc.world == null){
     		return;
@@ -822,6 +827,7 @@ public class GuiGhostwriterBook extends GuiScreen
                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
                 packetbuffer.writeItemStack(this.bookObj);
                 this.mc.getConnection().sendPacket(new CPacketCustomPayload(s, packetbuffer));
+                this.sentBookToServer = true;
             }
         }
     }
