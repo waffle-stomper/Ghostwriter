@@ -712,11 +712,6 @@ public class GuiGhostwriterBook extends GuiScreen
      * Called when the screen is unloaded. Used to disable keyboard repeat events
      */
     public void onGuiClosed(){
-    	try {
-			sendBookToServer(false);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
         Keyboard.enableRepeatEvents(false);
     }
 
