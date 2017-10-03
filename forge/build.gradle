@@ -11,9 +11,9 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the nessasary things for Forge to be setup.
 
 
-version = "1.9.6"
+version = "1.9.8"
 group = "wafflestomper" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "1.12.1-Ghostwriter"
+archivesBaseName = "1.12.2-Ghostwriter"
 
 sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
 compileJava {
@@ -21,7 +21,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.1-14.22.0.2453"
+    version = "1.12.2-14.23.0.2501"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
