@@ -1,0 +1,7 @@
+{
+    "pack": {
+        "description": "ghostwriter resources",
+        "pack_format": 4,
+        "_comment": "I don't really understand why this is necessary, but OK I guess"
+    }
+}

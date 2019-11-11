@@ -3,10 +3,10 @@ package wafflestomper.ghostwriter;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 
 public class Printer{
-	private static Minecraft mc = Minecraft.getMinecraft();
+	private static Minecraft mc = Minecraft.getInstance();
 	
 	// I think we've already established that I'm a terrible person 
 	public static final ChatFormatting BLACK = ChatFormatting.BLACK;
@@ -36,7 +36,7 @@ public class Printer{
 	}
 	
 	public void gamePrint(String inStr){
-		mc.ingameGUI.getChatGUI().printChatMessage(new TextComponentString(inStr));
+		mc.ingameGUI.getChatGUI().printChatMessage(new StringTextComponent(inStr));
 	}
 	
 	public void print(String toPrint){

@@ -13,7 +13,7 @@ import net.minecraft.util.text.ITextComponent;
 public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 116;
 	public static final char SPLIT_CHAR = '\u1337';
-	private static final Minecraft mc = Minecraft.getMinecraft();
+	private static final Minecraft mc = Minecraft.getInstance();
 	
 	/**
 	 * Prefix and suffix are optional, but if they are set to anything other than a blank string, they will be counted
@@ -22,7 +22,7 @@ public class BookUtilities {
 	 * (i.e. that the opposite end should be removed).
 	 */
 	public static String truncateStringPixels(String strIn, String substituteChars, int maxWidth, boolean keepRightSide){
-		FontRenderer f = Minecraft.getMinecraft().fontRenderer;
+		FontRenderer f = mc.fontRenderer;
 		if (f.getStringWidth(strIn) <= maxWidth){
 			return strIn;
 		}
@@ -166,7 +166,7 @@ public class BookUtilities {
                 case 32:
                     i1 = l;
                 default:
-                    k += Minecraft.getMinecraft().fontRenderer.getCharWidth(c0);
+                    k += mc.fontRenderer.getCharWidth(c0);
 
                     if (flag)
                     {
@@ -339,7 +339,7 @@ public class BookUtilities {
 		 */
 		
 		try{
-    		ITextComponent i = ITextComponent.Serializer.jsonToComponent(jsonIn);
+    		ITextComponent i = ITextComponent.Serializer.fromJson(jsonIn);
     		if (i != null){
     			String out = i.getFormattedText();
     			return(out);

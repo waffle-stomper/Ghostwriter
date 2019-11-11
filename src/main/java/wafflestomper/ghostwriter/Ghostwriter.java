@@ -1,43 +1,58 @@
 package wafflestomper.ghostwriter;
 
-import org.lwjgl.input.Keyboard;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiScreenBook;
-import net.minecraft.init.Items;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+
+import net.minecraft.client.gui.screen.EditBookScreen;
+import net.minecraft.client.gui.screen.ReadBookScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.launchwrapper.Launch;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 
-@Mod(modid = Ghostwriter.MODID, version = Ghostwriter.VERSION, name = Ghostwriter.NAME, updateJSON = "https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json", canBeDeactivated = true)
+@Mod("ghostwriter")
 public class Ghostwriter{
 	
-    public static final String MODID = "ghostwriter";
-    public static final String VERSION = "1.9.8";
-    public static final String NAME = "Ghostwriter";
-	
-	private Minecraft mc = Minecraft.getMinecraft();
+	private Minecraft mc = Minecraft.getInstance();
 	private Printer printer = new Printer();
 	public Clipboard clipboard = new Clipboard();
 	boolean devEnv = false;
 	private long lastMessage = 0;
+	private static final Logger LOGGER = LogManager.getLogger();
 	
 	
 	public Ghostwriter(){
-		FMLCommonHandler.instance().bus().register(this);
-		MinecraftForge.EVENT_BUS.register(this);
-		// Detect development environment
-		this.devEnv = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");
+//		FMLCommonHandler.instance().bus().register(this);
+//		MinecraftForge.EVENT_BUS.register(this);
+//		// Detect development environment
+//		this.devEnv = (Boolean)Launch.blackboard.get("fml.deobfuscatedEnvironment");
+		
+        // Register the setup method for modloading
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+
+        // Register ourselves for server and other game events we are interested in
+        MinecraftForge.EVENT_BUS.register(this);
 	}
+	
+	
+	private void setup(final FMLClientSetupEvent event){
+        LOGGER.info("Ghostwriter setup running...");
+    }
 	
 	
 	private void rateLimitedDebugMessage(String message){
@@ -55,22 +70,27 @@ public class Ghostwriter{
 	 * This glorious bastard swaps the default book GUI for the Ghostwriter screen before it even loads
 	 * I love the future
 	 */
-	@SubscribeEvent
+	@net.minecraftforge.eventbus.api.SubscribeEvent
 	public void guiOpen(GuiOpenEvent event){
-		GuiScreen eventGui = event.getGui();
+		Screen eventGui = event.getGui();
 		if (eventGui == null){return;}
-		if (eventGui instanceof GuiScreenBook){
-			EntityPlayerSP p = this.mc.player;
-        	ItemStack currStack = p.getHeldItem(EnumHand.MAIN_HAND);
+		LOGGER.debug(eventGui.toString());
+		// TODO: Signed books are handled differently from unsigned books for some bizarre reason
+		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen) {// || eventGui instanceof ReadBookScreen){
+			ClientPlayerEntity p = this.mc.player;
+        	ItemStack currStack = p.getHeldItem(Hand.MAIN_HAND);
         	if (currStack != null){
         		Item currItem = currStack.getItem();
         		if (currItem != null){
         			// If left shift is held down, let the standard Minecraft book GUI open
-        			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
-        				return;
-        			}
-        			eventGui = new GuiGhostwriterBook(p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
+//        			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){ // TODO: Re-enable this
+//        				return;
+//        			}
+        			//eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND); // p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
+        			
+        			eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND);
         			event.setGui(eventGui);
+        			LOGGER.debug("GUI swap done!");
         		}
         		else{
             		rateLimitedDebugMessage("this.mc.thePlayer.getHeldItem().getItem() is null!");

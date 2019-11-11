@@ -44,7 +44,7 @@ public class FileHandler {
 	
 	public FileHandler(Clipboard _clipboard){
 		this.clipboard = _clipboard;
-		String path = Minecraft.getMinecraft().mcDataDir.getAbsolutePath();
+		String path = Minecraft.getInstance().gameDir.getAbsolutePath(); // TODO: Test that this resolves to the correct directory
 		if (path.endsWith(".")){
 			path = path.substring(0, path.length()-2);
 		}
