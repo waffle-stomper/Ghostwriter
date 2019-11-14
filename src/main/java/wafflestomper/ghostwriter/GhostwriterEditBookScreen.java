@@ -181,6 +181,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import wafflestomper.ghostwriter.modified_mc_files.EditBookScreenMod;
 
 @OnlyIn(Dist.CLIENT)
@@ -271,6 +272,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
     private static final Printer printer = new Printer();
 	private static final Logger LOGGER = LogManager.getLogger();
+	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
 	
 
 	public GhostwriterEditBookScreen(PlayerEntity editingPlayer, ItemStack book, Hand hand, Clipboard clipboard) {
@@ -289,6 +291,48 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     		pages.add(pageText);
     	}
     	return pages;
+    }
+    
+    
+    private void removePages(){
+    	int from = Math.min(this.selectedPageA, this.selectedPageB);
+    	int to = Math.max(this.selectedPageA, this.selectedPageB);
+    	
+    	// Switch to single page mode if necessary
+    	if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+    		from = this.currPage;
+    		to = this.currPage;
+    	}
+    	
+    	//Make sure we're not going to find ourselves in a page that's being removed
+    	if (from > 0){
+    		this.currPage = from-1;
+    	}
+    	else{
+    		this.currPage = 0;
+    	}
+    	
+    	List<String> oldPages = pagesAsList();
+    	int newBookSize = this.bookPages.size() - ((to-from)+1);
+    	for (int i=bookPages.size()-1; i>=from; i--){
+    		if (i > newBookSize-1){
+    			if (i == 0){
+    				this.bookPages.set(0, "");
+    			}
+    			else{
+	    			//remove excess page
+	    			this.bookPages.remove(i);
+    			}
+    		}
+    		else{
+    			this.bookPages.set(i, oldPages.get(i + (to-from) + 1));
+    		}
+    	}
+    	
+        this.bookIsModified = true;
+		this.selectedPageA = -1;
+		this.selectedPageB = -1;
+		this.updateButtons();
     }
     
     
@@ -313,6 +357,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		if (this.bookPages.isEmpty()) {
 			this.bookPages.add("");
 		}
+		this.updateButtons();
     }
     
 	
@@ -322,13 +367,94 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.clipboard.pages.clear();
 		this.clipboard.pages.addAll(this.pagesAsList());
 		this.clipboard.bookInClipboard = true;
-		this.printer.gamePrint(Printer.GRAY + "Book copied");
+		printer.gamePrint(Printer.GRAY + "Book copied");
+    	this.updateButtons();
 	}
+    
+    
+    private void copySelectedPagesToClipboard(){
+    	int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
+    	int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
+    	
+    	if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages.size()){
+    		this.clipboard.miscPages.clear();
+    		List<String> pagesAsList = this.pagesAsList();
+    		for (int i=firstPage; i<=lastPage; i++){
+    			this.clipboard.miscPages.add(pagesAsList.get(i));
+    		}
+    		printer.gamePrint(Printer.GRAY + "Selection copied");
+    	}
+    	else{
+    		printer.gamePrint(Printer.RED + "Invalid selection! Copy aborted.");
+    	}
+    	this.updateButtons();
+    }
+    
+    
+    private void cutMultiplePages(){
+    	int from = Math.min(this.selectedPageA, this.selectedPageB);
+    	int to = Math.max(this.selectedPageA, this.selectedPageB);
+    	
+    	// Switch to single page mode if necessary
+    	if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+    		from = this.currPage;
+    		to = this.currPage;
+    	}
+    	
+    	this.clipboard.miscPages.clear();
+		List<String> pagesAsList = this.pagesAsList();
+		for (int i=from; i<=to; i++){
+			this.clipboard.miscPages.add(pagesAsList.get(i));
+		}
+		this.removePages();
+		
+		this.bookIsModified = true;
+		this.selectedPageA = -1;
+		this.selectedPageB = -1;
+		this.updateButtons();
+		
+		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " cut");
+    }
+    
+    
+    private void insertPage() {
+    	if (this.bookPages.size() < MAX_BOOK_PAGES) {
+    		this.bookPages.add(this.currPage, "");
+    		printer.gamePrint(Printer.GRAY + "Page inserted");
+    	}
+    	else {
+    		printer.gamePrint(Printer.RED + "Cannot add another page! Book is already " + MAX_BOOK_PAGES + " pages long!");
+    	}
+    }
     
     
     private void pasteBook(){
     	this.clipboardToBook(this.clipboard);
-		this.printer.gamePrint(Printer.GRAY + "Book pasted");
+    	this.bookIsModified = true;
+		printer.gamePrint(Printer.GRAY + "Book pasted");
+    }
+    
+    
+    private void pasteMultiplePages(){
+    	int startPos = this.currPage;
+    	List<String> oldBook = this.pagesAsList();
+    	int newBookSize = this.bookPages.size() + this.clipboard.miscPages.size();
+    	    	
+    	String pageNewText = "";
+    	for (int i=startPos; i<newBookSize; i++){
+    		if (i >= this.bookPages.size()){
+    			addNewPage();
+    		}
+    		if (i >= (startPos + this.clipboard.miscPages.size())){
+				pageNewText = oldBook.get(i-this.clipboard.miscPages.size());
+			}
+			else{
+				pageNewText = this.clipboard.miscPages.get(i-startPos);
+			}
+    		this.bookPages.set(i, pageNewText);
+    	}
+    	this.bookIsModified = true;
+        printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " pasted");
     }
 	
 	
@@ -374,28 +500,35 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.buttonAutoReloadBook = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "\u00a7mAutoReload Book", (pressed_button) -> {}));
 		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
 			this.copyBook();
-			this.updateButtons();
 		}));
-		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, "\u00a7mPaste Book", (pressed_button) -> {
+		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, "Paste Book", (pressed_button) -> {
 			this.pasteBook();
 		}));
-		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, "\u00a7mCut This Page", (pressed_button) -> {}));
 		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
 			this.selectedPageA = this.currPage;
-			LOGGER.debug("Select page A pressed");
 			this.updateButtons();
 		}));
 		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
 			this.selectedPageB = this.currPage;
-			LOGGER.debug("Select page B pressed");
 			this.updateButtons();
 		}));
-		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "\u00a7mCopy This Page", (pressed_button) -> {}));
-		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, "\u00a7mPaste Page", (pressed_button) -> {}));
-		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "\u00a7mInsert Blank Page", (pressed_button) -> {}));
+		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page", (pressed_button) -> {
+			this.copySelectedPagesToClipboard();
+		}));
+		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, "Cut This Page", (pressed_button) -> {
+			this.cutMultiplePages();
+		}));
+		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, "Paste This Page", (pressed_button) -> {
+			this.pasteMultiplePages();
+		}));
+		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "Insert Blank Page", (pressed_button) -> {
+			this.insertPage();
+		}));
 		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "\u00a7mRemove Top Space", (pressed_button) -> {}));
 		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, "\u00a7mAdd Signature Pages", (pressed_button) -> {}));
-		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "\u00a7mRemove This Page", (pressed_button) -> {}));
+		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "Remove This Page", (pressed_button) -> {
+			this.removePages();
+		}));
 		                     		
 		//The horror...
 		// TODO: Compress this into a more sensible data structure?
@@ -427,6 +560,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, "Reset Formatting", (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
 
 		super.init();
+		this.updateButtons();
 		LOGGER.debug("init done, innit");
 	}
 	
@@ -442,31 +576,23 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	protected void updateButtons() {
 		super.updateButtons();
 		
-		if (this.selectedPageA >= this.getPageCount() || this.selectedPageB >= this.getPageCount()){
+		// Reset invalid selection
+		if (this.selectedPageA < -1 || this.selectedPageA >= this.getPageCount()) {
     		this.selectedPageA = -1;
+    	}
+		if (this.selectedPageB < -1 || this.selectedPageB >= this.getPageCount()) {
     		this.selectedPageB = -1;
     	}
 		
-    	if (this.selectedPageA != -1 && this.selectedPageB != -1 && this.selectedPageA >= 0 && this.selectedPageA <= this.selectedPageB && this.selectedPageB < this.getPageCount()){
+    	if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
+    		// Multi page selection
     		this.buttonCopySelectedPages.active = true;
-    		String xPages = ((this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
+    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
     		this.buttonCopySelectedPages.setMessage("Copy " + xPages);
     		this.buttonCutMultiplePages.setMessage("Cut " + xPages);
     		this.buttonRemoveSelectedPages.setMessage("Remove " + xPages);
     		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
     		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
-    	}
-    	else if (this.selectedPageA != -1){
-    		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
-    		this.buttonCopySelectedPages.setMessage("Copy This Page");
-    		this.buttonCutMultiplePages.setMessage("Cut This Page");
-    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
-    	}
-    	else if (this.selectedPageB != -1){
-    		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
-    		this.buttonCopySelectedPages.setMessage("Copy This Page");
-    		this.buttonCutMultiplePages.setMessage("Cut This Page");
-    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
     	}
     	else{
     		this.buttonCopySelectedPages.setMessage("Copy This Page");
@@ -474,6 +600,12 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
     		this.buttonSelectPageA.setMessage("A");
     		this.buttonSelectPageB.setMessage("B");
+    		if (this.selectedPageA >= 0) {
+    			this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
+    		}
+    		if (this.selectedPageB >= 0) {
+    			this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    		}
     	}
     	
     	this.buttonPasteBook.active = this.clipboard.bookInClipboard;
@@ -485,13 +617,6 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         else{
         	this.buttonPasteMultiplePages.setMessage("Paste Multiple");
         }
-        
-    	// temp strikethrough
-    	this.buttonCopySelectedPages.setMessage("\u00a7m" + this.buttonCopySelectedPages.getMessage());
-    	this.buttonCutMultiplePages.setMessage("\u00a7m" + this.buttonCutMultiplePages.getMessage());
-    	this.buttonRemoveSelectedPages.setMessage("\u00a7m" + this.buttonRemoveSelectedPages.getMessage());
-    	this.buttonPasteMultiplePages.setMessage("\u00a7m" + this.buttonPasteMultiplePages.getMessage());
-    	
 	}
 
 }
