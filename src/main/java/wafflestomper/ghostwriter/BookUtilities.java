@@ -15,6 +15,7 @@ public class BookUtilities {
 	public static final char SPLIT_CHAR = '\u1337';
 	private static final Minecraft mc = Minecraft.getInstance();
 	
+	
 	/**
 	 * Prefix and suffix are optional, but if they are set to anything other than a blank string, they will be counted
 	 * as part of the length of the output string.
@@ -60,6 +61,7 @@ public class BookUtilities {
 		
 	}
 	
+	
 	/**
 	 * Truncates a string to the number of characters in maxChars
 	 * The character count includes the substitute characters (which will only be added if the string is truncated)
@@ -78,6 +80,8 @@ public class BookUtilities {
 	}
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
     /**
      * Checks if the char code is O-K...lLrRk-o... used to set special formatting.
      */
@@ -86,6 +90,7 @@ public class BookUtilities {
         return par0 >= 107 && par0 <= 111 || par0 >= 75 && par0 <= 79 || par0 == 114 || par0 == 82;
     }
 
+    
     /**
      * Digests a string for nonprinting formatting characters then returns a string containing only that formatting.
      */
@@ -115,6 +120,7 @@ public class BookUtilities {
         return s1;
     }
 	
+    
 	/**
      * Checks if the char code is a hexadecimal character, used to set colour.
      */
@@ -190,6 +196,7 @@ public class BookUtilities {
         return l != j && i1 != -1 && i1 < l ? i1 : l;
     }
 	
+    
     /**
      * Inserts splitchar into a string to wrap it within the specified width.
      */

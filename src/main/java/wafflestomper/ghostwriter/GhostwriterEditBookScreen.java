@@ -1,0 +1,497 @@
+/**
+ * 
+ * 
+
+NNNNNNNN        NNNNNNNN     OOOOOOOOO     TTTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEE   SSSSSSSSSSSSSSS 
+N:::::::N       N::::::N   OO:::::::::OO   T:::::::::::::::::::::TE::::::::::::::::::::E SS:::::::::::::::S
+N::::::::N      N::::::N OO:::::::::::::OO T:::::::::::::::::::::TE::::::::::::::::::::ES:::::SSSSSS::::::S
+N:::::::::N     N::::::NO:::::::OOO:::::::OT:::::TT:::::::TT:::::TEE::::::EEEEEEEEE::::ES:::::S     SSSSSSS
+N::::::::::N    N::::::NO::::::O   O::::::OTTTTTT  T:::::T  TTTTTT  E:::::E       EEEEEES:::::S            
+N:::::::::::N   N::::::NO:::::O     O:::::O        T:::::T          E:::::E             S:::::S            
+N:::::::N::::N  N::::::NO:::::O     O:::::O        T:::::T          E::::::EEEEEEEEEE    S::::SSSS         
+N::::::N N::::N N::::::NO:::::O     O:::::O        T:::::T          E:::::::::::::::E     SS::::::SSSSS    
+N::::::N  N::::N:::::::NO:::::O     O:::::O        T:::::T          E:::::::::::::::E       SSS::::::::SS  
+N::::::N   N:::::::::::NO:::::O     O:::::O        T:::::T          E::::::EEEEEEEEEE          SSSSSS::::S 
+N::::::N    N::::::::::NO:::::O     O:::::O        T:::::T          E:::::E                         S:::::S
+N::::::N     N:::::::::NO::::::O   O::::::O        T:::::T          E:::::E       EEEEEE            S:::::S
+N::::::N      N::::::::NO:::::::OOO:::::::O      TT:::::::TT      EE::::::EEEEEEEE:::::ESSSSSSS     S:::::S
+N::::::N       N:::::::N OO:::::::::::::OO       T:::::::::T      E::::::::::::::::::::ES::::::SSSSSS:::::S
+N::::::N        N::::::N   OO:::::::::OO         T:::::::::T      E::::::::::::::::::::ES:::::::::::::::SS 
+NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEEEEEEEEEE SSSSSSSSSSSSSSS  
+
+
+
+
+#########################################################################
+#																		#
+#                  FEATURE REQUESTS & STUFF TO DO                       #
+#																		#
+#########################################################################
+
+TODO: Figure out what to do with books over 50 pages long (maybe put them in miscPages?)
+
+TODO: text justification somehow?
+  
+  -automatically generate title page?
+  
+
+
+#########################################################################
+#																		#
+#                             BOOK FORMATS                              #
+#																		#
+#########################################################################
+
+  ~~~~~~~~~~~~~~~~~~~~
+  | GHB File format! |
+  ~~~~~~~~~~~~~~~~~~~~
+  * Java style comments, both single and multi-line, either of which are allowed to start at any point though a line (not just at the start)
+  * Author and title are optional, but they must each be on their own line, and prefaced by author: and title: respectively
+    For example:
+      title:Kicking Over Sandcastles
+      author:HCF_Kids
+    The title and author keys can appear anywhere within the file, and are case insensitive
+    Whitespace on either side of the value (e.g. 'title: The day of the Triffids ') will be ignored (the title would be read as 'The day of the Triffids')
+    Only the first instance of each title and author will be accepted. Subsequent lines will be treated as part of the book.
+  * Linebreaks are indicated by a pair of hashes (##) which can be repeated as many times as the user wants. The can be separated by a space but don't have to
+    be. Any whitespace preceding a pair of hashes will be removed.
+  * Ordinary linebreaks will be ignored
+  * Pagebreaks are denoted by four 'greater than' angled brackets (>>>>)
+    Whitespace preceding a pagebreak will be removed.
+  * The linebreak and pagebreak symbols can be escaped with a single backslash if they need to be used literally
+  * Blank lines will be removed
+  * Whitespace at the end of a page will be removed
+    
+  Example file:
+  
+  	//This is a single line comment by waffle_stomper on 2014-05-28. It will not appear in the book
+  	author:PETN //Comments can start at any point on a line
+  	title:Truncating excessively long names
+  	/* This is a multi-line comment
+  	   None of this will be included in the book
+  	   Please note that I had to put a space between the asterisk
+  	   and forward-slash to prevent it from terminating the 
+  	   comment that this is being posted in. In practice there should
+  	   be no space between those two 
+  	* /
+  	This is the first page.##
+  	This is going to be on a new line!
+  	>>>>
+  	This is the second page. The pagebreak character can go on the end of the line if you'd like.>>>>
+  	This is the third page.
+  	You 
+  	can 
+  	use 
+  	as 
+  	many 
+  	lines 
+  	as 
+  	you 
+  	like 
+  	but anything between pagebreaks will be considered as one page (unless it's too long to fit on a single page).
+  	Also, don't forget to insert a space 
+  	if you're splitting a line //See the space there?
+  	otherwise your words will be joined together.
+  	>>>>
+  	title: This is considered to be part of the text for the book.
+
+
+- Inserting signature pages
+
+- Get rid of the singlePage string in the clipboard. It should be handled in miscPages instead
+
+
+- GUI pops up with the opening of both a signed and unsigned book (I found it unnecessary to have to press a key for that).
+
+- Separate buttons for the formatting codes or some other way of easily entering them:
+  1) Italic 2) Bold 3) Underline 4) Strikethrough 5) Obfuscated 6) Reset
+  (and all the colours, if possible)
+  
+ - Some method to copy over the .txt format BookWorm books more easily, if at all possible
+ 
+ 
+- Bookworm uses a double colon (::) as a paragraph break. We need to find a suitable substitute. Single linebreaks aren't enough, but page breaks are too
+  much, espeically if someone uses a bunch of paragraph breaks in a row. (currently using hybrid approach)
+
+
+#########################################################################
+#																		#
+#                          OTHER NOTES                                  #
+#																		#
+#########################################################################
+
+Note on these notes: Some of the following information may be out of date. 
+Mojang loves to change things for seemingly no reason.
+Please double-check anything you find here to make sure it's still relevant.
+
+ - TITLES CANNOT BE OVER 16 CHARACTERS LONG. THIS IS GOING TO BE AN ISSUE (for now I'm truncating them)
+
+ - There is a 256 character/page limit. Thanks Mojang!
+
+ - Are Bookworm pagebreaks always preceded by a space?
+
+ - 13 lines long, but the font isn't monospaced, so there are an arbitrary number of characters on each line.
+
+ - If you set the title before you hit the signing screen, the book is automatically signed. This probably isn't a huge issue though.
+
+ - Bookworm save algorithm:
+    writer.write(id+"");
+	writer.newLine();
+	writer.write(title);
+	writer.newLine();
+	writer.write(author);
+	writer.newLine();
+	for (String s : hiddenData.keySet()) {
+	        writer.write("|!|" + s + "|" + hiddenData.get(s));
+	        writer.newLine();
+	}
+	writer.write(text);
+	writer.newLine();
+	writer.close();
+	
+I imagine the files look like this:
+
+###################################
+46
+Valentino Rossi - Portrait of a speed god
+Mat Oxley
+|!|hiddenkey0|hiddendata0
+|!|hiddenkey1|hiddendata1
+"The first time you ride the 500, it's like, FUCK!" -Valentino Rossi
+
+###################################
+ */
+
+
+package wafflestomper.ghostwriter;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.Lists;
+
+import net.minecraft.client.gui.screen.EditBookScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import wafflestomper.ghostwriter.modified_mc_files.EditBookScreenMod;
+
+@OnlyIn(Dist.CLIENT)
+public class GhostwriterEditBookScreen extends EditBookScreenMod{
+	
+	private static final int ID_SAVE_BOOK = 6;
+	private static final int ID_LOAD_BOOK = 7;
+	private static final int ID_COPY_BOOK = 10;
+	private static final int ID_PASTE_BOOK = 11;
+	private static final int ID_CUT_MULTIPLE_PAGES = 14;
+	private static final int ID_SELECT_PAGE_A = 15;
+	private static final int ID_SELECT_PAGE_B = 16;
+	private static final int ID_COPY_SELECTED_PAGES = 17;
+	private static final int ID_PASTE_MULTIPLE_PAGES = 18;
+	private static final int ID_INSERT_PAGE = 19;
+	private static final int ID_COLLAPSE_TOP = 20;
+	private static final int ID_ADD_SIGNATURE_PAGES = 21;
+	private static final int ID_REMOVE_SELECTED_PAGES = 22;
+	private static final int ID_AUTO_RELOAD_BOOK = 23;
+	
+	private static final int ID_BLACK = 50;
+	private static final int ID_DARK_BLUE = 51;
+	private static final int ID_DARK_GREEN = 52;
+	private static final int ID_DARK_AQUA = 53;
+	private static final int ID_DARK_RED = 54;
+	private static final int ID_DARK_PURPLE = 55;
+	private static final int ID_GOLD = 56;
+	private static final int ID_GRAY = 57;
+	private static final int ID_DARK_GRAY = 58;
+	private static final int ID_BLUE = 59;
+	private static final int ID_GREEN = 60;
+	private static final int ID_AQUA = 61;
+	private static final int ID_RED = 62;
+	private static final int ID_LIGHT_PURPLE = 63;
+	private static final int ID_YELLOW = 64;
+	private static final int ID_WHITE = 65;
+	private static final int ID_OBFUSCATED = 66;
+	private static final int ID_BOLD = 67;
+	private static final int ID_STRIKETHROUGH = 68;
+	private static final int ID_UNDERLINE = 69;
+	private static final int ID_ITALIC = 70;
+	private static final int ID_RESET_FORMAT = 71;
+	private static final int ID_CURRENT_FORMAT = 72;
+	
+	private Button buttonSaveBook;
+	private Button buttonLoadBook;
+	private Button buttonAutoReloadBook;
+	private Button buttonCopyBook;
+	private Button buttonPasteBook;
+	private Button buttonCutMultiplePages;
+	private Button buttonSelectPageA;
+	private Button buttonSelectPageB;
+	private Button buttonCopySelectedPages;
+	private Button buttonPasteMultiplePages;
+	private Button buttonInsertPage;
+	private Button buttonCollapseTop;
+	private Button buttonAddSignaturePages;
+	private Button buttonRemoveSelectedPages;
+	
+	private Button formatBlack;
+	private Button formatDarkBlue;
+	private Button formatDarkGreen;
+	private Button formatDarkAqua;
+	private Button formatDarkRed;
+	private Button formatDarkPurple;
+	private Button formatGold;
+	private Button formatGray;
+	private Button formatDarkGray;
+	private Button formatBlue;
+	private Button formatGreen;
+	private Button formatAqua;
+	private Button formatRed;
+	private Button formatLightPurple;
+	private Button formatYellow;
+	private Button formatWhite;
+	private Button formatObfuscated;
+	private Button formatBold;
+	private Button formatStrikethrough;
+	private Button formatUnderline;
+	private Button formatItalic;
+	private Button formatResetFormat;
+	
+    //Used for copying multiple pages at a time
+    private int selectedPageA = -1;
+    private int selectedPageB = -1;
+    
+    private Clipboard clipboard;
+	
+    private static final Printer printer = new Printer();
+	private static final Logger LOGGER = LogManager.getLogger();
+	
+
+	public GhostwriterEditBookScreen(PlayerEntity editingPlayer, ItemStack book, Hand hand, Clipboard clipboard) {
+		super(editingPlayer, book, hand);
+		this.clipboard = clipboard;
+	}
+	
+	
+    private List<String> pagesAsList(){
+    	List<String> pages = new ArrayList();
+    	for (int i=0; i<this.getPageCount(); i++){
+            // Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings 
+            //  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
+            //  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+    		String pageText = BookUtilities.deJSONify(this.bookPages.get(i));
+    		pages.add(pageText);
+    	}
+    	return pages;
+    }
+    
+    
+    /*
+     * Copies a book from the clipboard into the 'real' book
+     */
+    private void clipboardToBook(Clipboard fromBook){
+    	// Reset anything in the current book
+    	this.currPage = 0;
+    	this.cachedPage = -1;
+    	this.bookPages.clear();
+    	this.selectionStart = 0;
+    	this.selectionEnd = 0;
+    	
+    	this.bookTitle = fromBook.title;
+		
+		for (int i=0; i<clipboard.pages.size(); i++){
+    		this.bookPages.add(fromBook.pages.get(i));
+    	}
+		this.bookIsModified = true;
+		
+		if (this.bookPages.isEmpty()) {
+			this.bookPages.add("");
+		}
+    }
+    
+	
+    private void copyBook(){
+		this.clipboard.author = ""; // TODO: Do I need this field any more? Was this.author in old versions
+		this.clipboard.title = this.bookTitle;
+		this.clipboard.pages.clear();
+		this.clipboard.pages.addAll(this.pagesAsList());
+		this.clipboard.bookInClipboard = true;
+		this.printer.gamePrint(Printer.GRAY + "Book copied");
+	}
+    
+    
+    private void pasteBook(){
+    	this.clipboardToBook(this.clipboard);
+		this.printer.gamePrint(Printer.GRAY + "Book pasted");
+    }
+	
+	
+	/**
+	 * Helper function for laying out the color buttons
+	 */
+	public int getColorButX(int buttonNum){
+		int middle = this.width/2;
+		int leftMost = middle - 160;
+		return leftMost + 20 * (buttonNum-50);
+	}
+	
+	
+	/**
+	 * Helper function for laying out the format buttons
+	 */
+	public int getFormatButX(int buttonNum){
+		int middle = this.width/2;
+		int leftMost = middle - 100;
+		return leftMost + 20 * (buttonNum-66);
+	}
+	
+	
+	@Override
+	protected void init() {
+		// Note that you can use the parameter? in the lambda function like this:
+		// pressed_button.x += 20; // neat!
+		
+		//KeyboardHelper.enableRepeatEvents(true);
+		
+        int buttonWidth = 120;
+        int buttonHeight = 20;
+        int buttonSideOffset = 5;
+        
+        // Is this no longer a thing?
+        //ScaledResolution scaledResolution = new ScaledResolution(this.mc);
+  		//int rightXPos = scaledResolution.getScaledWidth() - (buttonWidth + buttonSideOffset);
+        // Temporary hack
+        int rightXPos = this.width-(buttonWidth+buttonSideOffset);
+		
+		this.buttonSaveBook = 				this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mSave Book", (pressed_button) -> {}));
+		this.buttonLoadBook = 				this.addButton(new Button(5, 25, buttonWidth, buttonHeight, "\u00a7mLoad Book", (pressed_button) -> {}));
+		this.buttonAutoReloadBook = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "\u00a7mAutoReload Book", (pressed_button) -> {}));
+		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
+			this.copyBook();
+			this.updateButtons();
+		}));
+		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, "\u00a7mPaste Book", (pressed_button) -> {
+			this.pasteBook();
+		}));
+		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, "\u00a7mCut This Page", (pressed_button) -> {}));
+		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
+			this.selectedPageA = this.currPage;
+			LOGGER.debug("Select page A pressed");
+			this.updateButtons();
+		}));
+		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
+			this.selectedPageB = this.currPage;
+			LOGGER.debug("Select page B pressed");
+			this.updateButtons();
+		}));
+		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "\u00a7mCopy This Page", (pressed_button) -> {}));
+		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, "\u00a7mPaste Page", (pressed_button) -> {}));
+		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "\u00a7mInsert Blank Page", (pressed_button) -> {}));
+		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "\u00a7mRemove Top Space", (pressed_button) -> {}));
+		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, "\u00a7mAdd Signature Pages", (pressed_button) -> {}));
+		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "\u00a7mRemove This Page", (pressed_button) -> {}));
+		                     		
+		//The horror...
+		// TODO: Compress this into a more sensible data structure?
+		int colorButY = this.height - 40;
+		int formatButY = this.height - 20;
+		
+		this.formatBlack =     		this.addButton(new Button(getColorButX(ID_BLACK), 			colorButY, 20, 20, "\u00a70A", (pressed_button) -> {this.insertTextIntoPage("\u00a70");}));
+		this.formatDarkBlue =  		this.addButton(new Button(getColorButX(ID_DARK_BLUE), 		colorButY, 20, 20, "\u00a71A", (pressed_button) -> {this.insertTextIntoPage("\u00a71");}));
+		this.formatDarkGreen = 		this.addButton(new Button(getColorButX(ID_DARK_GREEN), 		colorButY, 20, 20, "\u00a72A", (pressed_button) -> {this.insertTextIntoPage("\u00a72");}));
+		this.formatDarkAqua =  		this.addButton(new Button(getColorButX(ID_DARK_AQUA),		colorButY, 20, 20, "\u00a73A", (pressed_button) -> {this.insertTextIntoPage("\u00a73");}));
+		this.formatDarkRed = 		this.addButton(new Button(getColorButX(ID_DARK_RED), 		colorButY, 20, 20, "\u00a74A", (pressed_button) -> {this.insertTextIntoPage("\u00a74");}));
+		this.formatDarkPurple = 	this.addButton(new Button(getColorButX(ID_DARK_PURPLE), 	colorButY, 20, 20, "\u00a75A", (pressed_button) -> {this.insertTextIntoPage("\u00a75");}));
+		this.formatGold = 			this.addButton(new Button(getColorButX(ID_GOLD), 			colorButY, 20, 20, "\u00a76A", (pressed_button) -> {this.insertTextIntoPage("\u00a76");}));
+		this.formatGray = 			this.addButton(new Button(getColorButX(ID_GRAY), 			colorButY, 20, 20, "\u00a77A", (pressed_button) -> {this.insertTextIntoPage("\u00a77");}));
+		this.formatDarkGray = 		this.addButton(new Button(getColorButX(ID_DARK_GRAY), 		colorButY, 20, 20, "\u00a78A", (pressed_button) -> {this.insertTextIntoPage("\u007a8");}));
+		this.formatBlue = 			this.addButton(new Button(getColorButX(ID_BLUE), 			colorButY, 20, 20, "\u00a79A", (pressed_button) -> {this.insertTextIntoPage("\u00a79");}));
+		this.formatGreen = 			this.addButton(new Button(getColorButX(ID_GREEN), 			colorButY, 20, 20, "\u00a7aA", (pressed_button) -> {this.insertTextIntoPage("\u00a7a");}));
+		this.formatAqua = 			this.addButton(new Button(getColorButX(ID_AQUA), 			colorButY, 20, 20, "\u00a7bA", (pressed_button) -> {this.insertTextIntoPage("\u00a7b");}));
+		this.formatRed = 			this.addButton(new Button(getColorButX(ID_RED), 			colorButY, 20, 20, "\u00a7cA", (pressed_button) -> {this.insertTextIntoPage("\u00a7c");}));
+		this.formatLightPurple = 	this.addButton(new Button(getColorButX(ID_LIGHT_PURPLE),	colorButY, 20, 20, "\u00a7dA", (pressed_button) -> {this.insertTextIntoPage("\u00a7d");}));
+		this.formatYellow = 		this.addButton(new Button(getColorButX(ID_YELLOW), 			colorButY, 20, 20, "\u00a7eA", (pressed_button) -> {this.insertTextIntoPage("\u00a7e");}));
+		this.formatWhite = 			this.addButton(new Button(getColorButX(ID_WHITE), 			colorButY, 20, 20, "\u00a7fA", (pressed_button) -> {this.insertTextIntoPage("\u00a7f");}));
+		
+		this.formatObfuscated = 	this.addButton(new Button(getFormatButX(ID_OBFUSCATED), 	formatButY, 20, 20, "\u00a7kA", (pressed_button) -> {this.insertTextIntoPage("\u00a7k");}));
+		this.formatBold = 			this.addButton(new Button(getFormatButX(ID_BOLD), 			formatButY, 20, 20, "\u00a7lA", (pressed_button) -> {this.insertTextIntoPage("\u00a7l");}));
+		this.formatStrikethrough = 	this.addButton(new Button(getFormatButX(ID_STRIKETHROUGH),	formatButY, 20, 20, "\u00a7mA", (pressed_button) -> {this.insertTextIntoPage("\u00a7m");}));
+		this.formatUnderline = 		this.addButton(new Button(getFormatButX(ID_UNDERLINE), 		formatButY, 20, 20, "\u00a7nA", (pressed_button) -> {this.insertTextIntoPage("\u00a7n");}));
+		this.formatItalic = 		this.addButton(new Button(getFormatButX(ID_ITALIC), 		formatButY, 20, 20, "\u00a7oA", (pressed_button) -> {this.insertTextIntoPage("\u00a7o");}));
+		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, "Reset Formatting", (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
+
+		super.init();
+		LOGGER.debug("init done, innit");
+	}
+	
+	
+	@Override
+	public void tick() {
+		// TODO: Add autoreload check
+		++this.updateCount;
+	}
+	
+	
+	@Override
+	protected void updateButtons() {
+		super.updateButtons();
+		
+		if (this.selectedPageA >= this.getPageCount() || this.selectedPageB >= this.getPageCount()){
+    		this.selectedPageA = -1;
+    		this.selectedPageB = -1;
+    	}
+		
+    	if (this.selectedPageA != -1 && this.selectedPageB != -1 && this.selectedPageA >= 0 && this.selectedPageA <= this.selectedPageB && this.selectedPageB < this.getPageCount()){
+    		this.buttonCopySelectedPages.active = true;
+    		String xPages = ((this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
+    		this.buttonCopySelectedPages.setMessage("Copy " + xPages);
+    		this.buttonCutMultiplePages.setMessage("Cut " + xPages);
+    		this.buttonRemoveSelectedPages.setMessage("Remove " + xPages);
+    		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
+    		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    	}
+    	else if (this.selectedPageA != -1){
+    		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
+    		this.buttonCopySelectedPages.setMessage("Copy This Page");
+    		this.buttonCutMultiplePages.setMessage("Cut This Page");
+    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
+    	}
+    	else if (this.selectedPageB != -1){
+    		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    		this.buttonCopySelectedPages.setMessage("Copy This Page");
+    		this.buttonCutMultiplePages.setMessage("Cut This Page");
+    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
+    	}
+    	else{
+    		this.buttonCopySelectedPages.setMessage("Copy This Page");
+    		this.buttonCutMultiplePages.setMessage("Cut This Page");
+    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
+    		this.buttonSelectPageA.setMessage("A");
+    		this.buttonSelectPageB.setMessage("B");
+    	}
+    	
+    	this.buttonPasteBook.active = this.clipboard.bookInClipboard;
+        
+        this.buttonPasteMultiplePages.active = (this.clipboard.miscPages.size() > 0);
+        if (this.buttonPasteMultiplePages.active){
+        	this.buttonPasteMultiplePages.setMessage("Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s"));
+        }
+        else{
+        	this.buttonPasteMultiplePages.setMessage("Paste Multiple");
+        }
+        
+    	// temp strikethrough
+    	this.buttonCopySelectedPages.setMessage("\u00a7m" + this.buttonCopySelectedPages.getMessage());
+    	this.buttonCutMultiplePages.setMessage("\u00a7m" + this.buttonCutMultiplePages.getMessage());
+    	this.buttonRemoveSelectedPages.setMessage("\u00a7m" + this.buttonRemoveSelectedPages.getMessage());
+    	this.buttonPasteMultiplePages.setMessage("\u00a7m" + this.buttonPasteMultiplePages.getMessage());
+    	
+	}
+
+}

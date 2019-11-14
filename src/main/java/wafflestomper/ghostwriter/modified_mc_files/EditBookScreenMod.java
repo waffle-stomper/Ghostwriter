@@ -162,32 +162,32 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-// Note: this *should be* identical to the standard EditBookScreen, just with necessary methods set to protected instead of private
+// Note: this *should be* identical to the standard EditBookScreen, just with necessary methods set to protected instead of protected
 //       It's either this or reflection
 @OnlyIn(Dist.CLIENT)
 public class EditBookScreenMod extends Screen {
-   private final PlayerEntity editingPlayer;
-   private final ItemStack book;
-   private boolean bookIsModified; // field_214234_c;
-   private boolean bookGettingSigned; // field_214235_d;
-   private int updateCount; // field_214236_e;
-   private int currPage; //field_214237_f
-   private final List<String> bookPages = Lists.newArrayList(); // field_214238_g
-   private String bookTitle = ""; // field_214239_h
-   private int selectionEnd; // field_214240_i
-   private int selectionStart; // field_214241_j
-   private long lastClickTime; // field_214242_k (ms)
-   private int cachedPage = -1; // field_214243_l
-   private ChangePageButton buttonNextPage; // field_214244_m
-   private ChangePageButton buttonPreviousPage; // field_214245_n
-   private Button buttonDone; // field_214246_o
-   private Button buttonSign; // field_214247_p
-   private Button buttonFinalize; // field_214248_q
-   private Button buttonCancel; // field_214249_r
-   private final Hand hand;
+   protected final PlayerEntity editingPlayer;
+   protected final ItemStack book;
+   protected boolean bookIsModified; // field_214234_c;
+   protected boolean bookGettingSigned; // field_214235_d;
+   protected int updateCount; // field_214236_e;
+   protected int currPage; //field_214237_f
+   protected final List<String> bookPages = Lists.newArrayList(); // field_214238_g
+   protected String bookTitle = ""; // field_214239_h
+   protected int selectionEnd; // field_214240_i
+   protected int selectionStart; // field_214241_j
+   protected long lastClickTime; // field_214242_k (ms)
+   protected int cachedPage = -1; // field_214243_l
+   protected ChangePageButton buttonNextPage; // field_214244_m
+   protected ChangePageButton buttonPreviousPage; // field_214245_n
+   protected Button buttonDone; // field_214246_o
+   protected Button buttonSign; // field_214247_p
+   protected Button buttonFinalize; // field_214248_q
+   protected Button buttonCancel; // field_214249_r
+   protected final Hand hand;
 
    public EditBookScreenMod(PlayerEntity player, ItemStack bookIn, Hand handIn) { // PlayerEntity p_i51100_1_, ItemStack p_i51100_2_, Hand p_i51100_3_
-      super(NarratorChatListener.field_216868_a);
+      super(NarratorChatListener.EMPTY);
       this.editingPlayer = player;
       this.book = bookIn;
       this.hand = handIn;
@@ -206,7 +206,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private int getPageCount() { // func_214199_a
+   protected int getPageCount() { // func_214199_a
       return this.bookPages.size();
    }
 
@@ -257,10 +257,10 @@ public class EditBookScreenMod extends Screen {
     	Strips out delete and section characters
     	
     */
-   private String func_214219_a(String p_214219_1_) { 
+   protected String removeUnprintableChars(String text) { 
       StringBuilder stringbuilder = new StringBuilder();
 
-      for(char c0 : p_214219_1_.toCharArray()) {
+      for(char c0 : text.toCharArray()) {
          if (c0 != 167 && c0 != 127) {  // Character 127 is delete (no symbol) and 167 is the section sign
             stringbuilder.append(c0);
          }
@@ -269,7 +269,7 @@ public class EditBookScreenMod extends Screen {
       return stringbuilder.toString();
    }
 
-   private void previousPage() { // func_214228_b
+   protected void previousPage() { // func_214228_b
       if (this.currPage > 0) {
          --this.currPage;
          this.selectionEnd = 0;
@@ -279,7 +279,7 @@ public class EditBookScreenMod extends Screen {
       this.updateButtons();
    }
 
-   private void nextPage() { // func_214214_c
+   protected void nextPage() { // func_214214_c
       if (this.currPage < this.getPageCount() - 1) {
          ++this.currPage;
          this.selectionEnd = 0;
@@ -297,11 +297,13 @@ public class EditBookScreenMod extends Screen {
       this.updateButtons();
    }
 
+   
    public void removed() {
       this.minecraft.keyboardListener.enableRepeatEvents(false);
    }
 
-   private void updateButtons() { // func_214229_d
+   
+   protected void updateButtons() { // func_214229_d
       this.buttonPreviousPage.visible = !this.bookGettingSigned && this.currPage > 0;
       this.buttonNextPage.visible = !this.bookGettingSigned;
       this.buttonDone.visible = !this.bookGettingSigned;
@@ -315,7 +317,7 @@ public class EditBookScreenMod extends Screen {
    /*
     * This looks like it strips empty pages at the end of a book. It's only used in sendBookToSever
     */
-   private void trimEmptyPages() { // func_214213_e
+   protected void trimEmptyPages() { // func_214213_e
       ListIterator<String> listiterator = this.bookPages.listIterator(this.bookPages.size());
 
       while(listiterator.hasPrevious() && listiterator.previous().isEmpty()) {
@@ -324,7 +326,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void sendBookToServer(boolean publish) {  // boolean p_214198_1_
+   protected void sendBookToServer(boolean publish) {  // boolean p_214198_1_
       if (this.bookIsModified) {
          this.trimEmptyPages();
          ListNBT listnbt = new ListNBT();
@@ -342,7 +344,7 @@ public class EditBookScreenMod extends Screen {
       }
    }
 
-   private void addNewPage() { // func_214215_f
+   protected void addNewPage() { // func_214215_f
       if (this.getPageCount() < 100) {
          this.bookPages.add("");
          this.bookIsModified = true;
@@ -378,7 +380,7 @@ public class EditBookScreenMod extends Screen {
       }
    }
 
-   private boolean keyPressedInBook(int keyCode, int scanCode, int modifiers) { // func_214230_b int p_214230_1_, int p_214230_2_, int p_214230_3_
+   protected boolean keyPressedInBook(int keyCode, int scanCode, int modifiers) { // func_214230_b int p_214230_1_, int p_214230_2_, int p_214230_3_
       String s = this.getCurrPageText();
       if (Screen.isSelectAll(keyCode)) {
          this.selectionStart = 0;
@@ -388,7 +390,7 @@ public class EditBookScreenMod extends Screen {
          this.minecraft.keyboardListener.setClipboardString(this.getSelectedText());
          return true;
       } else if (Screen.isPaste(keyCode)) {
-         this.insertTextIntoPage(this.func_214219_a(TextFormatting.getTextWithoutFormattingCodes(this.minecraft.keyboardListener.getClipboardString().replaceAll("\\r", ""))));
+         this.insertTextIntoPage(this.removeUnprintableChars(TextFormatting.getTextWithoutFormattingCodes(this.minecraft.keyboardListener.getClipboardString().replaceAll("\\r", ""))));
          this.selectionStart = this.selectionEnd;
          return true;
       } else if (Screen.isCut(keyCode)) {
@@ -441,7 +443,7 @@ public class EditBookScreenMod extends Screen {
     *  Called when backspace is pressed
     * @param p_214207_1_ is the page text
     */
-   private void backspacePressed(String pageText) { // func_214207_b(String p_214207_1_)
+   protected void backspacePressed(String pageText) { // func_214207_b(String p_214207_1_)
       if (!pageText.isEmpty()) {
          if (this.selectionStart != this.selectionEnd) {
             this.removeSelectedText();
@@ -456,7 +458,7 @@ public class EditBookScreenMod extends Screen {
    }
 
    // Delete button pressed
-   private void deletePressed(String pageText) { // func_214221_c(String p_214221_1_) {
+   protected void deletePressed(String pageText) { // func_214221_c(String p_214221_1_) {
       if (!pageText.isEmpty()) {
          if (this.selectionStart != this.selectionEnd) {
             this.removeSelectedText();
@@ -468,7 +470,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void leftPressed(String pageText) { // func_214200_d(String p_214200_1_) {
+   protected void leftPressed(String pageText) { // func_214200_d(String p_214200_1_) {
 	  // System.out.println("LEFT");
       int i = this.font.getBidiFlag() ? 1 : -1;
       if (Screen.hasControlDown()) {
@@ -483,7 +485,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void rightPressed(String pageText) { //func_214218_e(String p_214218_1_) {
+   protected void rightPressed(String pageText) { //func_214218_e(String p_214218_1_) {
 	   //System.out.println("RIGHT");
       int i = this.font.getBidiFlag() ? -1 : 1;
       if (Screen.hasControlDown()) {
@@ -498,7 +500,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void upPressed(String pageText) { // func_214197_f(String p_214197_1_) {
+   protected void upPressed(String pageText) { // func_214197_f(String p_214197_1_) {
 	   //System.out.println("UP");
       if (!pageText.isEmpty()) {
          EditBookScreenMod.Point editbookscreen$point = this.func_214194_c(pageText, this.selectionEnd);
@@ -520,7 +522,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void downPressed(String pageText) { // func_214209_g(String p_214209_1_) {
+   protected void downPressed(String pageText) { // func_214209_g(String p_214209_1_) {
 	  // System.out.println("DOWN");
       if (!pageText.isEmpty()) {
          EditBookScreenMod.Point editbookscreen$point = this.func_214194_c(pageText, this.selectionEnd);
@@ -543,7 +545,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void homePressed(String pageText) { // func_214220_h(String p_214220_1_) {
+   protected void homePressed(String pageText) { // func_214220_h(String p_214220_1_) {
 	  // System.out.println("HOME");
       this.selectionEnd = this.func_214203_a(pageText, new EditBookScreenMod.Point(0, this.func_214194_c(pageText, this.selectionEnd).y));
       if (!Screen.hasShiftDown()) {
@@ -552,7 +554,7 @@ public class EditBookScreenMod extends Screen {
 
    }
 
-   private void endPressed(String pageText) { // func_214211_i(String p_214211_1_) {
+   protected void endPressed(String pageText) { // func_214211_i(String p_214211_1_) {
 	   //System.out.println("END");
       this.selectionEnd = this.func_214203_a(pageText, new EditBookScreenMod.Point(113, this.func_214194_c(pageText, this.selectionEnd).y));
       if (!Screen.hasShiftDown()) {
@@ -565,7 +567,7 @@ public class EditBookScreenMod extends Screen {
     * This seems to collapse a text selection down into a single point,  deleting as it goes?
     * Called when you type or press delete/backspace with text selected or 
     */
-   private void removeSelectedText() { // func_214192_g
+   protected void removeSelectedText() { // func_214192_g
       if (this.selectionStart != this.selectionEnd) {
          String s = this.getCurrPageText();
          int i = Math.min(this.selectionEnd, this.selectionStart);
@@ -577,14 +579,23 @@ public class EditBookScreenMod extends Screen {
       }
    }
 
-   private int func_214206_a(String p_214206_1_, int p_214206_2_) {
+   /**
+    * Only called by downPressed(S) and upPressed(S), so presumably it's for navigating through text on a page
+    * 
+    * Returns the width of the character at the given position in a string?
+    * 
+    * @param p_214206_1_ pageText?
+    * @param p_214206_2_ charPos?
+    * @return
+    */
+   protected int func_214206_a(String p_214206_1_, int p_214206_2_) {
       return (int)this.font.getCharWidth(p_214206_1_.charAt(MathHelper.clamp(p_214206_2_, 0, p_214206_1_.length() - 1)));
    }
 
    /*
     * Handles special characters being typed on the signing screen
     */
-   private boolean keyPressedInTitle(int keyCode, int scanCode, int modifiers) { //func_214196_c  int p_214196_1_, int p_214196_2_, int p_214196_3_
+   protected boolean keyPressedInTitle(int keyCode, int scanCode, int modifiers) { //func_214196_c  int p_214196_1_, int p_214196_2_, int p_214196_3_
       switch(keyCode) {
       case 257: // Enter
       case 335: // Numpad enter?
@@ -609,7 +620,7 @@ public class EditBookScreenMod extends Screen {
    /**
     * Gets the text from the current page
     */
-   private String getCurrPageText() { // func_214193_h
+   protected String getCurrPageText() { // func_214193_h
       return this.currPage >= 0 && this.currPage < this.bookPages.size() ? this.bookPages.get(this.currPage) : "";
    }
 
@@ -618,7 +629,7 @@ public class EditBookScreenMod extends Screen {
     * Set current page text
     * @param p_214217_1_ new page text
     */
-   private void func_214217_j(String p_214217_1_) {
+   protected void func_214217_j(String p_214217_1_) {
       if (this.currPage >= 0 && this.currPage < this.bookPages.size()) {
          this.bookPages.set(this.currPage, p_214217_1_);
          this.bookIsModified = true;
@@ -651,7 +662,7 @@ public class EditBookScreenMod extends Screen {
       this.renderBackground();
       this.setFocused((IGuiEventListener)null);
       GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-      this.minecraft.getTextureManager().bindTexture(ReadBookScreen.field_214167_b);
+      this.minecraft.getTextureManager().bindTexture(ReadBookScreenMod.BOOK_TEXTURES);
       int i = (this.width - 192) / 2;
       int j = 2;
       this.blit(i, 2, 0, 0, 192, 192);
@@ -700,11 +711,11 @@ public class EditBookScreenMod extends Screen {
    }
 
    
-   private int getTextWidth(String text) { // func_214225_l(String p_214225_1_) {
+   protected int getTextWidth(String text) { // func_214225_l(String p_214225_1_) {
       return this.font.getStringWidth(this.font.getBidiFlag() ? this.font.bidiReorder(text) : text);
    }
 
-   private int func_214216_b(String p_214216_1_, int p_214216_2_) {
+   protected int func_214216_b(String p_214216_1_, int p_214216_2_) {
       return this.font.sizeStringToWidth(p_214216_1_, p_214216_2_);
    }
    
@@ -714,7 +725,7 @@ public class EditBookScreenMod extends Screen {
     * only called by keyPressedInBook, (cut/copy to clipboard)
     * @return
     */
-   private String getSelectedText() { // func_214231_i
+   protected String getSelectedText() { // func_214231_i
       String s = this.getCurrPageText();
       int i = Math.min(this.selectionEnd, this.selectionStart);
       int j = Math.max(this.selectionEnd, this.selectionStart);
@@ -726,7 +737,7 @@ public class EditBookScreenMod extends Screen {
     * Only called by render()
     * Uses drawSelectionBox to draw blue boxes behind any selected text
     */
-   private void highlightSelectedText(String pageText) { // func_214222_m(String p_214222_1_) {
+   protected void highlightSelectedText(String pageText) { // func_214222_m(String p_214222_1_) {
 	   
       if (this.selectionStart != this.selectionEnd) {                    // only runs if there's a selection
     	  
@@ -771,7 +782,7 @@ public class EditBookScreenMod extends Screen {
     * @param p_214223_1_ top left?
     * @param p_214223_2_ bottom right?
     */
-   private void drawSelectionBox(EditBookScreenMod.Point topLeft, EditBookScreenMod.Point bottomRight) { // func_214223_a(EditBookScreenMod.Point p_214223_1_, EditBookScreenMod.Point p_214223_2_) {
+   protected void drawSelectionBox(EditBookScreenMod.Point topLeft, EditBookScreenMod.Point bottomRight) { // func_214223_a(EditBookScreenMod.Point p_214223_1_, EditBookScreenMod.Point p_214223_2_) {
       EditBookScreenMod.Point editbookscreen$point = new EditBookScreenMod.Point(topLeft.x, topLeft.y);
       EditBookScreenMod.Point editbookscreen$point1 = new EditBookScreenMod.Point(bottomRight.x, bottomRight.y);
       if (this.font.getBidiFlag()) {
@@ -810,7 +821,7 @@ public class EditBookScreenMod extends Screen {
     * @param p_214194_2_
     * @return
     */
-   private EditBookScreenMod.Point func_214194_c(String pageText, int p_214194_2_) { // func_214194_c(String p_214194_1_, int p_214194_2_) {
+   protected EditBookScreenMod.Point func_214194_c(String pageText, int p_214194_2_) { // func_214194_c(String p_214194_1_, int p_214194_2_) {
       EditBookScreenMod.Point editbookscreen$point = new EditBookScreenMod.Point();
       int i = 0;
       int j = 0;
@@ -845,7 +856,7 @@ public class EditBookScreenMod extends Screen {
     * Something to do with right to left text? 
     * @param p_214227_1_
     */
-   private void func_214227_a(EditBookScreenMod.Point p_214227_1_) {
+   protected void func_214227_a(EditBookScreenMod.Point p_214227_1_) {
       if (this.font.getBidiFlag()) {
          p_214227_1_.x = 114 - p_214227_1_.x;
       }
@@ -856,7 +867,7 @@ public class EditBookScreenMod extends Screen {
     * Called when selecting text?
     * @param p_214210_1_
     */
-   private void func_214210_b(EditBookScreenMod.Point p_214210_1_) {
+   protected void func_214210_b(EditBookScreenMod.Point p_214210_1_) {
       p_214210_1_.x = p_214210_1_.x - (this.width - 192) / 2 - 36;
       p_214210_1_.y = p_214210_1_.y - 32;
    }
@@ -866,13 +877,19 @@ public class EditBookScreenMod extends Screen {
     * Called when the book is opened too. Maybe sets the vertical cursor?
     * @param p_214224_1_
     */
-   private void func_214224_c(EditBookScreenMod.Point p_214224_1_) {
+   protected void func_214224_c(EditBookScreenMod.Point p_214224_1_) {
       p_214224_1_.x = p_214224_1_.x + (this.width - 192) / 2 + 36;
       p_214224_1_.y = p_214224_1_.y + 32;
    }
 
    
-   private int func_214226_d(String p_214226_1_, int p_214226_2_) {
+   /**
+    * Only called by func_214203_a(S,P)
+    * @param p_214226_1_
+    * @param p_214226_2_
+    * @return
+    */
+   protected int func_214226_d(String p_214226_1_, int p_214226_2_) {
       if (p_214226_2_ < 0) {
          return 0;
       } else {
@@ -922,7 +939,7 @@ public class EditBookScreenMod extends Screen {
     * @param p_214203_2_
     * @return
     */
-   private int func_214203_a(String p_214203_1_, EditBookScreenMod.Point p_214203_2_) {
+   protected int func_214203_a(String p_214203_1_, EditBookScreenMod.Point p_214203_2_) {
       int i = 16 * 9;
       if (p_214203_2_.y > i) {
          return -1;
@@ -1015,8 +1032,8 @@ public class EditBookScreenMod extends Screen {
 
    @OnlyIn(Dist.CLIENT)
    class Point {
-      private int x; // field_216928_b
-      private int y; // field_216929_c
+      protected int x; // field_216928_b
+      protected int y; // field_216929_c
 
       Point() {
       }

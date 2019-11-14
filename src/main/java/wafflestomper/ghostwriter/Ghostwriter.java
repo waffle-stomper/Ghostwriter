@@ -23,6 +23,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import wafflestomper.ghostwriter.modified_mc_files.EditBookScreenMod;
+import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 
 @Mod("ghostwriter")
@@ -75,10 +77,18 @@ public class Ghostwriter{
 		Screen eventGui = event.getGui();
 		if (eventGui == null){return;}
 		LOGGER.debug(eventGui.toString());
+		
 		// TODO: Signed books are handled differently from unsigned books for some bizarre reason
-		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen) {// || eventGui instanceof ReadBookScreen){
+		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen || eventGui instanceof ReadBookScreen){
 			ClientPlayerEntity p = this.mc.player;
         	ItemStack currStack = p.getHeldItem(Hand.MAIN_HAND);
+        	
+			// Abort if the player is crouching
+			if (p.isSneaking()) {
+				LOGGER.debug("Aborting GUI replacement becuase the player is crouching");
+				return;
+			}
+        	
         	if (currStack != null){
         		Item currItem = currStack.getItem();
         		if (currItem != null){
@@ -88,7 +98,14 @@ public class Ghostwriter{
 //        			}
         			//eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND); // p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
         			
-        			eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND);
+        			if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen){
+        				eventGui = new GhostwriterEditBookScreen(p, currStack, Hand.MAIN_HAND, this.clipboard);
+            			//eventGui = new EditBookScreenMod(p,currStack, Hand.MAIN_HAND);
+        			}
+        			else {
+        				ReadBookScreen factoryScreen = (ReadBookScreen)eventGui;
+        				eventGui = new ReadBookScreenMod(new ReadBookScreenMod.WrittenBookInfo(currStack), false);
+        			}
         			event.setGui(eventGui);
         			LOGGER.debug("GUI swap done!");
         		}
