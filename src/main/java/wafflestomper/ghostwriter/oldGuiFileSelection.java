@@ -1,10 +1,10 @@
 package wafflestomper.ghostwriter;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import net.minecraft.client.gui.screen.Screen;
+//import java.io.File;
+//import java.io.IOException;
+//import java.util.List;
+//
+//import net.minecraft.client.gui.screen.Screen;
 
 
 // public class GuiFileSelection extends Screen{

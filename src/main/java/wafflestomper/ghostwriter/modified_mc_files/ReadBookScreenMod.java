@@ -1,14 +1,16 @@
 package wafflestomper.ghostwriter.modified_mc_files;
 
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.mojang.blaze3d.platform.GlStateManager;
-import java.util.Collections;
-import java.util.List;
-import javax.annotation.Nullable;
+
 import net.minecraft.client.gui.RenderComponentsUtil;
 import net.minecraft.client.gui.chat.NarratorChatListener;
-import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.button.ChangePageButton;

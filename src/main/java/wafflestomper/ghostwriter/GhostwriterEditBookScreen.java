@@ -172,16 +172,12 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.common.collect.Lists;
-
-import net.minecraft.client.gui.screen.EditBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import wafflestomper.ghostwriter.modified_mc_files.EditBookScreenMod;
 
 @OnlyIn(Dist.CLIENT)
@@ -282,7 +278,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
 	
     private List<String> pagesAsList(){
-    	List<String> pages = new ArrayList();
+    	List<String> pages = new ArrayList<String>();
     	for (int i=0; i<this.getPageCount(); i++){
             // Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings 
             //  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once

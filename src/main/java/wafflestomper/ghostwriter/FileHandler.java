@@ -31,11 +31,11 @@ public class FileHandler {
 	private File defaultPath;
 	private File bookSavePath;
 	private File signaturePath;
-	private Printer printer = new Printer();
+	private static final Printer printer = new Printer();
 	private Clipboard clipboard;
 	
 	public File currentPath;
-	private List<File> lastListing = new ArrayList();
+	private List<File> lastListing = new ArrayList<File>();
 	private String lastCheckedPath = "";
 	
 	//File formats
@@ -74,7 +74,7 @@ public class FileHandler {
 			this.lastCheckedPath = path.getAbsolutePath();
 			this.lastListing.clear();
 			File[] newList = path.listFiles();
-			List<File> files = new ArrayList();
+			List<File> files = new ArrayList<File>();
 			for (File f : newList){
 				if (f.isDirectory()){
 					this.lastListing.add(f);
@@ -101,7 +101,7 @@ public class FileHandler {
 	}
 	
 	public List<File> getValidRoots(){
-		List<File> outList = new ArrayList();
+		List<File> outList = new ArrayList<File>();
 		for (File root : File.listRoots()){
 			if (root.listFiles() != null){
 				outList.add(root);
@@ -115,7 +115,7 @@ public class FileHandler {
 	}
 	
 	public List<String> readFile(File path, String encoding){
-		List<String> out = new ArrayList();
+		List<String> out = new ArrayList<String>();
 		BufferedReader br = null;
 		
 		CharsetDecoder decoder = Charset.forName(encoding).newDecoder();
@@ -124,7 +124,7 @@ public class FileHandler {
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(path), decoder));
 		} catch (FileNotFoundException e) {
-			this.printer.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
+			printer.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
 			return null;
 		}
 	    try {
@@ -137,7 +137,7 @@ public class FileHandler {
 	    catch (CharacterCodingException e){
 	    	// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
 	    	if (encoding == "UTF-8"){
-	    		this.printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
+	    		printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
 	    		// Try ISO-8859-15
 	    		try {
 					br.close();
@@ -146,12 +146,12 @@ public class FileHandler {
 				}
 	    		return readFile(path, "ISO-8859-15");
 	    	}
-	    	this.printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
+	    	printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
 	    	return null;
 	    }
 	    catch (IOException e) {
 			e.printStackTrace();
-			this.printer.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
+			printer.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
 			return null;
 		} 
 	    finally {
@@ -254,7 +254,7 @@ public class FileHandler {
 		}
 		
 		if (failedFlag){
-			this.printer.gamePrint(printer.RED + "WRITING TO DISK FAILED!");
+			printer.gamePrint(Printer.RED + "WRITING TO DISK FAILED!");
 			return false;
 		}		
 		return true;
@@ -358,8 +358,8 @@ public class FileHandler {
 	
 	
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
-		this.printer.gamePrint(Printer.GRAY + "Saving book to file...");
-		List<String> toWrite = new ArrayList();
+		printer.gamePrint(Printer.GRAY + "Saving book to file...");
+		List<String> toWrite = new ArrayList<String>();
 		toWrite.add("//Book saved in GHB format at " + getUTC());
 		if (!title.isEmpty()){toWrite.add("title:" + title);}
 		if (!author.isEmpty()){toWrite.add("author:" + author);}
@@ -384,11 +384,11 @@ public class FileHandler {
 			}
 		}
 		if (writeFile(toWrite, savePath)){
-			this.printer.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
+			printer.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
 			return true;
 		}
 		else{
-			this.printer.gamePrint(printer.RED + "WRITING BOOK TO DISK FAILED!");
+			printer.gamePrint(Printer.RED + "WRITING BOOK TO DISK FAILED!");
 			return false;
 		}
 	}

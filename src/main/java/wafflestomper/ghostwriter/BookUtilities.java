@@ -241,7 +241,7 @@ public class BookUtilities {
 		}
 		//Split string at newline characters
 		String[] lines = str.split("\\n");
-		List<String> out = new ArrayList();
+		List<String> out = new ArrayList<String>();
 		for (String line : lines){
 			out.addAll(Arrays.asList(wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR)));
 		}
@@ -256,7 +256,7 @@ public class BookUtilities {
 	 */
 	public static List<String> stringToPages(String str){
 		String wrapped = wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH);
-		List<String> pages = new ArrayList();
+		List<String> pages = new ArrayList<String>();
 		int newLineCount = 0;
 		int charCount = 0;
 		char currChar;
@@ -309,7 +309,7 @@ public class BookUtilities {
 			str = str.substring(pageBreakString.length(), str.length()-1);
 		}
 		String[] pageBroken = str.split(pageBreakString);
-		List<String> out = new ArrayList();
+		List<String> out = new ArrayList<String>();
 		for (String largePage : pageBroken){
 			out.addAll(stringToPages(largePage));
 		}
