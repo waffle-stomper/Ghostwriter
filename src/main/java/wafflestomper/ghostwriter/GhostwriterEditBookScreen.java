@@ -294,6 +294,21 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     }
     
     
+    private void bookChanged(boolean resetPageSelection){
+    	this.bookIsModified = true;
+		this.selectionStart = 0;
+		this.selectionEnd = 0;
+		this.cachedPage = -1;
+		
+		if (resetPageSelection){
+			this.selectedPageA = -1;
+			this.selectedPageB = -1;
+		}
+		
+		this.updateButtons();
+    }
+    
+    
     private void removePages(){
     	int from = Math.min(this.selectedPageA, this.selectedPageB);
     	int to = Math.max(this.selectedPageA, this.selectedPageB);
@@ -329,10 +344,24 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     		}
     	}
     	
-        this.bookIsModified = true;
-		this.selectedPageA = -1;
-		this.selectedPageB = -1;
-		this.updateButtons();
+    	// Ensure we're not left with a truely empty book
+    	if (this.bookPages.isEmpty()) {
+    		printer.gamePrint("Wow, I had to add a page");
+    		this.bookPages.add("");
+    	}
+    	
+        this.bookChanged(true);
+    }
+    
+    
+    /** 
+     * Removes whitespace from the top and bottom of the current page without affecting subsequent pages
+     */
+    private void collapseTop() {
+    	String trimmed = this.getCurrPageText().trim();
+		this.bookPages.set(this.currPage, trimmed);
+		this.bookChanged(false);
+		printer.gamePrint(Printer.GRAY + "Leading whitespace removed");
     }
     
     
@@ -341,11 +370,8 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
      */
     private void clipboardToBook(Clipboard fromBook){
     	// Reset anything in the current book
-    	this.currPage = 0;
-    	this.cachedPage = -1;
     	this.bookPages.clear();
-    	this.selectionStart = 0;
-    	this.selectionEnd = 0;
+    	this.bookChanged(true);
     	
     	this.bookTitle = fromBook.title;
 		
@@ -406,13 +432,9 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		for (int i=from; i<=to; i++){
 			this.clipboard.miscPages.add(pagesAsList.get(i));
 		}
+		
 		this.removePages();
-		
-		this.bookIsModified = true;
-		this.selectedPageA = -1;
-		this.selectedPageB = -1;
-		this.updateButtons();
-		
+		this.bookChanged(true);
 		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " cut");
     }
     
@@ -421,6 +443,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     	if (this.bookPages.size() < MAX_BOOK_PAGES) {
     		this.bookPages.add(this.currPage, "");
     		printer.gamePrint(Printer.GRAY + "Page inserted");
+    		this.bookChanged(false);
     	}
     	else {
     		printer.gamePrint(Printer.RED + "Cannot add another page! Book is already " + MAX_BOOK_PAGES + " pages long!");
@@ -430,7 +453,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     
     private void pasteBook(){
     	this.clipboardToBook(this.clipboard);
-    	this.bookIsModified = true;
+    	this.bookChanged(true);
 		printer.gamePrint(Printer.GRAY + "Book pasted");
     }
     
@@ -453,7 +476,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 			}
     		this.bookPages.set(i, pageNewText);
     	}
-    	this.bookIsModified = true;
+    	this.bookChanged(false);
         printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " pasted");
     }
 	
@@ -524,7 +547,9 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "Insert Blank Page", (pressed_button) -> {
 			this.insertPage();
 		}));
-		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "\u00a7mRemove Top Space", (pressed_button) -> {}));
+		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "Remove Top Space", (pressed_button) -> {
+			this.collapseTop();
+		}));
 		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, "\u00a7mAdd Signature Pages", (pressed_button) -> {}));
 		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "Remove This Page", (pressed_button) -> {
 			this.removePages();

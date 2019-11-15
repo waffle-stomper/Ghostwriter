@@ -1,3 +1,7 @@
+# local nonsense
+Run Server.*
+*.ods
+
 # eclipse
 bin
 *.launch
