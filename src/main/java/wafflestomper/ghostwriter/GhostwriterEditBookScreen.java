@@ -598,8 +598,6 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.buttonDone.y = 145;
 		this.buttonCancel.y = 145;
 		
-		
-		
 		this.updateButtons();
 		LOGGER.debug("init done, innit");
 	}

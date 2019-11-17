@@ -1,20 +1,24 @@
 package wafflestomper.ghostwriter;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.SlotGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Hand;
 import net.minecraft.util.text.StringTextComponent;
+import wafflestomper.ghostwriter.FileSelectionList.PathItemEntry;
+import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
-public class GuiFileBrowser extends Screen{// implements YesNoCallback{
+public class GuiFileBrowser extends Screen{ 
+	// TODO: Add overwrite warning when saving over another file
+	// TODO: Add file hashes. Maybe color coded for easy recognition?
 	
-	//private GuiSaveAs.ScrollList scrollList;
 	private FileSelectionList fileSelectionList;
 	public int slotSelected = -1;
 	private TextFieldWidget filenameField;
@@ -32,32 +36,26 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 	private static final int BTN_SAVE = 0;
 	private static final int BTN_CANCEL = 1;
 	
+	private Button btnLoad;
 	private Button btnSave;
 	private Button btnCancel;
 	
-	private String bookTitle = "";
-	private String bookAuthor = "";
-	private List<String> bookPages;
 	private static final Minecraft mc = Minecraft.getInstance();
 	private boolean initialized = false;
 	
 	private static final int SLOT_HEIGHT = 12;
 	
 
-	public GuiFileBrowser(Screen _parentGui, String _title, String _author, List<String> _pages){
+	public GuiFileBrowser(Screen _parentGui){
 		super(new StringTextComponent("Title I think?")); // TODO
 		this.parentGui = _parentGui;
 		this.fileHandler = new FileHandler(this.tempClipboard);
 		this.fileHandler.currentPath = this.fileHandler.getSavePath();
-		this.displayPath = this.fileHandler.currentPath.getAbsolutePath();
-		this.bookTitle = _title;
-		this.bookAuthor = _author;
-		this.bookPages = _pages;
 	}
 	
 	
 	private void driveButtonClicked(File root) {
-		System.out.println("Drive button clicked " + root);
+		this.fileHandler.currentPath = root;
 	}
 	
 	
@@ -68,8 +66,15 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 		if (this.initialized == false) {
 			this.fileSelectionList = new FileSelectionList(this, this.mc, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-50, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{}));
-			this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{}));
+			this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
+				// TODO
+			}));
+			this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
+				// TODO
+			}));
+			this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
+				goBackToParentGui();
+			}));
 			
 			//Add buttons for each non-empty drive letter
 			int rootNum = 100;
@@ -81,12 +86,28 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 				rootNum++;
 				//
 			}
+			
 			populateFileList();
-	//		this.scrollList.registerScrollButtons(4, 5);
 			this.filenameField = new TextFieldWidget(this.mc.fontRenderer, this.width/2-125, this.height-32, 250, 20, "filename");
 			this.filenameField.setMaxStringLength(100);
-			String ftitle = this.bookTitle.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-			String fauthor = this.bookAuthor.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
+			// Add default filename to filenameField
+			String ftitle = "";
+			String fauthor = "";
+			if (this.parentGui instanceof GhostwriterEditBookScreen) {
+				GhostwriterEditBookScreen parentBook = (GhostwriterEditBookScreen)this.parentGui;
+				ftitle = parentBook.getBookTitle();
+			}
+			if (this.parentGui instanceof ReadBookScreenMod) { //  TODO: Change this placeholder to the Ghostwriter version
+				ItemStack itemstack = this.mc.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
+			    if (itemstack.getItem() == Items.WRITTEN_BOOK){
+			    	CompoundNBT compoundnbt = itemstack.getTag();
+			        fauthor = compoundnbt.getString("author"); // TODO: Error handling
+			        ftitle = compoundnbt.getString("title");
+				}
+			}
+			
+			ftitle = ftitle.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
+			fauthor = fauthor.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
 			String defaultFilename = ftitle + "_" + fauthor + "_" + this.fileHandler.getUTC() + ".ghb";
 			this.filenameField.setText(defaultFilename);
 			
@@ -94,9 +115,23 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 		}
 		else {
 			// TODO: Do resizing here
+			System.out.println("RESIZE ME!");
 		}
+		
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
+	}
+	
+	
+	public void setDirectoryDirty() {
+		this.directoryDirty = true;
+	}
+	
+	
+	public void navigateUp() {
+		this.fileHandler.navigateUp();
+		this.directoryDirty = true;
+		this.displayPath = this.fileHandler.currentPath.getAbsolutePath();
 	}
 	
 	
@@ -124,12 +159,15 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 	
 	public void setSelectedSlot(FileSelectionList.Entry entry) {
 		this.fileSelectionList.setSelected(entry);
-		System.out.println("File selected! Do something here?");
+		if (entry instanceof PathItemEntry) {
+			System.out.println("File selected! Do something here?");
+		}
 	}
 	
 	@Override
 	public void tick(){
 		this.filenameField.tick();
+		this.populateFileList();
 		super.tick();
 	}
 	
@@ -161,7 +199,7 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 			return true;
 		}
 		// TODO: Escape should kick back to the parent GUI
-		// TODO: Add ctrl+s to save
+		// TODO: Add ctrl+s to save, maybe ctrl+d to load?
 		return this.filenameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
 	}
 	
@@ -177,7 +215,12 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 		}    	
 	}
 	
-	
+	/**
+	 * Callback from the old overwrite confirmation screen
+	 * @param result
+	 * @param id
+	 */
+	@Deprecated
 	public void confirmClicked(boolean result, int id)
 	{
 		if (id == 1000){
@@ -197,9 +240,10 @@ public class GuiFileBrowser extends Screen{// implements YesNoCallback{
 	
 	
 	private void saveBook(){
-		if (this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.bookPages, getSavePath())){
-			this.mc.displayGuiScreen(GuiFileBrowser.this.parentGui);
-		}
+//		if (this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.bookPages, getSavePath())){
+//			this.mc.displayGuiScreen(GuiFileBrowser.this.parentGui);
+//		}
+		// TODO
 	}
 	
 	

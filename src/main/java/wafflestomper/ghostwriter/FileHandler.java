@@ -92,7 +92,10 @@ public class FileHandler {
 	 * Navigates into the parent folder (of this.currentPath)
 	 */
 	public void navigateUp(){
-		for (File root : File.listRoots()){
+		if (this.currentPath.getParentFile() == null) {
+			return;
+		}
+		for (File root : File.listRoots()){ // TODO: Is this still required now that we have the check above?
 			if (this.currentPath.equals(root)){
 				return;
 			}

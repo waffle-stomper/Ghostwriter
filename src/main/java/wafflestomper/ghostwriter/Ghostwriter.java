@@ -72,7 +72,7 @@ public class Ghostwriter{
 		// TODO: Signed books are handled differently from unsigned books for some bizarre reason
 		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen || eventGui instanceof ReadBookScreen){
 			ClientPlayerEntity p = this.mc.player;
-        	ItemStack currStack = p.getHeldItem(Hand.MAIN_HAND);
+        	ItemStack currStack = p.getHeldItem(Hand.MAIN_HAND); // TODO: Does this need to take the off hand into account too?
         	
 			// Abort if the player is crouching
 			if (p.isSneaking()) {
