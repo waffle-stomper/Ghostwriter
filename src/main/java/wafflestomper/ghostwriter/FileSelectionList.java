@@ -122,37 +122,17 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
 	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
 	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
-	         if (d0 <= 32.0D) { // What is this? Some kind of left-right thing?
-
-
-//	            int i = this.owner.serverListSelector.children().indexOf(this);
-//	            if (d0 < 16.0D && d1 < 16.0D && i > 0) {
-//	               int k = Screen.hasShiftDown() ? 0 : i - 1;
-//	               this.owner.getServerList().swapServers(i, k);
-//	               if (this.owner.serverListSelector.getSelected() == this) {
-//	                  this.owner.func_214287_a(this);
-//	               }
-//
-//	               this.owner.serverListSelector.updateOnlineServers(this.owner.getServerList());
-//	               return true;
-//	            }
-//
-//	            if (d0 < 16.0D && d1 > 16.0D && i < this.owner.getServerList().countServers() - 1) {
-//	               ServerList serverlist = this.owner.getServerList();
-//	               int j = Screen.hasShiftDown() ? serverlist.countServers() - 1 : i + 1;
-//	               serverlist.swapServers(i, j);
-//	               if (this.owner.serverListSelector.getSelected() == this) {
-//	                  this.owner.func_214287_a(this);
-//	               }
-//
-//	               this.owner.serverListSelector.updateOnlineServers(serverlist);
-//	               return true;
-//	            }
-	         }
+	    
 	         this.owner.setSelectedSlot(this);
+	         if (Util.milliTime() - this.lastClickTime < 250L && this.path.isDirectory()) {
+	            // TODO: Double click handling
+	        	 this.lastClickTime = 0; // Prevent triple-click
+	        	 this.owner.navigateInto(path);
+	        	 return true;
+	         }
 
 	         this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
-	         return false;
+	         return false; // TODO: Should this really return false?
 	      }
 		
 	}

@@ -4,14 +4,19 @@ import java.io.File;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ServerSelectionList;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import wafflestomper.ghostwriter.FileSelectionList.Entry;
 import wafflestomper.ghostwriter.FileSelectionList.ParentDirEntry;
 import wafflestomper.ghostwriter.FileSelectionList.PathItemEntry;
@@ -30,6 +35,7 @@ public class GuiFileBrowser extends Screen{
 	
 	private Screen parentGui; // TODO: genericize somehow?
 	private Clipboard tempClipboard = new Clipboard();
+	private static Printer printer = new Printer();
 	
 	private FileHandler fileHandler;
 	private String displayPath = "";
@@ -44,7 +50,6 @@ public class GuiFileBrowser extends Screen{
 	private Button btnSave;
 	private Button btnCancel;
 	
-	private static final Minecraft mc = Minecraft.getInstance();
 	private boolean initialized = false;
 	
 	private static final int SLOT_HEIGHT = 12;
@@ -63,36 +68,32 @@ public class GuiFileBrowser extends Screen{
 	}
 	
 	
+	/**
+	 * Called when the user clicks a button on the overwrite confirmation screen
+	 * @param confirmed true if they clicked the left button, false if they clicked the one on the right
+	 */
+	public void saveCallback(boolean confirmed){
+		System.out.println("Wow, this actually worked! " + confirmed);
+		if (confirmed) {
+			// Do the save, then kick back to the book
+			printer.gamePrint(Printer.RED + "SAVE CODE STILL NEEDS TO BE WRITTEN!");
+			this.minecraft.displayGuiScreen(this.parentGui);
+		}
+		else {
+			this.minecraft.displayGuiScreen(this);
+		}
+	}
+	
+	
 	public void init(){
+		System.out.println("Init() called");
 		super.init();
 		this.minecraft.keyboardListener.enableRepeatEvents(true);
 		
 		if (this.initialized == false) {
-			this.fileSelectionList = new FileSelectionList(this, this.mc, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
+			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
-				// TODO
-			}));
-			this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
-				// TODO
-			}));
-			this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
-				goBackToParentGui();
-			}));
-			
-			//Add buttons for each non-empty drive letter
-			int rootNum = 100;
-			List<File> roots = this.fileHandler.getValidRoots();
-			for (File root : roots){
-				this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20, root.getAbsolutePath(), (pressedButton)->{
-					this.driveButtonClicked(root); // TODO: Test this to make sure it actually works
-				}));
-				rootNum++;
-				//
-			}
-			
-			this.populateFileList();
-			this.filenameField = new TextFieldWidget(this.mc.fontRenderer, this.width/2-125, this.height-32, 250, 20, "filename");
+			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-32, 250, 20, "filename");
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
 			String ftitle = "";
@@ -102,7 +103,7 @@ public class GuiFileBrowser extends Screen{
 				ftitle = parentBook.getBookTitle();
 			}
 			if (this.parentGui instanceof ReadBookScreenMod) { //  TODO: Change this placeholder to the Ghostwriter version
-				ItemStack itemstack = this.mc.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
+				ItemStack itemstack = this.minecraft.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
 			    if (itemstack.getItem() == Items.WRITTEN_BOOK){
 			    	CompoundNBT compoundnbt = itemstack.getTag();
 			        fauthor = compoundnbt.getString("author"); // TODO: Error handling
@@ -117,11 +118,35 @@ public class GuiFileBrowser extends Screen{
 			
 			this.initialized = true;
 		}
-		else {
-			// TODO: Do resizing here
-			System.out.println("RESIZE ME!");
+		
+		this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
+			// TODO
+		}));
+		this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
+			// Template for this found in the delete button on MultiplayerScreen
+			ITextComponent itextcomponent = new StringTextComponent("Are you sure you wish to overwrite <filename>?");
+			ITextComponent itextcomponent1 = new StringTextComponent("");
+			String s1 = "Delete button (yes?)";
+			String s2 = "Cancel button";
+			minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
+		}));
+		this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
+			goBackToParentGui();
+		}));
+		
+		//Add buttons for each non-empty drive letter
+		int rootNum = 100;
+		List<File> roots = this.fileHandler.getValidRoots();
+		for (File root : roots){
+			this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20, root.getAbsolutePath(), (pressedButton)->{
+				this.driveButtonClicked(root); // TODO: Test this to make sure it actually works
+			}));
+			rootNum++;
+			//
 		}
 		
+		// TODO: Do resizing here
+		System.out.println("RESIZE ME!");
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
 	}
@@ -156,7 +181,7 @@ public class GuiFileBrowser extends Screen{
 		this.btnSave.active = this.isFilenameValid();
 		this.fileSelectionList.render(p_render_1_, p_render_2_, p_render_3_);
 		super.render(p_render_1_, p_render_2_, p_render_3_);
-		this.drawCenteredString(this.mc.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
+		this.drawCenteredString(this.minecraft.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
 		this.filenameField.render(p_render_1_, p_render_2_, p_render_3_);
 	}
 	
@@ -184,6 +209,7 @@ public class GuiFileBrowser extends Screen{
 		this.filenameField.tick();
 		this.btnSave.active = this.isFilenameValid();
 		if (this.fileHandler.currentPath != this.cachedPath) {
+			this.directoryDirty = true; // This probably isn't necessary - it forces a refresh
 			this.populateFileList();
 		}
 		super.tick();
@@ -205,7 +231,7 @@ public class GuiFileBrowser extends Screen{
 	
 	
 	private void goBackToParentGui(){
-		this.mc.displayGuiScreen(this.parentGui);
+		this.minecraft.displayGuiScreen(this.parentGui);
 	}
 	
 	
@@ -247,7 +273,7 @@ public class GuiFileBrowser extends Screen{
 				saveBook();
 			}
 			else{
-				this.mc.displayGuiScreen(this);
+				this.minecraft.displayGuiScreen(this);
 			}
 		}
 	}
@@ -296,6 +322,11 @@ public class GuiFileBrowser extends Screen{
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
 		this.filenameField.mouseClicked(mouseX, mouseY, mouseButton);
 		return super.mouseClicked(mouseX, mouseY, mouseButton);
+	}
+
+
+	public void navigateInto(File path) {
+		this.fileHandler.currentPath = path;
 	}
 	
 	
