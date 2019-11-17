@@ -12,6 +12,8 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.StringTextComponent;
+import wafflestomper.ghostwriter.FileSelectionList.Entry;
+import wafflestomper.ghostwriter.FileSelectionList.ParentDirEntry;
 import wafflestomper.ghostwriter.FileSelectionList.PathItemEntry;
 import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
@@ -23,6 +25,8 @@ public class GuiFileBrowser extends Screen{
 	public int slotSelected = -1;
 	private TextFieldWidget filenameField;
 	private boolean directoryDirty = false;
+	private File cachedPath;
+	private File selectedFile = null;
 	
 	private Screen parentGui; // TODO: genericize somehow?
 	private Clipboard tempClipboard = new Clipboard();
@@ -87,7 +91,7 @@ public class GuiFileBrowser extends Screen{
 				//
 			}
 			
-			populateFileList();
+			this.populateFileList();
 			this.filenameField = new TextFieldWidget(this.mc.fontRenderer, this.width/2-125, this.height-32, 250, 20, "filename");
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
@@ -159,15 +163,29 @@ public class GuiFileBrowser extends Screen{
 	
 	public void setSelectedSlot(FileSelectionList.Entry entry) {
 		this.fileSelectionList.setSelected(entry);
-		if (entry instanceof PathItemEntry) {
-			System.out.println("File selected! Do something here?");
+		if (entry instanceof FileSelectionList.PathItemEntry) {
+			FileSelectionList.PathItemEntry p = (FileSelectionList.PathItemEntry)entry;
+			if (p.path != this.selectedFile && p.path.isFile()) {
+				this.btnLoad.active = this.fileHandler.loadBook(p.path);
+				this.selectedFile = p.path;
+				this.filenameField.setText(p.path.getName());
+				return;
+			}
 		}
+		this.btnLoad.active = false;
+		this.selectedFile = null;
 	}
+	
+
+	
 	
 	@Override
 	public void tick(){
 		this.filenameField.tick();
-		this.populateFileList();
+		this.btnSave.active = this.isFilenameValid();
+		if (this.fileHandler.currentPath != this.cachedPath) {
+			this.populateFileList();
+		}
 		super.tick();
 	}
 	
@@ -182,6 +200,7 @@ public class GuiFileBrowser extends Screen{
 	private void populateFileList(){
 		this.fileSelectionList.updateFileList(this.fileHandler.listFiles(this.fileHandler.currentPath, this.directoryDirty));
 		this.directoryDirty = false;
+		this.cachedPath = this.fileHandler.currentPath;
 	}
 	
 	

@@ -150,11 +150,8 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 //	            }
 	         }
 	         this.owner.setSelectedSlot(this);
-	         if (Util.milliTime() - this.lastClickTime < 250L) {
-	            // TODO: Double click handling
-	         }
 
-	         this.lastClickTime = Util.milliTime();
+	         this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
 	         return false;
 	      }
 		
