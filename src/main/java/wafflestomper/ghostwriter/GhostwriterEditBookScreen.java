@@ -514,7 +514,10 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         // Temporary hack
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonSaveBook = 				this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mSave Book", (pressed_button) -> {}));
+		this.buttonSaveBook = 				this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mSave Book", (pressed_button) -> {
+			// TODO
+			this.minecraft.displayGuiScreen(new GuiFileBrowser(this, this.bookTitle, "", this.pagesAsList()));
+		}));
 		this.buttonLoadBook = 				this.addButton(new Button(5, 25, buttonWidth, buttonHeight, "\u00a7mLoad Book", (pressed_button) -> {}));
 		this.buttonAutoReloadBook = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "\u00a7mAutoReload Book", (pressed_button) -> {}));
 		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
