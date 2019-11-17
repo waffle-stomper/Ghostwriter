@@ -222,8 +222,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	private static final int ID_RESET_FORMAT = 71;
 	private static final int ID_CURRENT_FORMAT = 72;
 	
-	private Button buttonSaveBook;
-	private Button buttonLoadBook;
+	private Button buttonFileBrowser;
 	private Button buttonAutoReloadBook;
 	private Button buttonCopyBook;
 	private Button buttonPasteBook;
@@ -499,6 +498,8 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
 	@Override
 	protected void init() {
+		// TODO: Should this only happen once? (i.e. have an initialized field)
+		
 		// Note that you can use the parameter? in the lambda function like this:
 		// pressed_button.x += 20; // neat!
 		
@@ -514,11 +515,10 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         // Temporary hack
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonSaveBook = 				this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mSave Book", (pressed_button) -> {
+		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mFile Browser", (pressed_button) -> {
 			// TODO
-			this.minecraft.displayGuiScreen(new GuiFileBrowser(this, this.bookTitle, "", this.pagesAsList()));
+			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
 		}));
-		this.buttonLoadBook = 				this.addButton(new Button(5, 25, buttonWidth, buttonHeight, "\u00a7mLoad Book", (pressed_button) -> {}));
 		this.buttonAutoReloadBook = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "\u00a7mAutoReload Book", (pressed_button) -> {}));
 		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
 			this.copyBook();
@@ -584,6 +584,22 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, "Reset Formatting", (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
 
 		super.init();
+		// Move standard buttons
+		this.buttonSign.setWidth(buttonWidth);
+		this.buttonFinalize.setWidth(buttonWidth);
+		this.buttonDone.setWidth(buttonWidth);
+		this.buttonCancel.setWidth(buttonWidth);
+		this.buttonSign.x = buttonSideOffset;
+		this.buttonFinalize.x = buttonSideOffset;
+		this.buttonDone.x = buttonSideOffset;
+		this.buttonCancel.x =  buttonSideOffset;
+		this.buttonSign.y = 120;
+		this.buttonFinalize.y = 120;
+		this.buttonDone.y = 145;
+		this.buttonCancel.y = 145;
+		
+		
+		
 		this.updateButtons();
 		LOGGER.debug("init done, innit");
 	}
@@ -641,6 +657,10 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         else{
         	this.buttonPasteMultiplePages.setMessage("Paste Multiple");
         }
+	}
+	
+	public String getBookTitle() {
+		return this.bookTitle;
 	}
 
 }
