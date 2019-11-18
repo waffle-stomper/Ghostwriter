@@ -76,11 +76,26 @@ public class GuiFileBrowser extends Screen{
 		System.out.println("Wow, this actually worked! " + confirmed);
 		if (confirmed) {
 			// Do the save, then kick back to the book
-			printer.gamePrint(Printer.RED + "SAVE CODE STILL NEEDS TO BE WRITTEN!");
-			this.minecraft.displayGuiScreen(this.parentGui);
+			saveBook();
 		}
 		else {
 			this.minecraft.displayGuiScreen(this);
+		}
+	}
+	
+	
+	private void saveClicked() {
+		// Template for this found in the delete button on MultiplayerScreen
+		File savepath = new File(this.fileHandler.currentPath, this.filenameField.getText());
+		if (savepath.exists()){
+			ITextComponent itextcomponent = new StringTextComponent("Are you sure you wish to overwrite this file?");
+			ITextComponent itextcomponent1 = new StringTextComponent(this.filenameField.getText());
+			String s1 = "Yes";
+			String s2 = "Cancel";
+			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
+		}
+		else {
+			this.saveBook();
 		}
 	}
 	
@@ -123,12 +138,7 @@ public class GuiFileBrowser extends Screen{
 			// TODO
 		}));
 		this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
-			// Template for this found in the delete button on MultiplayerScreen
-			ITextComponent itextcomponent = new StringTextComponent("Are you sure you wish to overwrite <filename>?");
-			ITextComponent itextcomponent1 = new StringTextComponent("");
-			String s1 = "Delete button (yes?)";
-			String s2 = "Cancel button";
-			minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
+			this.saveClicked();
 		}));
 		this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
 			goBackToParentGui();
@@ -260,63 +270,26 @@ public class GuiFileBrowser extends Screen{
 		}    	
 	}
 	
-	/**
-	 * Callback from the old overwrite confirmation screen
-	 * @param result
-	 * @param id
-	 */
-	@Deprecated
-	public void confirmClicked(boolean result, int id)
-	{
-		if (id == 1000){
-			if (result == true){
-				saveBook();
-			}
-			else{
-				this.minecraft.displayGuiScreen(this);
-			}
-		}
-	}
-	
 	
 	private File getSavePath(){
 		return(new File(this.fileHandler.currentPath, this.filenameField.getText()));
 	}
 	
 	
+	/**
+	 * This actually calls the save function and kicks back to the book screen
+	 */
 	private void saveBook(){
-//		if (this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.bookPages, getSavePath())){
-//			this.mc.displayGuiScreen(GuiFileBrowser.this.parentGui);
-//		}
-		// TODO
+		if (this.parentGui instanceof GhostwriterEditBookScreen) {
+			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.parentGui;
+			parent.saveBookToDisk(this.getSavePath());
+		}
+		else {
+			printer.gamePrint(Printer.RED + "Saving not implemented for the parent screen!");
+		}
+		this.minecraft.displayGuiScreen(this.parentGui);
 	}
 	
-	
-//	protected void actionPerformed(GuiButton buttonPressed){
-//		if (!buttonPressed.enabled){return;}
-//		
-//		switch (buttonPressed.id){
-//			case BTN_SAVE:
-//				if (getSavePath().exists()){
-//					String ynmessage = "Are you sure you wish to overwrite";
-//					this.mc.displayGuiScreen(new GuiYesNo(this, ynmessage, this.filenameField.getText() + "?", "Yes", "No", 1000));
-//				}
-//				else{
-//					saveBook();
-//				}
-//				break;
-//			case BTN_CANCEL:
-//				Minecraft.getMinecraft().displayGuiScreen(GuiSaveAs.this.parentGui);
-//				break;
-//			default:
-//				break;
-//		}
-//		
-//		//Handle the drive letter buttons
-//		if (buttonPressed.id >= 100){
-//			this.fileHandler.currentPath = new File(buttonPressed.displayString);
-//		}
-//	}
 	
 	@Override
 	public boolean mouseClicked(double mouseX, double mouseY, int mouseButton){
@@ -329,122 +302,4 @@ public class GuiFileBrowser extends Screen{
 		this.fileHandler.currentPath = path;
 	}
 	
-	
-//	class ScrollList extends GuiSlot{
-//		
-//		private static final int SLOT_HEIGHT = 12;
-//		
-//		public ScrollList(){
-//			super(GuiSaveAs.this.mc, GuiSaveAs.this.width, GuiSaveAs.this.height, 32, GuiSaveAs.this.height - 64, SLOT_HEIGHT);
-//		}
-//
-//		
-//		protected int getPaddedSize(){
-//			int scrollHeight = GuiSaveAs.this.height - 96;
-//			int minSlots = (int)Math.ceil(scrollHeight/SLOT_HEIGHT);
-//			
-//			if (GuiSaveAs.this.listItems.size() >= minSlots){
-//				//The extra slot is for the parent directory item (..)
-//				return GuiSaveAs.this.listItems.size() + 1;
-//			}
-//			else{
-//				return minSlots;
-//			}
-//		}
-//		
-//		
-//		protected int getSize(){
-//			return getPaddedSize();
-//		}
-//		
-//
-//		/**
-//		 * The element in the slot that was clicked, boolean for whether it was double clicked or not
-//		 */
-//		protected void elementClicked(int slotClicked, boolean doubleClicked, int clickXPos, int clickYPos){
-//			this.setShowSelectionBox(true);
-//			if (doubleClicked){
-//				if (slotClicked == 0){
-//					//Go up to the parent directory
-//					GuiSaveAs.this.fileHandler.navigateUp();
-//					GuiSaveAs.this.slotSelected = -1;
-//					this.setShowSelectionBox(false);
-//					return;
-//				}
-//				else if (slotClicked <= GuiSaveAs.this.listItems.size()){
-//					File itemClicked = GuiSaveAs.this.listItems.get(slotClicked-1);
-//					if (itemClicked.isDirectory()){
-//						//Go into the clicked directory
-//						GuiSaveAs.this.fileHandler.currentPath = itemClicked;
-//						GuiSaveAs.this.slotSelected = -1;
-//						this.setShowSelectionBox(false);
-//						return;
-//					}
-//				}
-//			}
-//			else if (slotClicked > 0 && slotClicked <= GuiSaveAs.this.listItems.size()){
-//				//A file or directory has been single-clicked
-//				File selectedFile = GuiSaveAs.this.listItems.get(slotClicked-1);
-//				if (selectedFile.isFile() && !isSelected(slotClicked)){
-//					GuiSaveAs.this.filenameField.setText(selectedFile.getName());
-//				}
-//			}
-//			else{
-//				//This is called when an empty slot is selected
-//				//It probably doesn't need to do anything
-//			}
-//			GuiSaveAs.this.slotSelected = slotClicked;
-//		}
-//		
-//
-//		/**
-//		 * Returns true if the element passed in is currently selected
-//		 */
-//		protected boolean isSelected(int pos){
-//			return pos == GuiSaveAs.this.slotSelected;
-//		}
-//		
-//
-//		/**
-//		 * Return the height of the content being scrolled
-//		 * This is used to determine the scrollable area. It doesn't affect the actual slot height
-//		 */
-//		protected int getContentHeight(){
-//			return getPaddedSize() * SLOT_HEIGHT;
-//		}
-//
-//		
-//		protected void drawBackground(){
-//			GuiSaveAs.this.drawDefaultBackground();
-//		}
-//
-//		
-//		protected void drawSlot(int slotNum, int slotX, int slotY, int four__UNKNOWN_USE__, int mouseX, int mouseY, float p_192637_7_){
-//			List<File> list= GuiSaveAs.this.listItems;
-//			//Empty padding slots at the bottom
-//			if (slotNum > list.size()){return;}
-//			
-//			String s = "";
-//			int color = 0xFFFFFF;
-//			
-//			if (slotNum == 0){
-//				s = "..";
-//				color = 0x00FF00;
-//			}
-//			else{
-//				s = BookUtilities.truncateStringPixels(list.get(slotNum-1).getName(), "...", 200, false);
-//				if (!list.get(slotNum-1).exists()){
-//					color = 0x333333;
-//					GuiSaveAs.this.directoryDirty = true;
-//				}
-//				else if (list.get(slotNum-1).isFile()){
-//					color = 0xFF0000;
-//				}
-//				else if (list.get(slotNum-1).isDirectory()){
-//					color = 0x00FF00;
-//				}
-//			}
-//			GuiSaveAs.this.drawString(GuiSaveAs.this.fontRenderer, s, slotX + 2, slotY + 1, color);
-//		}
-//	}
 }

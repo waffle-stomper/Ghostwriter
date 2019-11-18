@@ -166,6 +166,7 @@ Mat Oxley
 package wafflestomper.ghostwriter;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -267,12 +268,14 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
     private static final Printer printer = new Printer();
 	private static final Logger LOGGER = LogManager.getLogger();
+	private final FileHandler fileHandler;
 	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
 	
 
 	public GhostwriterEditBookScreen(PlayerEntity editingPlayer, ItemStack book, Hand hand, Clipboard clipboard) {
 		super(editingPlayer, book, hand);
 		this.clipboard = clipboard;
+		this.fileHandler = new FileHandler(this.clipboard);
 	}
 	
 	
@@ -600,6 +603,11 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		
 		this.updateButtons();
 		LOGGER.debug("init done, innit");
+	}
+	
+	
+	public void saveBookToDisk(File filepath) {
+		this.fileHandler.saveBookToGHBFile("", "", this.bookPages, filepath); // TODO: Populate the author and title params with something?
 	}
 	
 	
