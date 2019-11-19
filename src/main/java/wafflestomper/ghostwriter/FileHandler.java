@@ -35,6 +35,7 @@ public class FileHandler {
 	private Clipboard clipboard;
 	
 	public File currentPath;
+	public File lastLoadedBook;
 	private List<File> lastListing = new ArrayList<File>();
 	private String lastCheckedPath = "";
 	
@@ -212,6 +213,7 @@ public class FileHandler {
 			}
 			
 			this.clipboard.bookInClipboard = true;
+			this.lastLoadedBook = filePath;
 			return true;
 		}
 		return false;
@@ -313,6 +315,7 @@ public class FileHandler {
 		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>><<<<>>>><<<<"));
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
+		this.lastLoadedBook = filePath;
 		return true;
 	}
 	
@@ -356,6 +359,7 @@ public class FileHandler {
 		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>>"));
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
+		this.lastLoadedBook = filePath;
 		return true;
 	}
 	

@@ -3,28 +3,22 @@ package wafflestomper.ghostwriter;
 import java.io.File;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ServerSelectionList;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import wafflestomper.ghostwriter.FileSelectionList.Entry;
-import wafflestomper.ghostwriter.FileSelectionList.ParentDirEntry;
-import wafflestomper.ghostwriter.FileSelectionList.PathItemEntry;
 import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 public class GuiFileBrowser extends Screen{ 
 	// TODO: Add overwrite warning when saving over another file
 	// TODO: Add file hashes. Maybe color coded for easy recognition?
+	// TODO: Add autoreload button in here
 	
 	private FileSelectionList fileSelectionList;
 	public int slotSelected = -1;
@@ -43,12 +37,9 @@ public class GuiFileBrowser extends Screen{
 	private static final int BUTTONWIDTH = 60;
 	private static final int BUTTONHEIGHT = 20;
 	
-	private static final int BTN_SAVE = 0;
-	private static final int BTN_CANCEL = 1;
-	
+	private Button btnAutoReload;
 	private Button btnLoad;
 	private Button btnSave;
-	private Button btnCancel;
 	
 	private boolean initialized = false;
 	
@@ -81,6 +72,26 @@ public class GuiFileBrowser extends Screen{
 		else {
 			this.minecraft.displayGuiScreen(this);
 		}
+	}
+	
+	
+	private void loadClicked(boolean autoReload) {
+		// The book should already be in the temp clipboard at this point, right?
+		if (!this.tempClipboard.bookInClipboard) {
+			printer.gamePrint(Printer.RED + "Error loading book - no book in temp clipboard!");
+		}
+		else if (this.parentGui instanceof GhostwriterEditBookScreen) {
+			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.parentGui;
+			parent.setClipboard(this.tempClipboard);
+			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+			if (autoReload) {
+				parent.enableAutoReload(this.fileHandler.lastLoadedBook);
+			}
+		}
+		else {
+			printer.gamePrint(Printer.RED + "Error loading book - you can't load to a non-writable book!");
+		}
+		this.minecraft.displayGuiScreen(this.parentGui);
 	}
 	
 	
@@ -134,13 +145,16 @@ public class GuiFileBrowser extends Screen{
 			this.initialized = true;
 		}
 		
+		this.btnAutoReload = this.addButton(new Button(this.width-BUTTONWIDTH-5, this.height-85, BUTTONWIDTH, BUTTONHEIGHT, "\u00a7AutoReload", (pressedButton) ->{
+			this.loadClicked(true);
+		}));
 		this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
-			// TODO
+			this.loadClicked(false);
 		}));
 		this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
 			this.saveClicked();
 		}));
-		this.btnCancel = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
+		this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
 			goBackToParentGui();
 		}));
 		
@@ -200,8 +214,12 @@ public class GuiFileBrowser extends Screen{
 		this.fileSelectionList.setSelected(entry);
 		if (entry instanceof FileSelectionList.PathItemEntry) {
 			FileSelectionList.PathItemEntry p = (FileSelectionList.PathItemEntry)entry;
-			if (p.path != this.selectedFile && p.path.isFile()) {
+			if (p.path == this.selectedFile) {
+				return;
+			}
+			else if (p.path.isFile()) {
 				this.btnLoad.active = this.fileHandler.loadBook(p.path);
+				this.btnAutoReload.active = this.btnLoad.active;
 				this.selectedFile = p.path;
 				this.filenameField.setText(p.path.getName());
 				return;
@@ -210,8 +228,6 @@ public class GuiFileBrowser extends Screen{
 		this.btnLoad.active = false;
 		this.selectedFile = null;
 	}
-	
-
 	
 	
 	@Override
@@ -299,7 +315,15 @@ public class GuiFileBrowser extends Screen{
 
 
 	public void navigateInto(File path) {
-		this.fileHandler.currentPath = path;
+		if (path.isFile()) {
+			if (this.tempClipboard.bookInClipboard) {
+				// Handles double-click
+				this.loadClicked();
+			}
+		}
+		else {
+			this.fileHandler.currentPath = path;
+		}
 	}
 	
 }

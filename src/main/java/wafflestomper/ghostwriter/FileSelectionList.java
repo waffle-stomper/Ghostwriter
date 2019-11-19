@@ -83,7 +83,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 
 	         this.lastClickTime = Util.milliTime();
 	         return false;
-	      }
+	     }
 
 	}
 
@@ -124,7 +124,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
 	    
 	         this.owner.setSelectedSlot(this);
-	         if (Util.milliTime() - this.lastClickTime < 250L && this.path.isDirectory()) {
+	         if (Util.milliTime() - this.lastClickTime < 250L) {
 	            // TODO: Double click handling
 	        	 this.lastClickTime = 0; // Prevent triple-click
 	        	 this.owner.navigateInto(path);
@@ -133,8 +133,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 
 	         this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
 	         return false; // TODO: Should this really return false?
-	      }
-		
+	    }
 	}
 
 

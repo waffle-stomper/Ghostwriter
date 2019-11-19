@@ -518,7 +518,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         // Temporary hack
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "\u00a7mFile Browser", (pressed_button) -> {
+		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
 			// TODO
 			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
 		}));
@@ -665,8 +665,19 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         }
 	}
 	
+	
 	public String getBookTitle() {
 		return this.bookTitle;
+	}
+	
+	
+	public void setClipboard(Clipboard _clipboard){
+    	this.clipboard = _clipboard;
+    }
+	
+	
+	public void disableAutoReload() {
+		// TODO: this
 	}
 
 }
