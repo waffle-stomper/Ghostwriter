@@ -224,7 +224,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	private static final int ID_CURRENT_FORMAT = 72;
 	
 	private Button buttonFileBrowser;
-	private Button buttonAutoReloadBook;
+	private Button buttonDisableAutoReload;
 	private Button buttonCopyBook;
 	private Button buttonPasteBook;
 	private Button buttonCutMultiplePages;
@@ -265,6 +265,11 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     private int selectedPageB = -1;
     
     private Clipboard clipboard;
+    
+    private File autoReloadFile; // Auto Reload is active when this is not nullprivate Clipboard autoReloadBookClipboard;
+	private long autoReloadLastModified = 0;
+	private long autoReloadLastCheck = 0;
+	private Clipboard autoReloadClipboard;
 	
     private static final Printer printer = new Printer();
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -366,14 +371,14 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     /*
      * Copies a book from the clipboard into the 'real' book
      */
-    private void clipboardToBook(Clipboard fromBook){
+    public void clipboardToBook(Clipboard fromBook){
     	// Reset anything in the current book
     	this.bookPages.clear();
     	this.bookChanged(true);
     	
     	this.bookTitle = fromBook.title;
 		
-		for (int i=0; i<clipboard.pages.size(); i++){
+		for (int i=0; i<fromBook.pages.size(); i++){
     		this.bookPages.add(fromBook.pages.get(i));
     	}
 		this.bookIsModified = true;
@@ -519,10 +524,11 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
 		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
-			// TODO
 			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
 		}));
-		this.buttonAutoReloadBook = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "\u00a7mAutoReload Book", (pressed_button) -> {}));
+		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "Disable AutoReload", (pressed_button) -> {
+			this.disableAutoReload();
+		}));
 		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
 			this.copyBook();
 		}));
@@ -613,7 +619,30 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
 	@Override
 	public void tick() {
-		// TODO: Add autoreload check
+		// Handle autoreload
+		if (this.autoReloadFile != null && System.currentTimeMillis()-this.autoReloadLastCheck > 1000) {
+			if (this.autoReloadFile.exists()) {
+				if (this.autoReloadFile.lastModified() != this.autoReloadLastModified) {
+					FileHandler f = new FileHandler(this.autoReloadClipboard);
+					if (f.loadBook(this.autoReloadFile)) {
+						this.clipboardToBook(this.autoReloadClipboard);
+						printer.gamePrint(Printer.AQUA + "Automatically loaded new book version");
+						this.autoReloadLastModified = this.autoReloadFile.lastModified();
+					}
+					else {
+						printer.gamePrint(Printer.RED + "Book failed to automatically reload!");
+						this.disableAutoReload();
+					}
+					this.autoReloadLastCheck = System.currentTimeMillis();
+				}
+			}
+			else {
+				printer.gamePrint(Printer.RED + "Source file disappeared!");
+				this.disableAutoReload();
+			}
+		}
+		
+		// Update the count for flashing cursors etc.
 		++this.updateCount;
 	}
 	
@@ -663,6 +692,8 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         else{
         	this.buttonPasteMultiplePages.setMessage("Paste Multiple");
         }
+        
+        this.buttonDisableAutoReload.visible = this.autoReloadFile != null;
 	}
 	
 	
@@ -676,8 +707,25 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     }
 	
 	
-	public void disableAutoReload() {
-		// TODO: this
+	public void enableAutoReload(File path, Clipboard initalBookState) {
+		this.autoReloadClipboard = initalBookState;
+		this.autoReloadFile = path;
+		this.autoReloadLastModified = path.lastModified();
+		this.autoReloadLastCheck = System.currentTimeMillis();
+		this.updateButtons();
 	}
+	
+	
+	public void disableAutoReload() {
+		this.autoReloadFile = null;
+		printer.gamePrint(Printer.AQUA + "Autoreload disabled");
+		this.updateButtons();
+	}
+	
+//	@Override
+//	public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
+//		super.render(p_render_1_, p_render_2_, p_render_3_);
+//		this.font.drawStringWithShadow("Auto Reload Active!", 5, 45, 0x800888);
+//	}
 
 }

@@ -75,18 +75,6 @@ public class ReadBookScreenMod extends Screen {
 		this.bookInfo = bookInfoIn;
 		this.pageTurnSounds = p_i51099_2_;
 	}
-	
-	
-	private void rateLimitedDebugMessage(String message){
-		if (System.currentTimeMillis() - this.lastMessage > 1000){
-			System.out.println(message);
-			this.lastMessage = System.currentTimeMillis();
-		}
-	}
-	
-	private void rateLimitedDebugMessage(int number){
-		this.rateLimitedDebugMessage(String.valueOf(number));
-	}
 
 
 	public void func_214155_a(ReadBookScreenMod.IBookInfo p_214155_1_) {

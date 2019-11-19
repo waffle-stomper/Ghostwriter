@@ -64,7 +64,6 @@ public class GuiFileBrowser extends Screen{
 	 * @param confirmed true if they clicked the left button, false if they clicked the one on the right
 	 */
 	public void saveCallback(boolean confirmed){
-		System.out.println("Wow, this actually worked! " + confirmed);
 		if (confirmed) {
 			// Do the save, then kick back to the book
 			saveBook();
@@ -82,10 +81,13 @@ public class GuiFileBrowser extends Screen{
 		}
 		else if (this.parentGui instanceof GhostwriterEditBookScreen) {
 			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.parentGui;
-			parent.setClipboard(this.tempClipboard);
-			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
 			if (autoReload) {
-				parent.enableAutoReload(this.fileHandler.lastLoadedBook);
+				parent.enableAutoReload(this.fileHandler.lastLoadedBook, this.tempClipboard);
+				parent.clipboardToBook(this.tempClipboard);
+			}
+			else {
+				parent.setClipboard(this.tempClipboard);
+				new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
 			}
 		}
 		else {
@@ -145,7 +147,7 @@ public class GuiFileBrowser extends Screen{
 			this.initialized = true;
 		}
 		
-		this.btnAutoReload = this.addButton(new Button(this.width-BUTTONWIDTH-5, this.height-85, BUTTONWIDTH, BUTTONHEIGHT, "\u00a7AutoReload", (pressedButton) ->{
+		this.btnAutoReload = this.addButton(new Button(this.width-BUTTONWIDTH-5, this.height-85, BUTTONWIDTH, BUTTONHEIGHT, "AutoReload", (pressedButton) ->{
 			this.loadClicked(true);
 		}));
 		this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
@@ -318,7 +320,7 @@ public class GuiFileBrowser extends Screen{
 		if (path.isFile()) {
 			if (this.tempClipboard.bookInClipboard) {
 				// Handles double-click
-				this.loadClicked();
+				this.loadClicked(false);
 			}
 		}
 		else {
