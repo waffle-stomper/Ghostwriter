@@ -15,8 +15,6 @@ import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	
-	private Button buttonFileBrowser;
-	private Button buttonCopyBook;
 	private Button buttonSelectPageA;
 	private Button buttonSelectPageB;
 	
@@ -32,8 +30,9 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	private String bookTitle = "";
 
 
-	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack) {
+	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard) {
         super(bookInfoIn, pageTurnSoundsIn);
+        this.clipboard = globalClipboard;
         this.fileHandler = new FileHandler(this.clipboard);
     	if (currStack != null){
     		Item currItem = currStack.getItem();
@@ -107,6 +106,12 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     	int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
     	int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
     	
+    	// Handle the case where A or B is -1 (i.e. no selection)
+    	if (firstPage == -1 || lastPage == -1) {    	
+    		firstPage = this.currPage;
+    		lastPage = this.currPage;
+    	}
+    	
     	if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages().size()){
     		this.clipboard.miscPages.clear();
     		List<String> pagesAsList = this.pagesAsList();
@@ -141,29 +146,30 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
         // Temporary hack
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
+		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
 			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
 		}));
-		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
+		
+		this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
 			this.copyBook();
 		}));
+		
 		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
+		
 		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
+		
 		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page", (pressed_button) -> {
 			this.copySelectedPagesToClipboard();
 		}));
 
-		
-		super.init();
-		
+		super.init();		
 		this.updateButtons();
-		LOGGER.debug("init done, innit");
 	}
 	
 	

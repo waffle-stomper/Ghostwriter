@@ -405,6 +405,12 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     	int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
     	int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
     	
+    	// Handle the case where A or B is -1 (i.e. no selection)
+    	if (firstPage == -1 || lastPage == -1) {    	
+    		firstPage = this.currPage;
+    		lastPage = this.currPage;
+    	}
+    	
     	if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages.size()){
     		this.clipboard.miscPages.clear();
     		List<String> pagesAsList = this.pagesAsList();
@@ -510,9 +516,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		
 		// Note that you can use the parameter? in the lambda function like this:
 		// pressed_button.x += 20; // neat!
-		
-		//KeyboardHelper.enableRepeatEvents(true);
-		
+			
         int buttonWidth = 120;
         int buttonHeight = 20;
         int buttonSideOffset = 5;
@@ -526,38 +530,49 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
 			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
 		}));
+		
 		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "Disable AutoReload", (pressed_button) -> {
 			this.disableAutoReload();
 		}));
+		
 		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
 			this.copyBook();
 		}));
+		
 		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, "Paste Book", (pressed_button) -> {
 			this.pasteBook();
 		}));
+		
 		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
+		
 		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
+		
 		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page", (pressed_button) -> {
 			this.copySelectedPagesToClipboard();
 		}));
+		
 		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, "Cut This Page", (pressed_button) -> {
 			this.cutMultiplePages();
 		}));
+		
 		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, "Paste This Page", (pressed_button) -> {
 			this.pasteMultiplePages();
 		}));
+		
 		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "Insert Blank Page", (pressed_button) -> {
 			this.insertPage();
 		}));
+		
 		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "Remove Top Space", (pressed_button) -> {
 			this.collapseTop();
 		}));
+		
 		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, "\u00a7mAdd Signature Pages", (pressed_button) -> {}));
 		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "Remove This Page", (pressed_button) -> {
 			this.removePages();
@@ -608,7 +623,6 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		this.buttonCancel.y = 145;
 		
 		this.updateButtons();
-		LOGGER.debug("init done, innit");
 	}
 	
 	

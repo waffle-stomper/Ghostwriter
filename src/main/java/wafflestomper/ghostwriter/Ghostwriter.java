@@ -23,7 +23,7 @@ public class Ghostwriter{
 	
 	private Minecraft mc = Minecraft.getInstance();
 	private Printer printer = new Printer();
-	public Clipboard clipboard = new Clipboard();
+	public Clipboard globalClipboard = new Clipboard();
 	boolean devEnv = false;
 	private long lastMessage = 0;
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -90,12 +90,12 @@ public class Ghostwriter{
         			//eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND); // p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
         			
         			if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen) {
-        				eventGui = new GhostwriterEditBookScreen(p, currStack, Hand.MAIN_HAND, this.clipboard);
+        				eventGui = new GhostwriterEditBookScreen(p, currStack, Hand.MAIN_HAND, this.globalClipboard);
             			//eventGui = new EditBookScreenMod(p,currStack, Hand.MAIN_HAND);
         			}
         			else if (eventGui instanceof ReadBookScreen) {
         				ReadBookScreenMod.WrittenBookInfo bookInfo = new ReadBookScreenMod.WrittenBookInfo(currStack);
-        				eventGui = new GhostwriterReadBookScreen(bookInfo, true, currStack); // TODO: Shouldn't this accept UnwrittenBookInfo too?
+        				eventGui = new GhostwriterReadBookScreen(bookInfo, true, currStack, this.globalClipboard); // TODO: Shouldn't this accept UnwrittenBookInfo too?
         			}
         			event.setGui(eventGui);
         			LOGGER.debug("GUI swap done!");
