@@ -367,7 +367,7 @@ public class FileHandler {
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		printer.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList<String>();
-		toWrite.add("//Book saved in GHB format at " + getUTC());
+		toWrite.add("//Book saved in GHB format at " + this.getUTC());
 		if (!title.isEmpty()){toWrite.add("title:" + title);}
 		if (!author.isEmpty()){toWrite.add("author:" + author);}
 		toWrite.add("//=======================================");
@@ -419,7 +419,7 @@ public class FileHandler {
 	
 	public String getUTC(){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
-	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmm.S'Z'");
+	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss'Z'");
 	    df.setTimeZone(tz);
 	    return df.format(new Date());
 	}
