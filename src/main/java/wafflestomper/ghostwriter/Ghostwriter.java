@@ -89,13 +89,13 @@ public class Ghostwriter{
 //        			}
         			//eventGui = new GuiGhostwriterBook(p, currStack, Hand.MAIN_HAND); // p, currStack, currItem.equals(Items.WRITABLE_BOOK), this.clipboard);
         			
-        			if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen){
+        			if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen) {
         				eventGui = new GhostwriterEditBookScreen(p, currStack, Hand.MAIN_HAND, this.clipboard);
             			//eventGui = new EditBookScreenMod(p,currStack, Hand.MAIN_HAND);
         			}
-        			else {
-        				//ReadBookScreen factoryScreen = (ReadBookScreen)eventGui;
-        				eventGui = new ReadBookScreenMod(new ReadBookScreenMod.WrittenBookInfo(currStack), false);
+        			else if (eventGui instanceof ReadBookScreen) {
+        				ReadBookScreenMod.WrittenBookInfo bookInfo = new ReadBookScreenMod.WrittenBookInfo(currStack);
+        				eventGui = new GhostwriterReadBookScreen(bookInfo, true, currStack); // TODO: Shouldn't this accept UnwrittenBookInfo too?
         			}
         			event.setGui(eventGui);
         			LOGGER.debug("GUI swap done!");

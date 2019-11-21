@@ -505,7 +505,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
 	
 	@Override
-	protected void init() {
+	public void init() {
 		// TODO: Should this only happen once? (i.e. have an initialized field)
 		
 		// Note that you can use the parameter? in the lambda function like this:
@@ -648,7 +648,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	
 	
 	@Override
-	protected void updateButtons() {
+	public void updateButtons() {
 		super.updateButtons();
 		
 		// Reset invalid selection
