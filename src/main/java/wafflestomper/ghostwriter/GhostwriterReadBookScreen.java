@@ -147,7 +147,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
 		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
-			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
+			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 		}));
 		
 		this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {

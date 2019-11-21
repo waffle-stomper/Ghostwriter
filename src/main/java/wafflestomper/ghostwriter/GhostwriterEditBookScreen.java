@@ -528,7 +528,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
 		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
-			this.minecraft.displayGuiScreen(new GuiFileBrowser(this));
+			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 		}));
 		
 		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "Disable AutoReload", (pressed_button) -> {

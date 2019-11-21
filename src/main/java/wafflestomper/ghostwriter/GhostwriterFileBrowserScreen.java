@@ -15,7 +15,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
-public class GuiFileBrowser extends Screen{ 
+public class GhostwriterFileBrowserScreen extends Screen{ 
 	// TODO: Add overwrite warning when saving over another file
 	// TODO: Add file hashes. Maybe color coded for easy recognition?
 	// TODO: Add autoreload button in here
@@ -46,7 +46,7 @@ public class GuiFileBrowser extends Screen{
 	private static final int SLOT_HEIGHT = 12;
 	
 
-	public GuiFileBrowser(Screen _parentGui){
+	public GhostwriterFileBrowserScreen(Screen _parentGui){
 		super(new StringTextComponent("Title I think?")); // TODO
 		this.parentGui = _parentGui;
 		this.fileHandler = new FileHandler(this.tempClipboard);

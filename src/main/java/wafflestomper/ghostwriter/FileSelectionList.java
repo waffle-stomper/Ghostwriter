@@ -21,9 +21,9 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 
 	private final FileSelectionList.ParentDirEntry parentDir;
 	private final List<FileSelectionList.PathItemEntry> fileList = Lists.newArrayList();
-	private final GuiFileBrowser owner;
+	private final GhostwriterFileBrowserScreen owner;
 	
-	public FileSelectionList(GuiFileBrowser ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
+	public FileSelectionList(GhostwriterFileBrowserScreen ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
 		this.owner = ownerIn;
 		this.parentDir = new FileSelectionList.ParentDirEntry(this.owner);
@@ -52,11 +52,11 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	
 	public class ParentDirEntry extends FileSelectionList.Entry{
 		protected long lastClickTime;
-		protected final GuiFileBrowser owner;
+		protected final GhostwriterFileBrowserScreen owner;
 		protected final Minecraft mc;
 		
 		
-		public ParentDirEntry(GuiFileBrowser ownerIn) {
+		public ParentDirEntry(GhostwriterFileBrowserScreen ownerIn) {
 			this.lastClickTime = 0;
 			this.owner = ownerIn;
 			this.mc = Minecraft.getInstance();	
@@ -92,10 +92,10 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
  	public class PathItemEntry extends FileSelectionList.Entry {
 		public File path;
 		protected long lastClickTime;
-		protected final GuiFileBrowser owner;
+		protected final GhostwriterFileBrowserScreen owner;
 		protected final Minecraft mc;
 
-		public PathItemEntry(GuiFileBrowser ownerIn, File pathIn) {
+		public PathItemEntry(GhostwriterFileBrowserScreen ownerIn, File pathIn) {
 			this.path = pathIn;
 			this.owner = ownerIn;
 			this.mc = Minecraft.getInstance();
