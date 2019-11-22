@@ -19,6 +19,7 @@ import java.nio.charset.CodingErrorAction;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -75,6 +76,8 @@ public class FileHandler {
 			this.lastCheckedPath = path.getAbsolutePath();
 			this.lastListing.clear();
 			File[] newList = path.listFiles();
+			// TODO: Better sorting: https://stackoverflow.com/questions/16898029/how-to-sort-file-names-in-ascending-order
+			Arrays.sort(newList);
 			List<File> files = new ArrayList<File>();
 			for (File f : newList){
 				if (f.isDirectory()){

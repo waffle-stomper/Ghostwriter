@@ -61,12 +61,12 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			this.owner = ownerIn;
 			this.mc = Minecraft.getInstance();	
 		}
-
+		
 		
 		@Override
 		public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
-				int p_render_6_, int p_render_7_, boolean p_render_8_, float p_render_9_) {
-			this.mc.fontRenderer.drawString("..", (float)(p_render_3_ ), (float)(p_render_2_ + 1), 0x00FF00);
+				int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
+			this.mc.fontRenderer.drawString("..", (float)(p_render_3_ ), (float)(p_render_2_ + 1), 0x00FF00); // Params are string, x, y, color
 		}
 		
 		
@@ -94,16 +94,28 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		protected long lastClickTime;
 		protected final GhostwriterFileBrowserScreen owner;
 		protected final Minecraft mc;
+		private long hoverStart = System.currentTimeMillis();
 
 		public PathItemEntry(GhostwriterFileBrowserScreen ownerIn, File pathIn) {
 			this.path = pathIn;
 			this.owner = ownerIn;
 			this.mc = Minecraft.getInstance();
 		}
-
+		
+		/**
+		 * @param p_render_1_ slot number?
+		 * @param p_render_2_ some kind of y... maybe top?
+		 * @param slotX slotX?
+		 * @param slotWidth slotWidth?
+		 * @param p_render_5_ 
+		 * @param tickLengthMaybe tickLength i think
+		 * 
+		 */
 		@Override
-		public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
-				int p_render_6_, int p_render_7_, boolean p_render_8_, float p_render_9_) {
+		public void render(int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
+				int mouseX, int mouseY, boolean mouseIsOver, float tickLengthMaybe) {
+
+			
 			int color = 0xFFFFFF;
 			if (!path.exists()) { // TODO: do we really need to do do this every render tick?
 				color = 0x333333;
@@ -115,7 +127,21 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			else if (path.isDirectory()) {
 				color = 0x00FF00;
 			}
-			this.mc.fontRenderer.drawString(this.path.getName(),(float)(p_render_3_ ), (float)(p_render_2_ + 1), color);
+			
+			// Draw the trimmed filename in the slot
+			String s = this.mc.fontRenderer.trimStringToWidth(this.path.getName(), slotWidth);
+			this.mc.fontRenderer.drawString(s,(float)(slotX ), (float)(p_render_2_ + 1), color);
+			
+			// Set up the hover text if the mouse is hovering over this slot
+			if (mouseIsOver) {
+				if (System.currentTimeMillis()-this.hoverStart > 2000) {
+					String s2 = this.path.getName();
+					this.owner.setHoveringText(s2);
+				}
+			}
+			else {
+				this.hoverStart = System.currentTimeMillis();
+			}
 			
 		}
 		
@@ -139,6 +165,5 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 
 	public void setSelectedSlot(PathItemEntry normalEntry) {
 		// TODO Auto-generated method stub
-		
 	}
 }

@@ -24,8 +24,8 @@ public class Ghostwriter{
 	private Minecraft mc = Minecraft.getInstance();
 	private Printer printer = new Printer();
 	public Clipboard globalClipboard = new Clipboard();
-	boolean devEnv = false;
-	private long lastMessage = 0;
+	boolean devEnv = false; // TODO: Find another way to detect this
+	private static long lastMessage = 0;
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	
@@ -48,13 +48,10 @@ public class Ghostwriter{
     }
 	
 	
-	private void rateLimitedDebugMessage(String message){
-		if (!this.devEnv){
-			return;
-		}
-		if (System.currentTimeMillis() - this.lastMessage > 2000){
-			this.printer.gamePrint(message);
-			this.lastMessage = System.currentTimeMillis();
+	public static void rateLimitedDebugMessage(String message){
+		if (System.currentTimeMillis() - lastMessage > 1000){
+			System.out.println(message);
+			lastMessage = System.currentTimeMillis();
 		}
 	}
 	

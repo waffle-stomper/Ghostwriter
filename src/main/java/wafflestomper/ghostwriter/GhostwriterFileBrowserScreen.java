@@ -1,7 +1,13 @@
+// TODO: Add file hashes. Maybe color coded for easy recognition?
+// TODO: Sort files by name
+
 package wafflestomper.ghostwriter;
 
 import java.io.File;
 import java.util.List;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -16,9 +22,6 @@ import net.minecraft.util.text.StringTextComponent;
 import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 public class GhostwriterFileBrowserScreen extends Screen{ 
-	// TODO: Add overwrite warning when saving over another file
-	// TODO: Add file hashes. Maybe color coded for easy recognition?
-	// TODO: Add autoreload button in here
 	
 	private FileSelectionList fileSelectionList;
 	public int slotSelected = -1;
@@ -34,16 +37,20 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private FileHandler fileHandler;
 	private String displayPath = "";
 	
-	private static final int BUTTONWIDTH = 60;
-	private static final int BUTTONHEIGHT = 20;
+	private static final int BORDER_HEIGHT = 2;
+	private static final int BORDER_WIDTH = 5;
+	private static final int BUTTON_WIDTH = 60;
+	private static final int BUTTON_HEIGHT = 20;
+	private static final int SLOT_HEIGHT = 12;
 	
 	private Button btnAutoReload;
 	private Button btnLoad;
 	private Button btnSave;
 	
 	private boolean initialized = false;
+	private boolean enableLoading = false;
+	private String hoveringText;
 	
-	private static final int SLOT_HEIGHT = 12;
 	
 
 	public GhostwriterFileBrowserScreen(Screen _parentGui){
@@ -51,6 +58,9 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		this.parentGui = _parentGui;
 		this.fileHandler = new FileHandler(this.tempClipboard);
 		this.fileHandler.currentPath = this.fileHandler.getSavePath();
+		if (_parentGui instanceof GhostwriterEditBookScreen) {
+			this.enableLoading = true;
+		}
 	}
 	
 	
@@ -114,14 +124,13 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	
 	
 	public void init(){
-		System.out.println("Init() called");
 		super.init();
 		this.minecraft.keyboardListener.enableRepeatEvents(true);
 		
 		if (this.initialized == false) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-32, 250, 20, "filename");
+			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT, "filename");
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
 			String ftitle = "";
@@ -143,20 +152,28 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			fauthor = fauthor.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
 			String defaultFilename = ftitle + "_" + fauthor + "_" + this.fileHandler.getUTC() + ".ghb";
 			this.filenameField.setText(defaultFilename);
-			
 			this.initialized = true;
 		}
 		
-		this.btnAutoReload = this.addButton(new Button(this.width-BUTTONWIDTH-5, this.height-85, BUTTONWIDTH, BUTTONHEIGHT, "AutoReload", (pressedButton) ->{
-			this.loadClicked(true);
-		}));
-		this.btnLoad = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-65, BUTTONWIDTH, BUTTONHEIGHT, "Load", (pressedButton) ->{
+		// For some reason the button list is cleared when the window is resized
+		int mainButtonsY = this.height-BORDER_HEIGHT-BUTTON_HEIGHT;
+		int loadX = this.width/2 -127;
+		this.btnLoad = this.addButton(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Load", (pressedButton) ->{
 			this.loadClicked(false);
 		}));
-		this.btnSave = this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-45, BUTTONWIDTH, BUTTONHEIGHT, "Save", (pressedButton) ->{
+		
+		int autoReloadX = loadX + BUTTON_WIDTH;
+		this.btnAutoReload = this.addButton(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "AutoReload", (pressedButton) ->{
+			this.loadClicked(true);
+		}));
+		
+		int saveX = autoReloadX + BUTTON_WIDTH + 7;
+		this.btnSave = this.addButton(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Save", (pressedButton) ->{
 			this.saveClicked();
 		}));
-		this.addButton(new Button(this.width-(BUTTONWIDTH+5), this.height-25, BUTTONWIDTH, BUTTONHEIGHT, "Cancel", (pressedButton) ->{
+		
+		int cancelX = this.width/2+127 - BUTTON_WIDTH;
+		this.addButton(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Cancel", (pressedButton) ->{
 			goBackToParentGui();
 		}));
 		
@@ -168,13 +185,17 @@ public class GhostwriterFileBrowserScreen extends Screen{
 				this.driveButtonClicked(root); // TODO: Test this to make sure it actually works
 			}));
 			rootNum++;
-			//
 		}
 		
-		// TODO: Do resizing here
-		System.out.println("RESIZE ME!");
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
+		
+		// Make sure everything is in place in case the window was resized
+		this.fileSelectionList.updateSize(this.width, this.height, 32, this.height - 64);
+		this.filenameField.x = this.width/2-125;
+		this.filenameField.y = this.height-BORDER_HEIGHT*2-BUTTON_HEIGHT*2;
+		
+		this.updateButtons();
 	}
 	
 	
@@ -190,6 +211,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	}
 	
 	
+	// TODO: This could probably use some more checks
 	private boolean isFilenameValid(){
 		String fn = this.filenameField.getText();
 		if (!fn.equals("")){
@@ -198,37 +220,47 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		return false;
 	}
 	
-	/**
-	 * replaces drawScreen?
-	 */
+	
 	@Override
-	public void render(int p_render_1_, int p_render_2_, float p_render_3_) { 
+	public void render(int mouseX, int mouseY, float p_render_3_) {
 		this.displayPath = this.fileHandler.currentPath.getAbsolutePath();
 		this.btnSave.active = this.isFilenameValid();
-		this.fileSelectionList.render(p_render_1_, p_render_2_, p_render_3_);
-		super.render(p_render_1_, p_render_2_, p_render_3_);
+		this.hoveringText = null;
+		this.fileSelectionList.render(mouseX, mouseY, p_render_3_);
+		super.render(mouseX, mouseY, p_render_3_);
 		this.drawCenteredString(this.minecraft.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
-		this.filenameField.render(p_render_1_, p_render_2_, p_render_3_);
+		this.filenameField.render(mouseX, mouseY, p_render_3_);
+		
+
+		
+		// Draw tooltip if the path is hovered
+		if (mouseX >= this.width/2-100 && mouseX <= this.width/2+100 && mouseY >= 20 && mouseY <= 27) {
+			this.renderTooltip(this.displayPath, 0, 0);
+		}
+		else if (this.hoveringText != null) {
+			this.renderTooltip(this.hoveringText, mouseX, mouseY);
+		}
 	}
 	
 	
 	public void setSelectedSlot(FileSelectionList.Entry entry) {
 		this.fileSelectionList.setSelected(entry);
-		if (entry instanceof FileSelectionList.PathItemEntry) {
+		if (this.enableLoading && entry instanceof FileSelectionList.PathItemEntry) {
 			FileSelectionList.PathItemEntry p = (FileSelectionList.PathItemEntry)entry;
 			if (p.path == this.selectedFile) {
 				return;
 			}
 			else if (p.path.isFile()) {
-				this.btnLoad.active = this.fileHandler.loadBook(p.path);
-				this.btnAutoReload.active = this.btnLoad.active;
+				this.fileHandler.loadBook(p.path);
 				this.selectedFile = p.path;
 				this.filenameField.setText(p.path.getName());
+				this.updateButtons();
 				return;
 			}
 		}
-		this.btnLoad.active = false;
+		this.tempClipboard.clearBook();
 		this.selectedFile = null;
+		this.updateButtons();
 	}
 	
 	
@@ -263,8 +295,22 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	}
 	
 	
+	
+	public void updateButtons() {
+		if (this.enableLoading) {
+			this.btnLoad.active = this.tempClipboard.bookInClipboard;
+			this.btnAutoReload.active = this.tempClipboard.bookInClipboard;
+		}
+		else {
+			this.btnAutoReload.active = false;
+			this.btnAutoReload.visible = false;
+			this.btnLoad.active = false;
+			this.btnLoad.visible = false;
+		}
+	}
+	
 	/**
-	 * Handles special characters
+	 * Handles everything, which eventually filters down to charTyped if the key is printable
 	 */
 	@Override
 	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
@@ -273,19 +319,24 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		}
 		// TODO: Escape should kick back to the parent GUI
 		// TODO: Add ctrl+s to save, maybe ctrl+d to load?
+		this.tempClipboard.clearBook();
+		this.updateButtons();
 		return this.filenameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
 	}
 	
+	
 	/**
-	 * Handles ordinary characters
+	 * Handles ordinary (printable) characters
 	 */
+	@Override
 	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
+		System.out.println("charTyped");
 		if (super.charTyped(p_charTyped_1_, p_charTyped_2_)) {
 			return true;
 		} 
 		else {
 			return this.filenameField.charTyped(p_charTyped_1_, p_charTyped_2_);
-		}    	
+		} 	
 	}
 	
 	
@@ -326,6 +377,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		else {
 			this.fileHandler.currentPath = path;
 		}
-	}
+	}	
 	
+	
+	public void setHoveringText(String text) {
+		this.hoveringText = text;
+	}
 }
