@@ -1,6 +1,7 @@
 # local nonsense
 Run Server.*
 *.ods
+*.xcf
 
 # eclipse
 bin
