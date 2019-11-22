@@ -352,6 +352,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.parentGui;
 			parent.saveBookToDisk(this.getSavePath());
 		}
+		if (this.parentGui instanceof GhostwriterReadBookScreen) {
+			GhostwriterReadBookScreen parent = (GhostwriterReadBookScreen)this.parentGui;
+			parent.saveBookToDisk(this.getSavePath());
+		}
 		else {
 			printer.gamePrint(Printer.RED + "Saving not implemented for the parent screen!");
 		}

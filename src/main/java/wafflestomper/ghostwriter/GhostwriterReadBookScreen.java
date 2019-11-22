@@ -28,6 +28,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	private final FileHandler fileHandler;
 	private Button buttonCopySelectedPages;
 	private String bookTitle = "";
+	private String bookAuthor = "";
 
 
 	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard) {
@@ -40,6 +41,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     	        CompoundNBT compoundnbt = currStack.getTag();
     	        if (compoundnbt != null) {
     	        	this.bookTitle = compoundnbt.getString("title");
+    	        	this.bookAuthor = compoundnbt.getString("author");
     	        }
     		}
     	}
@@ -92,8 +94,8 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     
     
     private void copyBook() {
-		this.clipboard.author = ""; // TODO: Do I need this field any more? Was this.author in old versions
-		this.clipboard.title = this.bookTitle; // Find a way to ge this. From NBT maybe?
+		this.clipboard.author = this.bookAuthor;
+		this.clipboard.title = this.bookTitle;
 		this.clipboard.pages.clear();
 		this.clipboard.pages.addAll(this.pagesAsList());
 		this.clipboard.bookInClipboard = true;
@@ -174,7 +176,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	
 	
 	public void saveBookToDisk(File filepath) {
-		this.fileHandler.saveBookToGHBFile("", "", this.bookPages(), filepath); // TODO: Populate the author and title params with something?
+		this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.bookPages(), filepath);
 	}
 	
 	
@@ -210,4 +212,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     		}
     	}
 	}
+	
+	
+
 }
