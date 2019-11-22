@@ -1,4 +1,5 @@
 //TODO: Standardize function names
+//TODO: Proper logging
 
 package wafflestomper.ghostwriter;
 

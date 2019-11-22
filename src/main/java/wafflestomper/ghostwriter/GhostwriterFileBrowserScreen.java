@@ -330,7 +330,6 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	 */
 	@Override
 	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
-		System.out.println("charTyped");
 		if (super.charTyped(p_charTyped_1_, p_charTyped_2_)) {
 			return true;
 		} 
