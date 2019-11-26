@@ -18,7 +18,7 @@ issueTrackerURL="http://my.issue.tracker/" #optional
     modId="ghostwriter" #mandatory
     version="${file.jarVersion}"
     displayName="Ghostwriter" 
-    # updateJSONURL="https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json" # TODO: Reactivate this
+    updateJSONURL="https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json"
     displayURL="https://github.com/waffle-stomper/Ghostwriter" 
     logoFile="icon.png"
     credits="maester_flaminius, SortByNode, and all of the other wonderful people I've met through Minecraft"
@@ -27,23 +27,16 @@ issueTrackerURL="http://my.issue.tracker/" #optional
     Utility for dealing with books (backup, restore, copy, paste, etc.).
     '''
 
-# TODO: This?
-## A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-#[[dependencies.ghostwriter]] #optional
-#    # the modid of the dependency
-#    modId="forge" #mandatory
-#    # Does this dependency have to exist - if not, ordering below must be specified
-#    mandatory=true #mandatory
-#    # The version range of the dependency
-#    versionRange="[28,)" #mandatory
-#    # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
-#    ordering="NONE"
-#    # Side this dependency is applied on - BOTH, CLIENT or SERVER
-#    side="BOTH"
-## Here's another dependency
-#[[dependencies.ghostwriter]]
-#    modId="minecraft"
-#    mandatory=true
-#    versionRange="[1.14.4]"
-#    ordering="NONE"
-#    side="BOTH"
+[[dependencies.ghostwriter]]
+    modId="forge"
+    mandatory=true
+    versionRange="[28,)"
+    ordering="NONE"
+    side="CLIENT"
+# Here's another dependency
+[[dependencies.ghostwriter]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.14.4]"
+    ordering="NONE"
+    side="CLIENT"
