@@ -381,6 +381,7 @@ public class FileHandler {
 			while (pageAsString.startsWith("\"") && pageAsString.endsWith("\"")){
 				pageAsString = pageAsString.substring(1, pageAsString.length()-1);
 			}
+			// Strip 
 			//convert all escaped newline characters to real newline characters
 			pageAsString = pageAsString.replaceAll("\\\\n", "\\\n");
 			//Split the string into 116 pixel maximum lines
@@ -412,6 +413,7 @@ public class FileHandler {
 	 * @param pages
 	 * @return Success
 	 */
+	@Deprecated
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
 		String utcTime = getUTC();
 		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");

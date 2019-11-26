@@ -176,7 +176,12 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	
 	
 	public void saveBookToDisk(File filepath) {
-		this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, this.bookPages(), filepath);
+		List<String> pages = new ArrayList();
+		for (int i=0; i<this.getPageCount(); i++) {
+			String s = this.bookInfo.getPageText(i).getFormattedText();
+			pages.add(s);
+		}
+		this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, pages, filepath);
 	}
 	
 	
