@@ -1,5 +1,7 @@
 package wafflestomper.ghostwriter;
 
+import java.io.File;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ public class Ghostwriter{
 	boolean devEnv = false; // TODO: Find another way to detect this
 	private static long lastMessage = 0;
 	private static final Logger LOGGER = LogManager.getLogger();
+	public static File currentPath; 
 	
 	
 	public Ghostwriter(){

@@ -47,7 +47,7 @@ public class FileHandler {
 	
 	public FileHandler(Clipboard _clipboard){
 		this.clipboard = _clipboard;
-		String path = Minecraft.getInstance().gameDir.getAbsolutePath(); // TODO: Test that this resolves to the correct directory
+		String path = Minecraft.getInstance().gameDir.getAbsolutePath();
 		if (path.endsWith(".")){
 			path = path.substring(0, path.length()-2);
 		}
@@ -57,6 +57,7 @@ public class FileHandler {
 		if (!this.bookSavePath.exists()) this.bookSavePath.mkdirs();
 		this.signaturePath = new File(defaultPath, "Signatures");
 		if (!this.signaturePath.exists()) this.signaturePath.mkdirs();
+		this.currentPath = bookSavePath;
 	}
 	
 	

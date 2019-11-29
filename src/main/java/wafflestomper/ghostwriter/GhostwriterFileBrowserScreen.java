@@ -1,13 +1,7 @@
-// TODO: Add file hashes. Maybe color coded for easy recognition?
-// TODO: Sort files by name
-
 package wafflestomper.ghostwriter;
 
 import java.io.File;
 import java.util.List;
-
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -57,7 +51,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		super(new StringTextComponent("Title I think?")); // TODO
 		this.parentGui = _parentGui;
 		this.fileHandler = new FileHandler(this.tempClipboard);
-		this.fileHandler.currentPath = this.fileHandler.getSavePath();
+		if (Ghostwriter.currentPath == null) {
+			Ghostwriter.currentPath = this.fileHandler.getSavePath();
+		}
+		this.fileHandler.currentPath = Ghostwriter.currentPath;
 		if (_parentGui instanceof GhostwriterEditBookScreen) {
 			this.enableLoading = true;
 		}
@@ -79,7 +76,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			saveBook();
 		}
 		else {
-			this.minecraft.displayGuiScreen(this);
+			this.goBackToParentGui();
 		}
 	}
 	
@@ -103,7 +100,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		else {
 			printer.gamePrint(Printer.RED + "Error loading book - you can't load to a non-writable book!");
 		}
-		this.minecraft.displayGuiScreen(this.parentGui);
+		this.goBackToParentGui();
 	}
 	
 	
@@ -115,6 +112,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			ITextComponent itextcomponent1 = new StringTextComponent(this.filenameField.getText());
 			String s1 = "Yes";
 			String s2 = "Cancel";
+			Ghostwriter.currentPath = this.fileHandler.currentPath;
 			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
 		}
 		else {
@@ -291,6 +289,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	
 	
 	private void goBackToParentGui(){
+		Ghostwriter.currentPath = this.fileHandler.currentPath;
 		this.minecraft.displayGuiScreen(this.parentGui);
 	}
 	
@@ -359,7 +358,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		else {
 			printer.gamePrint(Printer.RED + "Saving not implemented for the parent screen!");
 		}
-		this.minecraft.displayGuiScreen(this.parentGui);
+		this.goBackToParentGui();
 	}
 	
 	
