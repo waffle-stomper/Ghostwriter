@@ -24,7 +24,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     
     private Clipboard clipboard;
     private static final Printer printer = new Printer();
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOG = LogManager.getLogger();
 	private final FileHandler fileHandler;
 	private Button buttonCopySelectedPages;
 	private String bookTitle = "";

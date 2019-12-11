@@ -3,6 +3,9 @@ package wafflestomper.ghostwriter;
 import java.io.File;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -16,7 +19,8 @@ import net.minecraft.util.text.StringTextComponent;
 import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 public class GhostwriterFileBrowserScreen extends Screen{ 
-	
+
+	private static final Logger LOG = LogManager.getLogger();
 	private FileSelectionList fileSelectionList;
 	public int slotSelected = -1;
 	private TextFieldWidget filenameField;

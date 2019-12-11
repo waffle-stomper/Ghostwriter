@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.JsonParseException;
 
 import net.minecraft.client.Minecraft;
@@ -14,6 +17,7 @@ public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 116;
 	public static final char SPLIT_CHAR = '\u1337';
 	private static final Minecraft mc = Minecraft.getInstance();
+	private static final Logger LOG = LogManager.getLogger();
 	
 	
 	/**

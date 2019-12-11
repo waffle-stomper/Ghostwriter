@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
 
@@ -35,6 +37,7 @@ public class FileHandler {
 	private File signaturePath;
 	private static final Printer printer = new Printer();
 	private Clipboard clipboard;
+	private static final Logger LOG = LogManager.getLogger();
 	
 	public File currentPath;
 	public File lastLoadedBook;
@@ -247,8 +250,8 @@ public class FileHandler {
 				}
 				catch (IOException e){
 					failedFlag = true;
-					System.out.println("Ghostwriter: Write failed!");
-					System.out.println(e.getMessage());
+					LOG.error("Ghostwriter: Write failed!");
+					LOG.error(e.getMessage());
 					return false;
 				}
 				finally{
@@ -257,8 +260,8 @@ public class FileHandler {
 			} 
 			catch (IOException e) {
 				failedFlag = true;
-				System.out.println("Ghostwriter: Write failed!");
-				System.out.println(e.getMessage());
+				LOG.error("Ghostwriter: Write failed!");
+				LOG.error(e.getMessage());
 				return false;
 			}
 		}
@@ -274,14 +277,14 @@ public class FileHandler {
 	public boolean loadBook(File filePath){
 		// Handle bookwork books in .txt files
 		if (filePath.getName().endsWith(".txt")){
-			System.out.println("Trying to load .txt as bookworm book...");
+			LOG.info("Trying to load .txt as bookworm book...");
 			if (loadBookwormBook(filePath)){return true;}
-			System.out.println("Trying to load .txt as regular text file...");
+			LOG.info("Trying to load .txt as regular text file...");
 			if (loadPlainText(filePath)){return true;}
 		}
 		//Handle Ghostwriter books in .ghb
 		if (filePath.getName().endsWith(".ghb")){
-			System.out.println("Loading GHB book..." + filePath);
+			LOG.info("Loading GHB book..." + filePath);
 			if (loadBookFromGHBFile(filePath)){return true;}
 		}
 		//This was not a valid book

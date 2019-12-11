@@ -272,7 +272,7 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 	private Clipboard autoReloadClipboard;
 	
     private static final Printer printer = new Printer();
-	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Logger LOG = LogManager.getLogger();
 	private final FileHandler fileHandler;
 	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
 	

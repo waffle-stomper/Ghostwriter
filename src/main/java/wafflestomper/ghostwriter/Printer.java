@@ -1,5 +1,8 @@
 package wafflestomper.ghostwriter;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import net.minecraft.client.Minecraft;
@@ -7,6 +10,7 @@ import net.minecraft.util.text.StringTextComponent;
 
 public class Printer{
 	private static Minecraft mc = Minecraft.getInstance();
+	private static final Logger LOG = LogManager.getLogger();
 	
 	// I think we've already established that I'm a terrible person 
 	public static final ChatFormatting BLACK = ChatFormatting.BLACK;
@@ -40,7 +44,7 @@ public class Printer{
 	}
 	
 	public void print(String toPrint){
-		System.out.println(toPrint);
+		LOG.info(toPrint);
 	}
 
 	public void print(float toPrint) {

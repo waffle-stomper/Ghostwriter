@@ -3,6 +3,9 @@ package wafflestomper.ghostwriter;
 import java.io.File;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.Minecraft;
@@ -17,11 +20,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
  */
 public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 
-
-
 	private final FileSelectionList.ParentDirEntry parentDir;
 	private final List<FileSelectionList.PathItemEntry> fileList = Lists.newArrayList();
 	private final GhostwriterFileBrowserScreen owner;
+	private static final Logger LOG = LogManager.getLogger();
 	
 	public FileSelectionList(GhostwriterFileBrowserScreen ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
