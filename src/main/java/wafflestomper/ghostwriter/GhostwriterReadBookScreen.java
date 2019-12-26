@@ -7,7 +7,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.inventory.container.LecternContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -29,12 +32,15 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	private Button buttonCopySelectedPages;
 	private String bookTitle = "";
 	private String bookAuthor = "";
+	
+	private LecternContainer lecternContainer;
 
 
-	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard) {
+	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard, LecternContainer lecternContainer) {
         super(bookInfoIn, pageTurnSoundsIn);
         this.clipboard = globalClipboard;
         this.fileHandler = new FileHandler(this.clipboard);
+        this.lecternContainer = lecternContainer;
     	if (currStack != null){
     		Item currItem = currStack.getItem();
     		if (currItem != null){
@@ -45,12 +51,9 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     	        }
     		}
     	}
-    	if (this.bookTitle == "") {
-    		printer.gamePrint(Printer.RED + "Couldn't load title");
-    	}
     }
 	
-	
+//  The vanilla ReadBookScreen has these other constructors but I don't think we need them	
 //	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn) {
 //        this(bookInfoIn, true);
 //    }
@@ -127,6 +130,31 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     	}
     	this.updateButtons();
     }
+    
+    
+    private void takeLecternBook(int p_214179_1_){
+    	if (this.lecternContainer == null) {
+    		printer.gamePrint(Printer.RED + "Error: LecternContainer is null!");
+    		return;
+    	}
+        this.minecraft.playerController.sendEnchantPacket(this.lecternContainer.windowId, p_214179_1_);
+    }
+    
+    
+    @Override
+	public void addDoneButton() {
+        if (this.minecraft.player.isAllowEdit() && this.lecternContainer != null){
+           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, I18n.format("gui.done"), (p_214181_1_) -> {
+              this.minecraft.displayGuiScreen((Screen)null);
+           }));
+           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, I18n.format("lectern.take_book"), (p_214178_1_) -> {
+              this.takeLecternBook(3);
+           }));
+        } else {
+           super.addDoneButton();
+        }
+
+     }
     
     
     @Override
