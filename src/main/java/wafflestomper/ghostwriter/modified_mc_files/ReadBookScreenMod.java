@@ -2,7 +2,7 @@ package wafflestomper.ghostwriter.modified_mc_files;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -28,9 +28,6 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-/**
- * This is just the standard ReadBookScreen but with all methods and fields made public
- */
 @OnlyIn(Dist.CLIENT)
 public class ReadBookScreenMod extends Screen {
    public static final ReadBookScreenMod.IBookInfo EMPTY_BOOK = new ReadBookScreenMod.IBookInfo() {
@@ -98,22 +95,22 @@ public class ReadBookScreenMod extends Screen {
    /**
     * I'm not sure why this exists. The function it calls is public and does all of the work
     */
-   public boolean showPage2(int pageNum) {
+   protected boolean showPage2(int pageNum) {
       return this.showPage(pageNum);
    }
 
-   public void init() {
+   protected void init() {
       this.addDoneButton();
       this.addChangePageButtons();
    }
 
-   public void addDoneButton() {
+   protected void addDoneButton() {
       this.addButton(new Button(this.width / 2 - 100, 196, 200, 20, I18n.format("gui.done"), (p_214161_1_) -> {
          this.minecraft.displayGuiScreen((Screen)null);
       }));
    }
 
-   public void addChangePageButtons() {
+   protected void addChangePageButtons() {
       int i = (this.width - 192) / 2;
       int j = 2;
       this.buttonNextPage = this.addButton(new ChangePageButton(i + 116, 159, true, (p_214159_1_) -> {
@@ -132,7 +129,7 @@ public class ReadBookScreenMod extends Screen {
    /**
     * Moves the display back one page
     */
-   public void previousPage() {
+   protected void previousPage() {
       if (this.currPage > 0) {
          --this.currPage;
       }
@@ -143,7 +140,7 @@ public class ReadBookScreenMod extends Screen {
    /**
     * Moves the display forward one page
     */
-   public void nextPage() {
+   protected void nextPage() {
       if (this.currPage < this.getPageCount() - 1) {
          ++this.currPage;
       }
@@ -175,7 +172,7 @@ public class ReadBookScreenMod extends Screen {
 
    public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
       this.renderBackground();
-      GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+      RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
       this.minecraft.getTextureManager().bindTexture(BOOK_TEXTURES);
       int i = (this.width - 192) / 2;
       int j = 2;

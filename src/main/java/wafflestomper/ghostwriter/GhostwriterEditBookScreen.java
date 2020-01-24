@@ -509,11 +509,11 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 			addNewPage();
 			this.clipboard.miscPages.addAll(clip.pages);
 			pasteMultiplePages(this.bookPages.size()-1);
-			this.printer.gamePrint(Printer.GRAY + "Signature pages added");
+			printer.gamePrint(Printer.GRAY + "Signature pages added");
 			removePages(this.bookPages.size()-1, this.bookPages.size()-1);
 		}
 		else{
-			this.printer.gamePrint(Printer.RED + "Couldn't load " + sigFile + " Does it exist?");
+			printer.gamePrint(Printer.RED + "Couldn't load " + sigFile + " Does it exist?");
 		}
 		this.clipboard.clone(temp);
     }

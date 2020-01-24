@@ -4,10 +4,8 @@ import java.io.File;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jline.utils.Log;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.screen.LecternScreen;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -70,7 +68,7 @@ public class Ghostwriter{
 			lecternArmed = false;
 			LOG.debug("Lectern screen detected!");
 			// Abort if the player is crouching
-			if (this.mc.player.isSneaking()) {
+			if (this.mc.player.isCrouching()) {
 				LOG.debug("Aborting GUI replacement becuase the player is crouching");
 				return;
 			}
@@ -112,7 +110,7 @@ public class Ghostwriter{
 		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen || eventGui instanceof ReadBookScreen){
 			
 			// Abort if the player is crouching
-			if (this.mc.player.isSneaking()) {
+			if (this.mc.player.isCrouching()) {
 				LOG.debug("Aborting GUI replacement becuase the player is crouching");
 				return;
 			}
