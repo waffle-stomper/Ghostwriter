@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.16.1-recommended": "2.0.7",
+    "1.16.1-recommended": "2.0.8",
     "1.14.4-recommended": "2.0.4",
     "1.12.2-recommended": "1.9.8",
     "1.12.1-recommended": "1.9.6",
@@ -11,6 +11,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.0.8": "Fix erroneous 'saving not implemented' message",
     "2.0.7": "Update to 1.16.1"
   },
   "1.15.2":{
