@@ -355,7 +355,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.parentGui;
 			parent.saveBookToDisk(this.getSavePath());
 		}
-		if (this.parentGui instanceof GhostwriterReadBookScreen) {
+		else if (this.parentGui instanceof GhostwriterReadBookScreen) {
 			GhostwriterReadBookScreen parent = (GhostwriterReadBookScreen)this.parentGui;
 			parent.saveBookToDisk(this.getSavePath());
 		}
