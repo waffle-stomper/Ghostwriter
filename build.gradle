@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 
 version = '2.0.7'
 group = 'wafflestomper' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = '1.15.2-Ghostwriter'
+archivesBaseName = '1.16.1-Ghostwriter'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
