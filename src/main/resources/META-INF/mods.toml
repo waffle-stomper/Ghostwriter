@@ -30,12 +30,12 @@ issueTrackerURL="http://my.issue.tracker/" #optional
 [[dependencies.ghostwriter]]
     modId="forge"
     mandatory=true
-    versionRange="[31.0.1,)"
+    versionRange="[32.0.108,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.ghostwriter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.16.1]"
     ordering="NONE"
     side="CLIENT"

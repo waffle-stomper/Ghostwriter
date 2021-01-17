@@ -170,6 +170,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.gui.screen.EditBookScreen;
+import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -179,10 +181,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import wafflestomper.ghostwriter.modified_mc_files.EditBookScreenMod;
 
 @OnlyIn(Dist.CLIENT)
-public class GhostwriterEditBookScreen extends EditBookScreenMod{
+public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	private static final int ID_SAVE_BOOK = 6;
 	private static final int ID_LOAD_BOOK = 7;
@@ -263,6 +264,11 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     //Used for copying multiple pages at a time
     private int selectedPageA = -1;
     private int selectedPageB = -1;
+
+    // Note that end can be less than start if you select text right to left
+	// TODO: Incorporate text selection back into the new version
+    private int selectionEnd = 0;
+    private int selectionStart = 0;
     
     private Clipboard clipboard;
     
@@ -309,6 +315,9 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		}
 		
 		this.updateButtons();
+		// This is some kind of new display update/refresh function
+		// It must be called every time the book's content changes
+		this.func_238751_C_();
     }
     
     
@@ -465,8 +474,8 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     	this.bookChanged(true);
 		printer.gamePrint(Printer.GRAY + "Book pasted");
     }
-    
-    
+
+
     private void pasteMultiplePages(int startPos) {
     	// Idiot proofing
     	if (startPos < 0) {
@@ -537,7 +546,14 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		int leftMost = middle - 100;
 		return leftMost + 20 * (buttonNum-66);
 	}
-	
+
+
+	// TODO: Check that this works as intended
+	// TODO: The 1.15 version of this used to delete selected text. Does that still happen?
+	public void insertTextIntoPage(String text) {
+		this.field_238748_u_.putText(text);
+	}
+
 	
 	@Override
 	public void init() {
@@ -552,57 +568,57 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
+		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"), (pressed_button) -> {
 			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 		}));
 		
-		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, "Disable AutoReload", (pressed_button) -> {
+		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, new StringTextComponent("Disable AutoReload"), (pressed_button) -> {
 			this.disableAutoReload();
 		}));
 		
-		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
+		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, new StringTextComponent("Copy Book"), (pressed_button) -> {
 			this.copyBook();
 		}));
 		
-		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, "Paste Book", (pressed_button) -> {
+		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, new StringTextComponent("Paste Book"), (pressed_button) -> {
 			this.pasteBook();
 		}));
 		
-		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
+		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, new StringTextComponent("A"), (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
+		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, new StringTextComponent("B"), (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page", (pressed_button) -> {
+		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, new StringTextComponent("Copy This Page"), (pressed_button) -> {
 			this.copySelectedPagesToClipboard();
 		}));
 		
-		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, "Cut This Page", (pressed_button) -> {
+		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, new StringTextComponent("Cut This Page"), (pressed_button) -> {
 			this.cutMultiplePages();
 		}));
 		
-		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, "Paste This Page", (pressed_button) -> {
+		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, new StringTextComponent("Paste This Page"), (pressed_button) -> {
 			this.pasteMultiplePages(this.currPage);
 		}));
 		
-		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, "Insert Blank Page", (pressed_button) -> {
+		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, new StringTextComponent("Insert Blank Page"), (pressed_button) -> {
 			this.insertPage();
 		}));
 		
-		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, "Remove Top Space", (pressed_button) -> {
+		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, new StringTextComponent("Remove Top Space"), (pressed_button) -> {
 			this.collapseTop();
 		}));
 		
-		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, "Add Signature Pages", (pressed_button) -> {
+		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, new StringTextComponent("Add Signature Pages"), (pressed_button) -> {
 			this.addSignaturePages();
 		}));
 		
-		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, "Remove This Page", (pressed_button) -> {
+		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, new StringTextComponent("Remove This Page"), (pressed_button) -> {
 			this.removePages(this.selectedPageA, this.selectedPageB);
 		}));
 		                     		
@@ -611,29 +627,29 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
 		int colorButY = this.height - 40;
 		int formatButY = this.height - 20;
 		
-		this.formatBlack =     		this.addButton(new Button(getColorButX(ID_BLACK), 			colorButY, 20, 20, "\u00a70A", (pressed_button) -> {this.insertTextIntoPage("\u00a70");}));
-		this.formatDarkBlue =  		this.addButton(new Button(getColorButX(ID_DARK_BLUE), 		colorButY, 20, 20, "\u00a71A", (pressed_button) -> {this.insertTextIntoPage("\u00a71");}));
-		this.formatDarkGreen = 		this.addButton(new Button(getColorButX(ID_DARK_GREEN), 		colorButY, 20, 20, "\u00a72A", (pressed_button) -> {this.insertTextIntoPage("\u00a72");}));
-		this.formatDarkAqua =  		this.addButton(new Button(getColorButX(ID_DARK_AQUA),		colorButY, 20, 20, "\u00a73A", (pressed_button) -> {this.insertTextIntoPage("\u00a73");}));
-		this.formatDarkRed = 		this.addButton(new Button(getColorButX(ID_DARK_RED), 		colorButY, 20, 20, "\u00a74A", (pressed_button) -> {this.insertTextIntoPage("\u00a74");}));
-		this.formatDarkPurple = 	this.addButton(new Button(getColorButX(ID_DARK_PURPLE), 	colorButY, 20, 20, "\u00a75A", (pressed_button) -> {this.insertTextIntoPage("\u00a75");}));
-		this.formatGold = 			this.addButton(new Button(getColorButX(ID_GOLD), 			colorButY, 20, 20, "\u00a76A", (pressed_button) -> {this.insertTextIntoPage("\u00a76");}));
-		this.formatGray = 			this.addButton(new Button(getColorButX(ID_GRAY), 			colorButY, 20, 20, "\u00a77A", (pressed_button) -> {this.insertTextIntoPage("\u00a77");}));
-		this.formatDarkGray = 		this.addButton(new Button(getColorButX(ID_DARK_GRAY), 		colorButY, 20, 20, "\u00a78A", (pressed_button) -> {this.insertTextIntoPage("\u007a8");}));
-		this.formatBlue = 			this.addButton(new Button(getColorButX(ID_BLUE), 			colorButY, 20, 20, "\u00a79A", (pressed_button) -> {this.insertTextIntoPage("\u00a79");}));
-		this.formatGreen = 			this.addButton(new Button(getColorButX(ID_GREEN), 			colorButY, 20, 20, "\u00a7aA", (pressed_button) -> {this.insertTextIntoPage("\u00a7a");}));
-		this.formatAqua = 			this.addButton(new Button(getColorButX(ID_AQUA), 			colorButY, 20, 20, "\u00a7bA", (pressed_button) -> {this.insertTextIntoPage("\u00a7b");}));
-		this.formatRed = 			this.addButton(new Button(getColorButX(ID_RED), 			colorButY, 20, 20, "\u00a7cA", (pressed_button) -> {this.insertTextIntoPage("\u00a7c");}));
-		this.formatLightPurple = 	this.addButton(new Button(getColorButX(ID_LIGHT_PURPLE),	colorButY, 20, 20, "\u00a7dA", (pressed_button) -> {this.insertTextIntoPage("\u00a7d");}));
-		this.formatYellow = 		this.addButton(new Button(getColorButX(ID_YELLOW), 			colorButY, 20, 20, "\u00a7eA", (pressed_button) -> {this.insertTextIntoPage("\u00a7e");}));
-		this.formatWhite = 			this.addButton(new Button(getColorButX(ID_WHITE), 			colorButY, 20, 20, "\u00a7fA", (pressed_button) -> {this.insertTextIntoPage("\u00a7f");}));
+		this.formatBlack =     		this.addButton(new Button(getColorButX(ID_BLACK), 			colorButY, 20, 20, new StringTextComponent("\u00a70A)"), (pressed_button) -> {this.insertTextIntoPage("\u00a70");}));
+		this.formatDarkBlue =  		this.addButton(new Button(getColorButX(ID_DARK_BLUE), 		colorButY, 20, 20, new StringTextComponent("\u00a71A"), (pressed_button) -> {this.insertTextIntoPage("\u00a71");}));
+		this.formatDarkGreen = 		this.addButton(new Button(getColorButX(ID_DARK_GREEN), 		colorButY, 20, 20, new StringTextComponent("\u00a72A"), (pressed_button) -> {this.insertTextIntoPage("\u00a72");}));
+		this.formatDarkAqua =  		this.addButton(new Button(getColorButX(ID_DARK_AQUA),		colorButY, 20, 20, new StringTextComponent("\u00a73A"), (pressed_button) -> {this.insertTextIntoPage("\u00a73");}));
+		this.formatDarkRed = 		this.addButton(new Button(getColorButX(ID_DARK_RED), 		colorButY, 20, 20, new StringTextComponent("\u00a74A"), (pressed_button) -> {this.insertTextIntoPage("\u00a74");}));
+		this.formatDarkPurple = 	this.addButton(new Button(getColorButX(ID_DARK_PURPLE), 	colorButY, 20, 20, new StringTextComponent("\u00a75A"), (pressed_button) -> {this.insertTextIntoPage("\u00a75");}));
+		this.formatGold = 			this.addButton(new Button(getColorButX(ID_GOLD), 			colorButY, 20, 20, new StringTextComponent("\u00a76A"), (pressed_button) -> {this.insertTextIntoPage("\u00a76");}));
+		this.formatGray = 			this.addButton(new Button(getColorButX(ID_GRAY), 			colorButY, 20, 20, new StringTextComponent("\u00a77A"), (pressed_button) -> {this.insertTextIntoPage("\u00a77");}));
+		this.formatDarkGray = 		this.addButton(new Button(getColorButX(ID_DARK_GRAY), 		colorButY, 20, 20, new StringTextComponent("\u00a78A"), (pressed_button) -> {this.insertTextIntoPage("\u007a8");}));
+		this.formatBlue = 			this.addButton(new Button(getColorButX(ID_BLUE), 			colorButY, 20, 20, new StringTextComponent("\u00a79A"), (pressed_button) -> {this.insertTextIntoPage("\u00a79");}));
+		this.formatGreen = 			this.addButton(new Button(getColorButX(ID_GREEN), 			colorButY, 20, 20, new StringTextComponent("\u00a7aA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7a");}));
+		this.formatAqua = 			this.addButton(new Button(getColorButX(ID_AQUA), 			colorButY, 20, 20, new StringTextComponent("\u00a7bA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7b");}));
+		this.formatRed = 			this.addButton(new Button(getColorButX(ID_RED), 			colorButY, 20, 20, new StringTextComponent("\u00a7cA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7c");}));
+		this.formatLightPurple = 	this.addButton(new Button(getColorButX(ID_LIGHT_PURPLE),	colorButY, 20, 20, new StringTextComponent("\u00a7dA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7d");}));
+		this.formatYellow = 		this.addButton(new Button(getColorButX(ID_YELLOW), 			colorButY, 20, 20, new StringTextComponent("\u00a7eA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7e");}));
+		this.formatWhite = 			this.addButton(new Button(getColorButX(ID_WHITE), 			colorButY, 20, 20, new StringTextComponent("\u00a7fA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7f");}));
 		
-		this.formatObfuscated = 	this.addButton(new Button(getFormatButX(ID_OBFUSCATED), 	formatButY, 20, 20, "\u00a7kA", (pressed_button) -> {this.insertTextIntoPage("\u00a7k");}));
-		this.formatBold = 			this.addButton(new Button(getFormatButX(ID_BOLD), 			formatButY, 20, 20, "\u00a7lA", (pressed_button) -> {this.insertTextIntoPage("\u00a7l");}));
-		this.formatStrikethrough = 	this.addButton(new Button(getFormatButX(ID_STRIKETHROUGH),	formatButY, 20, 20, "\u00a7mA", (pressed_button) -> {this.insertTextIntoPage("\u00a7m");}));
-		this.formatUnderline = 		this.addButton(new Button(getFormatButX(ID_UNDERLINE), 		formatButY, 20, 20, "\u00a7nA", (pressed_button) -> {this.insertTextIntoPage("\u00a7n");}));
-		this.formatItalic = 		this.addButton(new Button(getFormatButX(ID_ITALIC), 		formatButY, 20, 20, "\u00a7oA", (pressed_button) -> {this.insertTextIntoPage("\u00a7o");}));
-		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, "Reset Formatting", (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
+		this.formatObfuscated = 	this.addButton(new Button(getFormatButX(ID_OBFUSCATED), 	formatButY, 20, 20, new StringTextComponent("\u00a7kA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7k");}));
+		this.formatBold = 			this.addButton(new Button(getFormatButX(ID_BOLD), 			formatButY, 20, 20, new StringTextComponent("\u00a7lA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7l");}));
+		this.formatStrikethrough = 	this.addButton(new Button(getFormatButX(ID_STRIKETHROUGH),	formatButY, 20, 20, new StringTextComponent("\u00a7mA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7m");}));
+		this.formatUnderline = 		this.addButton(new Button(getFormatButX(ID_UNDERLINE), 		formatButY, 20, 20, new StringTextComponent("\u00a7nA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7n");}));
+		this.formatItalic = 		this.addButton(new Button(getFormatButX(ID_ITALIC), 		formatButY, 20, 20, new StringTextComponent("\u00a7oA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7o");}));
+		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, new StringTextComponent("Reset Formatting"), (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
 
 		super.init();
 		// Move standard buttons
@@ -704,24 +720,24 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
     	if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
     		// Multi page selection
     		this.buttonCopySelectedPages.active = true;
-    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
-    		this.buttonCopySelectedPages.setMessage("Copy " + xPages);
-    		this.buttonCutMultiplePages.setMessage("Cut " + xPages);
-    		this.buttonRemoveSelectedPages.setMessage("Remove " + xPages);
-    		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
-    		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Pages";
+    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
+    		this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut " + xPages));
+    		this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove " + xPages));
+    		this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
+    		this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
     	}
     	else{
-    		this.buttonCopySelectedPages.setMessage("Copy This Page");
-    		this.buttonCutMultiplePages.setMessage("Cut This Page");
-    		this.buttonRemoveSelectedPages.setMessage("Remove This Page");
-    		this.buttonSelectPageA.setMessage("A");
-    		this.buttonSelectPageB.setMessage("B");
+    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
+    		this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut This Page"));
+    		this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove This Page"));
+    		this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
+    		this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
     		if (this.selectedPageA >= 0) {
-    			this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
+    			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
     		}
     		if (this.selectedPageB >= 0) {
-    			this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
     		}
     	}
     	
@@ -729,10 +745,10 @@ public class GhostwriterEditBookScreen extends EditBookScreenMod{
         
         this.buttonPasteMultiplePages.active = (this.clipboard.miscPages.size() > 0);
         if (this.buttonPasteMultiplePages.active){
-        	this.buttonPasteMultiplePages.setMessage("Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s"));
+        	this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s")));
         }
         else{
-        	this.buttonPasteMultiplePages.setMessage("Paste Multiple");
+        	this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste Multiple"));
         }
         
         this.buttonDisableAutoReload.visible = this.autoReloadFile != null;

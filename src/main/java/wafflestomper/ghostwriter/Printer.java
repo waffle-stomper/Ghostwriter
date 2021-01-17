@@ -3,7 +3,7 @@ package wafflestomper.ghostwriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.StringTextComponent;
@@ -13,28 +13,28 @@ public class Printer{
 	private static final Logger LOG = LogManager.getLogger();
 	
 	// I think we've already established that I'm a terrible person 
-	public static final ChatFormatting BLACK = ChatFormatting.BLACK;
-	public static final ChatFormatting DARK_BLUE = ChatFormatting.DARK_BLUE;
-	public static final ChatFormatting DARK_GREEN = ChatFormatting.DARK_GREEN;
-	public static final ChatFormatting DARK_AQUA = ChatFormatting.DARK_AQUA;
-	public static final ChatFormatting DARK_RED = ChatFormatting.DARK_RED;
-	public static final ChatFormatting DARK_PURPLE = ChatFormatting.DARK_PURPLE;
-	public static final ChatFormatting GOLD = ChatFormatting.GOLD;
-	public static final ChatFormatting GRAY = ChatFormatting.GRAY;
-	public static final ChatFormatting DARK_GRAY = ChatFormatting.DARK_GRAY;
-	public static final ChatFormatting BLUE = ChatFormatting.BLUE;
-	public static final ChatFormatting GREEN = ChatFormatting.GREEN;
-	public static final ChatFormatting AQUA = ChatFormatting.AQUA;
-	public static final ChatFormatting RED = ChatFormatting.RED;
-	public static final ChatFormatting LIGHT_PURPLE = ChatFormatting.LIGHT_PURPLE;
-	public static final ChatFormatting YELLOW = ChatFormatting.YELLOW;
-	public static final ChatFormatting WHITE = ChatFormatting.WHITE;
-	public static final ChatFormatting OBFUSCATED = ChatFormatting.OBFUSCATED;
-	public static final ChatFormatting BOLD = ChatFormatting.BOLD;
-	public static final ChatFormatting STRIKETHROUGH = ChatFormatting.STRIKETHROUGH;
-	public static final ChatFormatting UNDERLINE = ChatFormatting.UNDERLINE;
-	public static final ChatFormatting ITALIC = ChatFormatting.ITALIC;
-	public static final ChatFormatting RESET = ChatFormatting.RESET;
+	public static final TextFormatting BLACK = TextFormatting.BLACK;
+	public static final TextFormatting DARK_BLUE = TextFormatting.DARK_BLUE;
+	public static final TextFormatting DARK_GREEN = TextFormatting.DARK_GREEN;
+	public static final TextFormatting DARK_AQUA = TextFormatting.DARK_AQUA;
+	public static final TextFormatting DARK_RED = TextFormatting.DARK_RED;
+	public static final TextFormatting DARK_PURPLE = TextFormatting.DARK_PURPLE;
+	public static final TextFormatting GOLD = TextFormatting.GOLD;
+	public static final TextFormatting GRAY = TextFormatting.GRAY;
+	public static final TextFormatting DARK_GRAY = TextFormatting.DARK_GRAY;
+	public static final TextFormatting BLUE = TextFormatting.BLUE;
+	public static final TextFormatting GREEN = TextFormatting.GREEN;
+	public static final TextFormatting AQUA = TextFormatting.AQUA;
+	public static final TextFormatting RED = TextFormatting.RED;
+	public static final TextFormatting LIGHT_PURPLE = TextFormatting.LIGHT_PURPLE;
+	public static final TextFormatting YELLOW = TextFormatting.YELLOW;
+	public static final TextFormatting WHITE = TextFormatting.WHITE;
+	public static final TextFormatting OBFUSCATED = TextFormatting.OBFUSCATED;
+	public static final TextFormatting BOLD = TextFormatting.BOLD;
+	public static final TextFormatting STRIKETHROUGH = TextFormatting.STRIKETHROUGH;
+	public static final TextFormatting UNDERLINE = TextFormatting.UNDERLINE;
+	public static final TextFormatting ITALIC = TextFormatting.ITALIC;
+	public static final TextFormatting RESET = TextFormatting.RESET;
 	
 	public Printer(){
 	}

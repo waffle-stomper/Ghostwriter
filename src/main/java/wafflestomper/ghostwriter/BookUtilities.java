@@ -133,7 +133,9 @@ public class BookUtilities {
         return par0 >= 48 && par0 <= 57 || par0 >= 97 && par0 <= 102 || par0 >= 65 && par0 <= 70;
     }
 
-	
+
+    // TODO: It looks like a lot has changed internally in books. Check that this still functions as intended
+	//       It might be worth looking into replacing this with vanilla functions?
 	/**
      * Determines how many characters from the string will fit into the specified width.
      */
@@ -176,7 +178,9 @@ public class BookUtilities {
                 case 32:
                     i1 = l;
                 default:
-                    k += mc.fontRenderer.getCharWidth(c0);
+					// TODO: Does the function still work now that we've replaced getCharWidth with getStringWidth?
+					//       Note that I'm also converting the character back to a string
+                    k += mc.fontRenderer.getStringWidth(String.valueOf(c0));
 
                     if (flag)
                     {
@@ -350,9 +354,11 @@ public class BookUtilities {
 		 */
 		
 		try{
-    		ITextComponent i = ITextComponent.Serializer.fromJson(jsonIn);
+			// func_240643_a_() is fromJson()
+    		ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
     		if (i != null){
-    			String out = i.getFormattedText();
+    			// TODO: Verify that the new getString() produces the same results as the old getFormattedText()
+    			String out = i.getString();
     			return(out);
     		}
         }

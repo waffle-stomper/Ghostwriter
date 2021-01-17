@@ -3,6 +3,7 @@ package wafflestomper.ghostwriter;
 import java.io.File;
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,19 +33,18 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		// TODO Auto-generated constructor stub
 	}
 
-	
+	// TODO: Verify that this still works
 	public void updateFileList(List<File> displayFiles) {
 		this.fileList.clear();
 		for (File f : displayFiles) {
 			this.fileList.add(new PathItemEntry(this.owner, f));
 		}
 		// This is required to have the slots render... I think?
-		this.children().clear();
-		this.children().add(this.parentDir);
+		this.clearEntries();
+		this.addEntry(this.parentDir);
 		for (PathItemEntry n : this.fileList) {
-			this.children().add(n);
+			this.addEntry(n);
 		}
-		
 	}
 	
 
@@ -64,17 +64,18 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			this.mc = Minecraft.getInstance();	
 		}
 		
-		
+		// TODO: Verify that this still works
 		@Override
-		public void render(int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
-				int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
-			this.mc.fontRenderer.drawString("..", (float)(p_render_3_ ), (float)(p_render_2_ + 1), 0x00FF00); // Params are string, x, y, color
+		public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
+						   int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
+			this.mc.fontRenderer.drawString(matrixStack, "..", (float)(p_render_3_ ), (float)(p_render_2_ + 1), 0x00FF00); // Params are string, x, y, color
 		}
 		
 		
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
-	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
+			// TODO: Why were we calculating these? They're not used?
+//	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
+//	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
 	         this.owner.setSelectedSlot(this);
 	         if (Util.milliTime() - this.lastClickTime < 250L) {
 	            // TODO: Double click handling
@@ -114,7 +115,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		 * 
 		 */
 		@Override
-		public void render(int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
+		public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
 				int mouseX, int mouseY, boolean mouseIsOver, float tickLengthMaybe) {
 
 			
@@ -131,8 +132,9 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			}
 			
 			// Draw the trimmed filename in the slot
-			String s = this.mc.fontRenderer.trimStringToWidth(this.path.getName(), slotWidth);
-			this.mc.fontRenderer.drawString(s,(float)(slotX ), (float)(p_render_2_ + 1), color);
+			// TODO: I think func_238412_a_ is the new trimStringToWidth but I'm not sure
+			String s = this.mc.fontRenderer.func_238412_a_(this.path.getName(), slotWidth);
+			this.mc.fontRenderer.drawString(matrixStack, s,(float)(slotX ), (float)(p_render_2_ + 1), color);
 			
 			// Set up the hover text if the mouse is hovering over this slot
 			if (mouseIsOver) {
@@ -148,8 +150,9 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		}
 		
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
-	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
+			// TODO: Why were we calculating these? They aren't used?
+//	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
+//	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
 	    
 	         this.owner.setSelectedSlot(this);
 	         if (Util.milliTime() - this.lastClickTime < 250L) {

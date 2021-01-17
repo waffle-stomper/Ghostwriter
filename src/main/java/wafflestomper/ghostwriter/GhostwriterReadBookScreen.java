@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.gui.screen.ReadBookScreen;
+import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -14,9 +16,8 @@ import net.minecraft.inventory.container.LecternContainer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
-public class GhostwriterReadBookScreen extends ReadBookScreenMod {
+public class GhostwriterReadBookScreen extends ReadBookScreen {
 	
 	private Button buttonSelectPageA;
 	private Button buttonSelectPageB;
@@ -36,8 +37,8 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	private LecternContainer lecternContainer;
 
 
-	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard, LecternContainer lecternContainer) {
-        super(bookInfoIn, pageTurnSoundsIn);
+	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard, LecternContainer lecternContainer) {
+        super(bookInfoIn);  // TODO: Page sound control has been disabled because that constructor is private
         this.clipboard = globalClipboard;
         this.fileHandler = new FileHandler(this.clipboard);
         this.lecternContainer = lecternContainer;
@@ -54,7 +55,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     }
 	
 //  The vanilla ReadBookScreen has these other constructors but I don't think we need them	
-//	public GhostwriterReadBookScreen(ReadBookScreenMod.IBookInfo bookInfoIn) {
+//	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn) {
 //        this(bookInfoIn, true);
 //    }
 //
@@ -69,12 +70,12 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
      * @return
      */
     public List<String> bookPages(){
-    	if (this.bookInfo instanceof ReadBookScreenMod.WrittenBookInfo) {
-    		ReadBookScreenMod.WrittenBookInfo b = (ReadBookScreenMod.WrittenBookInfo)this.bookInfo;
+    	if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
+    		ReadBookScreen.WrittenBookInfo b = (ReadBookScreen.WrittenBookInfo)this.bookInfo;
     		return b.pages;
     	}
-    	else if (this.bookInfo instanceof ReadBookScreenMod.UnwrittenBookInfo) {
-    		ReadBookScreenMod.UnwrittenBookInfo b = (ReadBookScreenMod.UnwrittenBookInfo)this.bookInfo;
+    	else if (this.bookInfo instanceof ReadBookScreen.UnwrittenBookInfo) {
+    		ReadBookScreen.UnwrittenBookInfo b = (ReadBookScreen.UnwrittenBookInfo)this.bookInfo;
     		return b.pages;
     	}
     	else {
@@ -144,10 +145,10 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     @Override
 	public void addDoneButton() {
         if (this.minecraft.player.isAllowEdit() && this.lecternContainer != null){
-           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, I18n.format("gui.done"), (p_214181_1_) -> {
+           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, new StringTextComponent("gui.done"), (p_214181_1_) -> {
               this.minecraft.displayGuiScreen((Screen)null);
            }));
-           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, I18n.format("lectern.take_book"), (p_214178_1_) -> {
+           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, new StringTextComponent("lectern.take_book"), (p_214178_1_) -> {
               this.takeLecternBook(3);
            }));
         } else {
@@ -176,25 +177,25 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
         // Temporary hack
         int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, "File Browser", (pressed_button) -> {
+		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"), (pressed_button) -> {
 			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 		}));
 		
-		this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, "Copy Book", (pressed_button) -> {
+		this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, new StringTextComponent("Copy Book"), (pressed_button) -> {
 			this.copyBook();
 		}));
 		
-		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, "A", (pressed_button) -> {
+		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, new StringTextComponent("A"), (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, "B", (pressed_button) -> {
+		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, new StringTextComponent("B"), (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, "Copy This Page", (pressed_button) -> {
+		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, new StringTextComponent("Copy This Page"), (pressed_button) -> {
 			this.copySelectedPagesToClipboard();
 		}));
 
@@ -206,7 +207,9 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
 	public void saveBookToDisk(File filepath) {
 		List<String> pages = new ArrayList();
 		for (int i=0; i<this.getPageCount(); i++) {
-			String s = this.bookInfo.getPageText(i).getFormattedText();
+			// func_230456_a_ is the old getPageText
+			// TODO: Verify that getString is returning formatting codes (the old function was getFormattedText())
+			String s = this.bookInfo.func_230456_a_(i).getString();
 			pages.add(s);
 		}
 		this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, pages, filepath);
@@ -228,20 +231,20 @@ public class GhostwriterReadBookScreen extends ReadBookScreenMod {
     	if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
     		// Multi page selection
     		this.buttonCopySelectedPages.active = true;
-    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Page"  + ((this.selectedPageA!=this.selectedPageB)?"s":"");
-    		this.buttonCopySelectedPages.setMessage("Copy " + xPages);
-    		this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
-    		this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Pages";
+    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
+    		this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
+    		this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
     	}
     	else{
-    		this.buttonCopySelectedPages.setMessage("Copy This Page");
-    		this.buttonSelectPageA.setMessage("A");
-    		this.buttonSelectPageB.setMessage("B");
+    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
+    		this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
+    		this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
     		if (this.selectedPageA >= 0) {
-    			this.buttonSelectPageA.setMessage("A: " + (this.selectedPageA+1));
+    			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
     		}
     		if (this.selectedPageB >= 0) {
-    			this.buttonSelectPageB.setMessage("B: " + (this.selectedPageB+1));
+    			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
     		}
     	}
 	}

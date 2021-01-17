@@ -2,6 +2,7 @@ package wafflestomper.ghostwriter;
 
 import java.io.File;
 
+import net.minecraft.client.gui.screen.EditBookScreen;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,14 +22,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 
 @Mod("ghostwriter")
 public class Ghostwriter{
 	
-	private Minecraft mc = Minecraft.getInstance();
-	private Printer printer = new Printer();
+	private final Minecraft mc = Minecraft.getInstance();
+	private final Printer printer = new Printer();
 	public Clipboard globalClipboard = new Clipboard();
 	boolean devEnv = false; // TODO: Find another way to detect this
 	private static long lastMessage = 0;
@@ -54,22 +54,28 @@ public class Ghostwriter{
 			lastMessage = System.currentTimeMillis();
 		}
 	}
-	
+
+
 	// TODO: Is this even right? We're closing the container I think?
 	// TODO: Add check for 'air' stack instead of book (I think there's a race condition where this might get called too early)
 	// TODO: Refactor this to remove the duplicated code with guiOpen() below
 	/**
 	 * This swaps the book on a lectern for the Ghostwriter equivalent
-	 * @param event
 	 */
 	@SubscribeEvent
 	public void tick(TickEvent event) {
 		if (this.mc.currentScreen instanceof LecternScreen && lecternArmed) {
 			lecternArmed = false;
 			LOG.debug("Lectern screen detected!");
+
+			if (this.mc.player == null){
+				LOG.error("Aborting GUI replacement because the player is null");
+				return;
+			}
+
 			// Abort if the player is crouching
 			if (this.mc.player.isCrouching()) {
-				LOG.debug("Aborting GUI replacement becuase the player is crouching");
+				LOG.debug("Aborting GUI replacement because the player is crouching");
 				return;
 			}
 			
@@ -77,12 +83,12 @@ public class Ghostwriter{
 			ItemStack bookStack = ls.getContainer().getBook();
 			LOG.info("Swapping LecternScreen for GhostwriterReadBookScreen...");
 			
-			ReadBookScreenMod.IBookInfo bookInfo;
+			ReadBookScreen.IBookInfo bookInfo;
 			if (bookStack.getItem() instanceof WritableBookItem){
-				bookInfo = new ReadBookScreenMod.UnwrittenBookInfo(bookStack);
+				bookInfo = new ReadBookScreen.UnwrittenBookInfo(bookStack);
 			}
 			else if (bookStack.getItem() instanceof WrittenBookItem) {
-				bookInfo = new ReadBookScreenMod.WrittenBookInfo(bookStack);
+				bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
 			}
 			else {
 				LOG.error("Unknown book type on lectern!");
@@ -135,11 +141,11 @@ public class Ghostwriter{
     		}
     		
     		// Finally, do the GUI replacement
-			if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen) {
+			if (eventGui instanceof EditBookScreen) {
 				eventGui = new GhostwriterEditBookScreen(this.mc.player, bookStack, Hand.MAIN_HAND, this.globalClipboard);
 			}
 			else if (eventGui instanceof ReadBookScreen) {
-				ReadBookScreenMod.WrittenBookInfo bookInfo = new ReadBookScreenMod.WrittenBookInfo(bookStack);
+				ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
 				eventGui = new GhostwriterReadBookScreen(bookInfo, true, bookStack, this.globalClipboard, null); // TODO: Shouldn't this accept UnwrittenBookInfo too?
 			}
 			event.setGui(eventGui);

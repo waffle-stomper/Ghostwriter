@@ -3,6 +3,7 @@ package wafflestomper.ghostwriter;
 import java.io.File;
 import java.util.List;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +17,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import wafflestomper.ghostwriter.modified_mc_files.ReadBookScreenMod;
 
 public class GhostwriterFileBrowserScreen extends Screen{ 
 
@@ -114,8 +114,8 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		if (savepath.exists()){
 			ITextComponent itextcomponent = new StringTextComponent("Are you sure you wish to overwrite this file?");
 			ITextComponent itextcomponent1 = new StringTextComponent(this.filenameField.getText());
-			String s1 = "Yes";
-			String s2 = "Cancel";
+			ITextComponent s1 = new StringTextComponent("Yes");
+			ITextComponent s2 = new StringTextComponent("Cancel");
 			Ghostwriter.currentPath = this.fileHandler.currentPath;
 			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
 		}
@@ -132,7 +132,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		if (this.initialized == false) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT, "filename");
+			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT, new StringTextComponent("filename"));
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
 			String ftitle = "";
@@ -141,7 +141,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 				GhostwriterEditBookScreen parentBook = (GhostwriterEditBookScreen)this.parentGui;
 				ftitle = parentBook.getBookTitle();
 			}
-			if (this.parentGui instanceof ReadBookScreenMod) { //  TODO: Change this placeholder to the Ghostwriter version
+			if (this.parentGui instanceof GhostwriterReadBookScreen) {  // TODO: Check that this still works now that we're using the ghostwriter version
 				ItemStack itemstack = this.minecraft.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
 			    if (itemstack.getItem() == Items.WRITTEN_BOOK){
 			    	CompoundNBT compoundnbt = itemstack.getTag();
@@ -160,22 +160,22 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		// For some reason the button list is cleared when the window is resized
 		int mainButtonsY = this.height-BORDER_HEIGHT-BUTTON_HEIGHT;
 		int loadX = this.width/2 -127;
-		this.btnLoad = this.addButton(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Load", (pressedButton) ->{
+		this.btnLoad = this.addButton(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, new StringTextComponent("Load"), (pressedButton) ->{
 			this.loadClicked(false);
 		}));
 		
 		int autoReloadX = loadX + BUTTON_WIDTH;
-		this.btnAutoReload = this.addButton(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "AutoReload", (pressedButton) ->{
+		this.btnAutoReload = this.addButton(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, new StringTextComponent("AutoReload"), (pressedButton) ->{
 			this.loadClicked(true);
 		}));
 		
 		int saveX = autoReloadX + BUTTON_WIDTH + 7;
-		this.btnSave = this.addButton(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Save", (pressedButton) ->{
+		this.btnSave = this.addButton(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, new StringTextComponent("Save"), (pressedButton) ->{
 			this.saveClicked();
 		}));
 		
 		int cancelX = this.width/2+127 - BUTTON_WIDTH;
-		this.addButton(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Cancel", (pressedButton) ->{
+		this.addButton(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, new StringTextComponent("Cancel"), (pressedButton) ->{
 			goBackToParentGui();
 		}));
 		
@@ -183,7 +183,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		int rootNum = 100;
 		List<File> roots = this.fileHandler.getValidRoots();
 		for (File root : roots){
-			this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20, root.getAbsolutePath(), (pressedButton)->{
+			this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20, new StringTextComponent(root.getAbsolutePath()), (pressedButton)->{
 				this.driveButtonClicked(root); // TODO: Test this to make sure it actually works
 			}));
 			rootNum++;
@@ -222,25 +222,25 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		return false;
 	}
 	
-	
+	// TODO: Check that this still works
 	@Override
-	public void render(int mouseX, int mouseY, float p_render_3_) {
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)  {
 		this.displayPath = this.fileHandler.currentPath.getAbsolutePath();
 		this.btnSave.active = this.isFilenameValid();
 		this.hoveringText = null;
-		this.fileSelectionList.render(mouseX, mouseY, p_render_3_);
-		super.render(mouseX, mouseY, p_render_3_);
-		this.drawCenteredString(this.minecraft.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
-		this.filenameField.render(mouseX, mouseY, p_render_3_);
-		
-
+		this.fileSelectionList.render(matrixStack, mouseX, mouseY, partialTicks);
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		this.drawCenteredString(matrixStack, this.minecraft.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
+		this.filenameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// Draw tooltip if the path is hovered
 		if (mouseX >= this.width/2-100 && mouseX <= this.width/2+100 && mouseY >= 20 && mouseY <= 27) {
-			this.renderTooltip(this.displayPath, 0, 0);
+			// TODO: Cache the StringTextComponent instead of creating it each iteration?
+			this.renderTooltip(matrixStack, new StringTextComponent(this.displayPath), 0, 0);
 		}
 		else if (this.hoveringText != null) {
-			this.renderTooltip(this.hoveringText, mouseX, mouseY);
+			// TODO: Cache the StringTextComponent instead of creating it each iteration?
+			this.renderTooltip(matrixStack, new StringTextComponent(this.hoveringText), mouseX, mouseY);
 		}
 	}
 	
