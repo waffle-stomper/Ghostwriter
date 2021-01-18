@@ -126,6 +126,11 @@ public class Ghostwriter{
 				lecternArmed = true;
 				return;
 			}
+
+			if (eventGui instanceof GhostwriterReadBookScreen || eventGui instanceof GhostwriterEditBookScreen){
+				LOG.debug("Aborting GUI replacement - it's already a Ghostwriter gui");
+				return;
+			}
 			
 			ItemStack bookStack = this.mc.player.getHeldItem(Hand.MAIN_HAND); // TODO: Does this need to take the off hand into account too?
 			
