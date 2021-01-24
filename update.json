@@ -13,6 +13,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.1.0": "Fix lectern button labels. Thanks Maester Lodish!",
     "2.0.9": "Fix bug that prevented loading books from file",
     "2.0.8": "Fix erroneous 'saving not implemented' message",
     "2.0.7": "Update to 1.16.1"

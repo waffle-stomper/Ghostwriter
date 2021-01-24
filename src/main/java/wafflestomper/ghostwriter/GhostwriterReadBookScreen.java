@@ -145,10 +145,10 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
     @Override
 	public void addDoneButton() {
         if (this.minecraft.player.isAllowEdit() && this.lecternContainer != null){
-           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, new StringTextComponent("gui.done"), (p_214181_1_) -> {
+           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, new StringTextComponent("Done"), (p_214181_1_) -> {
               this.minecraft.displayGuiScreen((Screen)null);
            }));
-           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, new StringTextComponent("lectern.take_book"), (p_214178_1_) -> {
+           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, new StringTextComponent("Take Book"), (p_214178_1_) -> {
               this.takeLecternBook(3);
            }));
         } else {
