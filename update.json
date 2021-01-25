@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.16.1-recommended": "2.0.9",
+    "1.16.1-recommended": "2.1.1",
     "1.15.2-recommended": "2.0.6",
     "1.15.1-recommended": "2.0.5",
     "1.14.4-recommended": "2.0.4",
@@ -13,6 +13,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.1.1": "Fix lectern books always opening on the first page.\nThanks again to Maester Lodish",
     "2.1.0": "Fix lectern button labels. Thanks Maester Lodish!",
     "2.0.9": "Fix bug that prevented loading books from file",
     "2.0.8": "Fix erroneous 'saving not implemented' message",

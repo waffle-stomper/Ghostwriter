@@ -81,7 +81,7 @@ public class Ghostwriter{
 			
 			LecternScreen ls = (LecternScreen)this.mc.currentScreen;
 			ItemStack bookStack = ls.getContainer().getBook();
-			LOG.info("Swapping LecternScreen for GhostwriterReadBookScreen...");
+			LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
 			
 			ReadBookScreen.IBookInfo bookInfo;
 			if (bookStack.getItem() instanceof WritableBookItem){
@@ -95,10 +95,12 @@ public class Ghostwriter{
 				return;
 			}
 
-			GhostwriterReadBookScreen g = new GhostwriterReadBookScreen(bookInfo, true, bookStack, this.globalClipboard, ls.getContainer());
+			LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
+			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookInfo, true, bookStack,
+					this.globalClipboard, ls.getContainer(), this.mc.player.inventory);
 			this.mc.displayGuiScreen(g);
 			
-			LOG.debug("GUI swap done!");
+			LOG.debug("Lectern GUI swap done!");
 		}
 	}
 	
@@ -121,8 +123,12 @@ public class Ghostwriter{
 				return;
 			}
 
-			if (eventGui instanceof LecternScreen) {
-				LOG.info("Aborting early GUI replacement (target is a lectern)");
+			if (eventGui instanceof LecternScreen){
+				if (eventGui instanceof GhostwriterLecternScreen){
+					LOG.info("Aborting GUI replacement - it's already a Ghostwriter Lectern Screen");
+					return;
+				}
+				LOG.info("Aborting early GUI replacement (target is a lectern). Setting lectern swap flag");
 				lecternArmed = true;
 				return;
 			}
@@ -146,12 +152,14 @@ public class Ghostwriter{
     		}
     		
     		// Finally, do the GUI replacement
-			if (eventGui instanceof EditBookScreen) {
+			if (eventGui instanceof EditBookScreen){
+				LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
 				eventGui = new GhostwriterEditBookScreen(this.mc.player, bookStack, Hand.MAIN_HAND, this.globalClipboard);
 			}
 			else if (eventGui instanceof ReadBookScreen) {
+				LOG.debug("Replacing the current screen with a GhostwriterReadBookScreen");
 				ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
-				eventGui = new GhostwriterReadBookScreen(bookInfo, true, bookStack, this.globalClipboard, null); // TODO: Shouldn't this accept UnwrittenBookInfo too?
+				eventGui = new GhostwriterReadBookScreen(bookInfo, true, bookStack, this.globalClipboard);
 			}
 			event.setGui(eventGui);
 			LOG.debug("GUI swap done!");

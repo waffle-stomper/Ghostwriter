@@ -1,21 +1,17 @@
 package wafflestomper.ghostwriter;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.gui.screen.ReadBookScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.inventory.container.LecternContainer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GhostwriterReadBookScreen extends ReadBookScreen {
 	
@@ -33,15 +29,13 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 	private Button buttonCopySelectedPages;
 	private String bookTitle = "";
 	private String bookAuthor = "";
-	
-	private LecternContainer lecternContainer;
 
 
-	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, boolean pageTurnSoundsIn, ItemStack currStack, Clipboard globalClipboard, LecternContainer lecternContainer) {
+	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, boolean pageTurnSoundsIn,
+									 ItemStack currStack, Clipboard globalClipboard) {
         super(bookInfoIn);  // TODO: Page sound control has been disabled because that constructor is private
         this.clipboard = globalClipboard;
         this.fileHandler = new FileHandler(this.clipboard);
-        this.lecternContainer = lecternContainer;
     	if (currStack != null){
     		Item currItem = currStack.getItem();
     		if (currItem != null){
@@ -53,21 +47,10 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
     		}
     	}
     }
-	
-//  The vanilla ReadBookScreen has these other constructors but I don't think we need them	
-//	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn) {
-//        this(bookInfoIn, true);
-//    }
-//
-//	
-//    public GhostwriterReadBookScreen() {
-//        this(EMPTY_BOOK, false);
-//    }
     
     
     /**
      * Helper function that extracts the pages from the read book until I find a cleaner way to do this
-     * @return
      */
     public List<String> bookPages(){
     	if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
@@ -131,31 +114,6 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
     	}
     	this.updateButtons();
     }
-    
-    
-    private void takeLecternBook(int p_214179_1_){
-    	if (this.lecternContainer == null) {
-    		printer.gamePrint(Printer.RED + "Error: LecternContainer is null!");
-    		return;
-    	}
-        this.minecraft.playerController.sendEnchantPacket(this.lecternContainer.windowId, p_214179_1_);
-    }
-    
-    
-    @Override
-	public void addDoneButton() {
-        if (this.minecraft.player.isAllowEdit() && this.lecternContainer != null){
-           this.addButton(new Button(this.width / 2 - 100, 196, 98, 20, new StringTextComponent("Done"), (p_214181_1_) -> {
-              this.minecraft.displayGuiScreen((Screen)null);
-           }));
-           this.addButton(new Button(this.width / 2 + 2, 196, 98, 20, new StringTextComponent("Take Book"), (p_214178_1_) -> {
-              this.takeLecternBook(3);
-           }));
-        } else {
-           super.addDoneButton();
-        }
-
-     }
     
     
     @Override
@@ -248,7 +206,4 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
     		}
     	}
 	}
-	
-	
-
 }
