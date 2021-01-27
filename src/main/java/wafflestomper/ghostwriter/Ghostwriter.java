@@ -1,16 +1,10 @@
 package wafflestomper.ghostwriter;
 
-import java.io.File;
-
-import net.minecraft.client.gui.screen.EditBookScreen;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.EditBookScreen;
 import net.minecraft.client.gui.screen.LecternScreen;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.WritableBookItem;
 import net.minecraft.item.WrittenBookItem;
@@ -22,16 +16,17 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 
 @Mod("ghostwriter")
 public class Ghostwriter{
 	
 	private final Minecraft mc = Minecraft.getInstance();
-	private final Printer printer = new Printer();
 	public Clipboard globalClipboard = new Clipboard();
-	boolean devEnv = false; // TODO: Find another way to detect this
-	private static long lastMessage = 0;
 	private static final Logger LOG = LogManager.getLogger();
 	public static File currentPath; 
 	private boolean lecternArmed = false;
@@ -45,14 +40,6 @@ public class Ghostwriter{
 	
 	private void setup(final FMLClientSetupEvent event){
 		LOG.info("Setting up...");
-	}
-	
-	
-	public static void rateLimitedDebugMessage(String message){
-		if (System.currentTimeMillis() - lastMessage > 1000){
-			System.out.println(message);
-			lastMessage = System.currentTimeMillis();
-		}
 	}
 
 
@@ -114,8 +101,13 @@ public class Ghostwriter{
 		if (eventGui == null){return;}
 		LOG.debug("GUIOpenEvent: " + eventGui.toString());
 		
-		// TODO: Signed books are handled differently from unsigned books for some bizarre reason
-		if (eventGui instanceof net.minecraft.client.gui.screen.EditBookScreen || eventGui instanceof ReadBookScreen){
+		// Signed books are handled differently from unsigned books for some bizarre reason
+		if (eventGui instanceof EditBookScreen || eventGui instanceof ReadBookScreen){
+			
+			if (this.mc.player == null){
+				LOG.error("Minecraft.player is null. Cannot continue with GUI swap");
+				return;
+			}
 			
 			// Abort if the player is crouching
 			if (this.mc.player.isCrouching()) {
@@ -138,18 +130,8 @@ public class Ghostwriter{
 				return;
 			}
 			
-			ItemStack bookStack = this.mc.player.getHeldItem(Hand.MAIN_HAND); // TODO: Does this need to take the off hand into account too?
-			
-			// Abort if there's nothing in the player's hand (which should be impossible?)
-			if (bookStack == null){
-				LOG.error("Aborting GUI replacement - bookStack is null!");
-				return;
-			}
-			Item currItem = bookStack.getItem();
-			if (currItem == null){
-				LOG.error("bookStack.getItem() is null!");
-				return;
-			}
+			// TODO: Does this need to take the off hand into account too?
+			ItemStack bookStack = this.mc.player.getHeldItem(Hand.MAIN_HAND);
 			
 			// Finally, do the GUI replacement
 			if (eventGui instanceof EditBookScreen){

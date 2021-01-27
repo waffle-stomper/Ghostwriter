@@ -3,33 +3,20 @@ package wafflestomper.ghostwriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class Clipboard {
 	//Stores entire books
 	public String title = ""; 
 	public String author = ""; // TODO: Remove author now that we can't set it?
-	public List<String> pages = new ArrayList<String>();
+	public List<String> pages = new ArrayList<>();
 	public boolean bookInClipboard = false;
 	/** Used for copying one or more pages (so we don't have to wipe out a book in the clipboard) */
-	public List<String> miscPages = new ArrayList<String>();
-	private static final Logger LOG = LogManager.getLogger();
+	public List<String> miscPages = new ArrayList<>();
 	
 	
-	public Clipboard(){
-		//Debugging
-		//this.singlePage = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-	}
+	public Clipboard(){}
 	
 	public Clipboard(Clipboard _clipboard){
-		this.title = _clipboard.title;
-		this.author = _clipboard.author;
-		this.pages.clear();
-		for (String page : _clipboard.pages){this.pages.add(page);}
-		this.bookInClipboard = _clipboard.bookInClipboard;
-		this.miscPages.clear();
-		for (String page : _clipboard.miscPages){this.miscPages.add(page);}
+		this.clone(_clipboard);
 	}
 	
 	public void clearBook(){

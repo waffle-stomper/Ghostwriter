@@ -32,11 +32,11 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.client.Minecraft;
 
 public class FileHandler {
-	private File defaultPath;
-	private File bookSavePath;
-	private File signaturePath;
+	private final File defaultPath;
+	private final File bookSavePath;
+	private final File signaturePath;
 	private static final Printer printer = new Printer();
-	private Clipboard clipboard;
+	private final Clipboard clipboard;
 	private static final Logger LOG = LogManager.getLogger();
 	
 	public File currentPath;

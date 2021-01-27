@@ -1,23 +1,18 @@
 package wafflestomper.ghostwriter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.gson.JsonParseException;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.ITextComponent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 116;
 	public static final char SPLIT_CHAR = '\u1337';
 	private static final Minecraft mc = Minecraft.getInstance();
-	private static final Logger LOG = LogManager.getLogger();
 	
 	
 	/**
@@ -75,7 +70,7 @@ public class BookUtilities {
 		strIn = strIn.replaceAll(" ", "");
 		if (strIn.length() <= maxChars){return strIn;}
 		if (keepRightSide){
-			strIn = substituteChars + strIn.substring(strIn.length()-(maxChars-substituteChars.length()), strIn.length());
+			strIn = substituteChars + strIn.substring(strIn.length()-(maxChars-substituteChars.length()));
 		}
 		else{
 			strIn = strIn.substring(0, maxChars-substituteChars.length()) + substituteChars;
@@ -249,7 +244,7 @@ public class BookUtilities {
 		}
 		//Split string at newline characters
 		String[] lines = str.split("\\n");
-		List<String> out = new ArrayList<String>();
+		List<String> out = new ArrayList<>();
 		for (String line : lines){
 			out.addAll(Arrays.asList(wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR)));
 		}
@@ -264,7 +259,7 @@ public class BookUtilities {
 	 */
 	public static List<String> stringToPages(String str){
 		String wrapped = wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH);
-		List<String> pages = new ArrayList<String>();
+		List<String> pages = new ArrayList<>();
 		int newLineCount = 0;
 		int charCount = 0;
 		char currChar;
@@ -298,7 +293,7 @@ public class BookUtilities {
 			}
 			//add the last little bit of the string as a page
 			if (i == wrapped.length()-1 && lastSubstringEnd < i){
-				pages.add(wrapped.substring(lastSubstringEnd, wrapped.length()).replaceAll("" + SPLIT_CHAR, ""));
+				pages.add(wrapped.substring(lastSubstringEnd).replaceAll("" + SPLIT_CHAR, ""));
 			}
 		}
 		return pages;
@@ -317,7 +312,7 @@ public class BookUtilities {
 			str = str.substring(pageBreakString.length(), str.length()-1);
 		}
 		String[] pageBroken = str.split(pageBreakString);
-		List<String> out = new ArrayList<String>();
+		List<String> out = new ArrayList<>();
 		for (String largePage : pageBroken){
 			out.addAll(stringToPages(largePage));
 		}
@@ -325,7 +320,7 @@ public class BookUtilities {
 		// This is a quick hack to remove blank pages until I can figure out why they're
 		//   being inserted erroneously
 		// TODO: FIX THIS PROPERLY
-		List<String> cleanedOut = new ArrayList<String>();
+		List<String> cleanedOut = new ArrayList<>();
 		for (String page : out){
 			if (page.replaceAll("[ \n\r\t]|(\\u00A7.)", "").length() > 0){
 				cleanedOut.add(page);
@@ -341,30 +336,16 @@ public class BookUtilities {
 	 * Hopefully this is just temporary.
 	 */
 	public static String deJSONify(String jsonIn){
-		/*
-		 //This is from the rendering algorithm and seems to produce usable results
-		 //It looks like it iterates through line by line, converting them and then printing them on the screen
-		 i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
-
-		for (int k1 = 0; k1 < i1; ++k1)
-		{
-			IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
-			this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), k + 36, b0 + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
-		}
-		 */
-		
 		try{
 			// func_240643_a_() is fromJson()
 			ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
 			if (i != null){
 				// TODO: Verify that the new getString() produces the same results as the old getFormattedText()
-				String out = i.getString();
-				return(out);
+				return(i.getString());
 			}
 		}
 		catch (JsonParseException jsonparseexception){
 			//Do nothing for now
-			//jsonparseexception.printStackTrace();
 		}
 		return(jsonIn);
 	}
