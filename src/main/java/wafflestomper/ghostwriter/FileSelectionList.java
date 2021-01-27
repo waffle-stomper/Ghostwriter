@@ -76,23 +76,23 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			// TODO: Why were we calculating these? They're not used?
 //	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
 //	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
-	         this.owner.setSelectedSlot(this);
-	         if (Util.milliTime() - this.lastClickTime < 250L) {
-	            // TODO: Double click handling
-	        	 this.lastClickTime = 0; // Prevent triple-click
-	        	 this.owner.navigateUp();
-	        	 return true;
-	         }
+			 this.owner.setSelectedSlot(this);
+			 if (Util.milliTime() - this.lastClickTime < 250L) {
+				// TODO: Double click handling
+				 this.lastClickTime = 0; // Prevent triple-click
+				 this.owner.navigateUp();
+				 return true;
+			 }
 
-	         this.lastClickTime = Util.milliTime();
-	         return false;
-	     }
+			 this.lastClickTime = Util.milliTime();
+			 return false;
+		 }
 
 	}
 
 	
 	@OnlyIn(Dist.CLIENT)
- 	public class PathItemEntry extends FileSelectionList.Entry {
+	public class PathItemEntry extends FileSelectionList.Entry {
 		public File path;
 		protected long lastClickTime;
 		protected final GhostwriterFileBrowserScreen owner;
@@ -122,7 +122,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			int color = 0xFFFFFF;
 			if (!path.exists()) { // TODO: do we really need to do do this every render tick?
 				color = 0x333333;
-    			this.owner.setDirectoryDirty();
+				this.owner.setDirectoryDirty();
 			}
 			else if (path.isFile()) {
 				color = 0xFF0000;
@@ -153,18 +153,18 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			// TODO: Why were we calculating these? They aren't used?
 //	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
 //	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
-	    
-	         this.owner.setSelectedSlot(this);
-	         if (Util.milliTime() - this.lastClickTime < 250L) {
-	            // TODO: Double click handling
-	        	 this.lastClickTime = 0; // Prevent triple-click
-	        	 this.owner.navigateInto(path);
-	        	 return true;
-	         }
+		
+			 this.owner.setSelectedSlot(this);
+			 if (Util.milliTime() - this.lastClickTime < 250L) {
+				// TODO: Double click handling
+				 this.lastClickTime = 0; // Prevent triple-click
+				 this.owner.navigateInto(path);
+				 return true;
+			 }
 
-	         this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
-	         return false; // TODO: Should this really return false?
-	    }
+			 this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
+			 return false; // TODO: Should this really return false?
+		}
 	}
 
 

@@ -47,53 +47,53 @@ TODO: text justification somehow?
   ~~~~~~~~~~~~~~~~~~~~
   * Java style comments, both single and multi-line, either of which are allowed to start at any point though a line (not just at the start)
   * Author and title are optional, but they must each be on their own line, and prefaced by author: and title: respectively
-    For example:
-      title:Kicking Over Sandcastles
-      author:HCF_Kids
-    The title and author keys can appear anywhere within the file, and are case insensitive
-    Whitespace on either side of the value (e.g. 'title: The day of the Triffids ') will be ignored (the title would be read as 'The day of the Triffids')
-    Only the first instance of each title and author will be accepted. Subsequent lines will be treated as part of the book.
+	For example:
+	  title:Kicking Over Sandcastles
+	  author:HCF_Kids
+	The title and author keys can appear anywhere within the file, and are case insensitive
+	Whitespace on either side of the value (e.g. 'title: The day of the Triffids ') will be ignored (the title would be read as 'The day of the Triffids')
+	Only the first instance of each title and author will be accepted. Subsequent lines will be treated as part of the book.
   * Linebreaks are indicated by a pair of hashes (##) which can be repeated as many times as the user wants. The can be separated by a space but don't have to
-    be. Any whitespace preceding a pair of hashes will be removed.
+	be. Any whitespace preceding a pair of hashes will be removed.
   * Ordinary linebreaks will be ignored
   * Pagebreaks are denoted by four 'greater than' angled brackets (>>>>)
-    Whitespace preceding a pagebreak will be removed.
+	Whitespace preceding a pagebreak will be removed.
   * The linebreak and pagebreak symbols can be escaped with a single backslash if they need to be used literally
   * Blank lines will be removed
   * Whitespace at the end of a page will be removed
-    
+	
   Example file:
   
-  	//This is a single line comment by waffle_stomper on 2014-05-28. It will not appear in the book
-  	author:PETN //Comments can start at any point on a line
-  	title:Truncating excessively long names
-  	/* This is a multi-line comment
-  	   None of this will be included in the book
-  	   Please note that I had to put a space between the asterisk
-  	   and forward-slash to prevent it from terminating the 
-  	   comment that this is being posted in. In practice there should
-  	   be no space between those two 
-  	* /
-  	This is the first page.##
-  	This is going to be on a new line!
-  	>>>>
-  	This is the second page. The pagebreak character can go on the end of the line if you'd like.>>>>
-  	This is the third page.
-  	You 
-  	can 
-  	use 
-  	as 
-  	many 
-  	lines 
-  	as 
-  	you 
-  	like 
-  	but anything between pagebreaks will be considered as one page (unless it's too long to fit on a single page).
-  	Also, don't forget to insert a space 
-  	if you're splitting a line //See the space there?
-  	otherwise your words will be joined together.
-  	>>>>
-  	title: This is considered to be part of the text for the book.
+	//This is a single line comment by waffle_stomper on 2014-05-28. It will not appear in the book
+	author:PETN //Comments can start at any point on a line
+	title:Truncating excessively long names
+	/* This is a multi-line comment
+	   None of this will be included in the book
+	   Please note that I had to put a space between the asterisk
+	   and forward-slash to prevent it from terminating the
+	   comment that this is being posted in. In practice there should
+	   be no space between those two
+	* /
+	This is the first page.##
+	This is going to be on a new line!
+	>>>>
+	This is the second page. The pagebreak character can go on the end of the line if you'd like.>>>>
+	This is the third page.
+	You
+	can
+	use
+	as
+	many
+	lines
+	as
+	you
+	like
+	but anything between pagebreaks will be considered as one page (unless it's too long to fit on a single page).
+	Also, don't forget to insert a space
+	if you're splitting a line //See the space there?
+	otherwise your words will be joined together.
+	>>>>
+	title: This is considered to be part of the text for the book.
 
 
 - Inserting signature pages
@@ -135,15 +135,15 @@ Please double-check anything you find here to make sure it's still relevant.
  - If you set the title before you hit the signing screen, the book is automatically signed. This probably isn't a huge issue though.
 
  - Bookworm save algorithm:
-    writer.write(id+"");
+	writer.write(id+"");
 	writer.newLine();
 	writer.write(title);
 	writer.newLine();
 	writer.write(author);
 	writer.newLine();
 	for (String s : hiddenData.keySet()) {
-	        writer.write("|!|" + s + "|" + hiddenData.get(s));
-	        writer.newLine();
+			writer.write("|!|" + s + "|" + hiddenData.get(s));
+			writer.newLine();
 	}
 	writer.write(text);
 	writer.newLine();
@@ -261,23 +261,23 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	private Button formatItalic;
 	private Button formatResetFormat;
 	
-    //Used for copying multiple pages at a time
-    private int selectedPageA = -1;
-    private int selectedPageB = -1;
+	//Used for copying multiple pages at a time
+	private int selectedPageA = -1;
+	private int selectedPageB = -1;
 
-    // Note that end can be less than start if you select text right to left
+	// Note that end can be less than start if you select text right to left
 	// TODO: Incorporate text selection back into the new version
-    private int selectionEnd = 0;
-    private int selectionStart = 0;
-    
-    private Clipboard clipboard;
-    
-    private File autoReloadFile; // Auto Reload is active when this is not nullprivate Clipboard autoReloadBookClipboard;
+	private int selectionEnd = 0;
+	private int selectionStart = 0;
+	
+	private Clipboard clipboard;
+	
+	private File autoReloadFile; // Auto Reload is active when this is not nullprivate Clipboard autoReloadBookClipboard;
 	private long autoReloadLastModified = 0;
 	private long autoReloadLastCheck = 0;
 	private Clipboard autoReloadClipboard;
 	
-    private static final Printer printer = new Printer();
+	private static final Printer printer = new Printer();
 	private static final Logger LOG = LogManager.getLogger();
 	private final FileHandler fileHandler;
 	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
@@ -290,21 +290,21 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	}
 	
 	
-    private List<String> pagesAsList(){
-    	List<String> pages = new ArrayList<String>();
-    	for (int i=0; i<this.getPageCount(); i++){
-            // Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings 
-            //  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-            //  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
-    		String pageText = BookUtilities.deJSONify(this.bookPages.get(i));
-    		pages.add(pageText);
-    	}
-    	return pages;
-    }
-    
-    
-    private void bookChanged(boolean resetPageSelection){
-    	this.bookIsModified = true;
+	private List<String> pagesAsList(){
+		List<String> pages = new ArrayList<String>();
+		for (int i=0; i<this.getPageCount(); i++){
+			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
+			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
+			//  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+			String pageText = BookUtilities.deJSONify(this.bookPages.get(i));
+			pages.add(pageText);
+		}
+		return pages;
+	}
+	
+	
+	private void bookChanged(boolean resetPageSelection){
+		this.bookIsModified = true;
 		this.selectionStart = 0;
 		this.selectionEnd = 0;
 		this.cachedPage = -1;
@@ -318,134 +318,134 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		// This is some kind of new display update/refresh function
 		// It must be called every time the book's content changes
 		this.func_238751_C_();
-    }
-    
-    
-    private void removePages(int start, int end){
-    	int from = Math.min(start, end);
-    	int to = Math.max(start, end);
-    	
-    	// Switch to single page mode if necessary
-    	if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
-    		from = this.currPage;
-    		to = this.currPage;
-    	}
-    	
-    	//Make sure we're not going to find ourselves in a page that's being removed
-    	if (from > 0){
-    		this.currPage = from-1;
-    	}
-    	else{
-    		this.currPage = 0;
-    	}
-    	
-    	List<String> oldPages = pagesAsList();
-    	int newBookSize = this.bookPages.size() - ((to-from)+1);
-    	for (int i=bookPages.size()-1; i>=from; i--){
-    		if (i > newBookSize-1){
-    			if (i == 0){
-    				this.bookPages.set(0, "");
-    			}
-    			else{
-	    			//remove excess page
-	    			this.bookPages.remove(i);
-    			}
-    		}
-    		else{
-    			this.bookPages.set(i, oldPages.get(i + (to-from) + 1));
-    		}
-    	}
-    	
-    	// Ensure we're not left with a truely empty book
-    	if (this.bookPages.isEmpty()) {
-    		printer.gamePrint("Wow, I had to add a page");
-    		this.bookPages.add("");
-    	}
-    	
-        this.bookChanged(true);
-    }
-    
-    
-    /** 
-     * Removes whitespace from the top and bottom of the current page without affecting subsequent pages
-     */
-    private void collapseTop() {
-    	String trimmed = this.getCurrPageText().trim();
+	}
+	
+	
+	private void removePages(int start, int end){
+		int from = Math.min(start, end);
+		int to = Math.max(start, end);
+		
+		// Switch to single page mode if necessary
+		if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+			from = this.currPage;
+			to = this.currPage;
+		}
+		
+		//Make sure we're not going to find ourselves in a page that's being removed
+		if (from > 0){
+			this.currPage = from-1;
+		}
+		else{
+			this.currPage = 0;
+		}
+		
+		List<String> oldPages = pagesAsList();
+		int newBookSize = this.bookPages.size() - ((to-from)+1);
+		for (int i=bookPages.size()-1; i>=from; i--){
+			if (i > newBookSize-1){
+				if (i == 0){
+					this.bookPages.set(0, "");
+				}
+				else{
+					//remove excess page
+					this.bookPages.remove(i);
+				}
+			}
+			else{
+				this.bookPages.set(i, oldPages.get(i + (to-from) + 1));
+			}
+		}
+		
+		// Ensure we're not left with a truely empty book
+		if (this.bookPages.isEmpty()) {
+			printer.gamePrint("Wow, I had to add a page");
+			this.bookPages.add("");
+		}
+		
+		this.bookChanged(true);
+	}
+	
+	
+	/**
+	 * Removes whitespace from the top and bottom of the current page without affecting subsequent pages
+	 */
+	private void collapseTop() {
+		String trimmed = this.getCurrPageText().trim();
 		this.bookPages.set(this.currPage, trimmed);
 		this.bookChanged(false);
 		printer.gamePrint(Printer.GRAY + "Leading whitespace removed");
-    }
-    
-    
-    /*
-     * Copies a book from the clipboard into the 'real' book
-     */
-    public void clipboardToBook(Clipboard fromBook){
-    	// Reset anything in the current book
-    	this.bookPages.clear();
-    	this.bookChanged(true);
-    	
-    	this.bookTitle = fromBook.title;
+	}
+	
+	
+	/*
+	 * Copies a book from the clipboard into the 'real' book
+	 */
+	public void clipboardToBook(Clipboard fromBook){
+		// Reset anything in the current book
+		this.bookPages.clear();
+		this.bookChanged(true);
+		
+		this.bookTitle = fromBook.title;
 		
 		for (int i=0; i<fromBook.pages.size(); i++){
-    		this.bookPages.add(fromBook.pages.get(i));
-    	}
+			this.bookPages.add(fromBook.pages.get(i));
+		}
 		this.bookIsModified = true;
 		
 		if (this.bookPages.isEmpty()) {
 			this.bookPages.add("");
 		}
 		this.updateButtons();
-    }
-    
+	}
 	
-    private void copyBook(){
+	
+	private void copyBook(){
 		this.clipboard.author = ""; // TODO: Do I need this field any more? Was this.author in old versions
 		this.clipboard.title = this.bookTitle;
 		this.clipboard.pages.clear();
 		this.clipboard.pages.addAll(this.pagesAsList());
 		this.clipboard.bookInClipboard = true;
 		printer.gamePrint(Printer.GRAY + "Book copied");
-    	this.updateButtons();
+		this.updateButtons();
 	}
-    
-    
-    private void copySelectedPagesToClipboard(){
-    	int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
-    	int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
-    	
-    	// Handle the case where A or B is -1 (i.e. no selection)
-    	if (firstPage == -1 || lastPage == -1) {    	
-    		firstPage = this.currPage;
-    		lastPage = this.currPage;
-    	}
-    	
-    	if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages.size()){
-    		this.clipboard.miscPages.clear();
-    		List<String> pagesAsList = this.pagesAsList();
-    		for (int i=firstPage; i<=lastPage; i++){
-    			this.clipboard.miscPages.add(pagesAsList.get(i));
-    		}
-    		printer.gamePrint(Printer.GRAY + "Selection copied");
-    	}
-    	else{
-    		printer.gamePrint(Printer.RED + "Invalid selection! Copy aborted.");
-    	}
-    	this.updateButtons();
-    }
-    
-    
-    private void cutMultiplePages(){
-    	int from = Math.min(this.selectedPageA, this.selectedPageB);
-    	int to = Math.max(this.selectedPageA, this.selectedPageB);
-    	
-    	// Switch to single page mode if necessary
-    	if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
-    		from = this.currPage;
-    		to = this.currPage;
-    	}
-    	
-    	this.clipboard.miscPages.clear();
+	
+	
+	private void copySelectedPagesToClipboard(){
+		int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
+		int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
+		
+		// Handle the case where A or B is -1 (i.e. no selection)
+		if (firstPage == -1 || lastPage == -1) {
+			firstPage = this.currPage;
+			lastPage = this.currPage;
+		}
+		
+		if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages.size()){
+			this.clipboard.miscPages.clear();
+			List<String> pagesAsList = this.pagesAsList();
+			for (int i=firstPage; i<=lastPage; i++){
+				this.clipboard.miscPages.add(pagesAsList.get(i));
+			}
+			printer.gamePrint(Printer.GRAY + "Selection copied");
+		}
+		else{
+			printer.gamePrint(Printer.RED + "Invalid selection! Copy aborted.");
+		}
+		this.updateButtons();
+	}
+	
+	
+	private void cutMultiplePages(){
+		int from = Math.min(this.selectedPageA, this.selectedPageB);
+		int to = Math.max(this.selectedPageA, this.selectedPageB);
+		
+		// Switch to single page mode if necessary
+		if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+			from = this.currPage;
+			to = this.currPage;
+		}
+		
+		this.clipboard.miscPages.clear();
 		List<String> pagesAsList = this.pagesAsList();
 		for (int i=from; i<=to; i++){
 			this.clipboard.miscPages.add(pagesAsList.get(i));
@@ -454,65 +454,65 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.removePages(this.selectedPageA, this.selectedPageB);
 		this.bookChanged(true);
 		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " cut");
-    }
-    
-    
-    private void insertPage() {
-    	if (this.bookPages.size() < MAX_BOOK_PAGES) {
-    		this.bookPages.add(this.currPage, "");
-    		printer.gamePrint(Printer.GRAY + "Page inserted");
-    		this.bookChanged(false);
-    	}
-    	else {
-    		printer.gamePrint(Printer.RED + "Cannot add another page! Book is already " + MAX_BOOK_PAGES + " pages long!");
-    	}
-    }
-    
-    
-    private void pasteBook(){
-    	this.clipboardToBook(this.clipboard);
-    	this.bookChanged(true);
+	}
+	
+	
+	private void insertPage() {
+		if (this.bookPages.size() < MAX_BOOK_PAGES) {
+			this.bookPages.add(this.currPage, "");
+			printer.gamePrint(Printer.GRAY + "Page inserted");
+			this.bookChanged(false);
+		}
+		else {
+			printer.gamePrint(Printer.RED + "Cannot add another page! Book is already " + MAX_BOOK_PAGES + " pages long!");
+		}
+	}
+	
+	
+	private void pasteBook(){
+		this.clipboardToBook(this.clipboard);
+		this.bookChanged(true);
 		printer.gamePrint(Printer.GRAY + "Book pasted");
-    }
+	}
 
 
-    private void pasteMultiplePages(int startPos) {
-    	// Idiot proofing
-    	if (startPos < 0) {
-    		startPos = 0;
-    	}
-    	else if (startPos >= this.bookPages.size()) {
-    		startPos = this.bookPages.size()-1;
-    	}
-    	
-    	List<String> oldBook = this.pagesAsList();
-    	int newBookSize = this.bookPages.size() + this.clipboard.miscPages.size();
-    	    	
-    	String pageNewText = "";
-    	for (int i=startPos; i<newBookSize; i++){
-    		if (i >= this.bookPages.size()){
-    			addNewPage();
-    		}
-    		if (i >= (startPos + this.clipboard.miscPages.size())){
+	private void pasteMultiplePages(int startPos) {
+		// Idiot proofing
+		if (startPos < 0) {
+			startPos = 0;
+		}
+		else if (startPos >= this.bookPages.size()) {
+			startPos = this.bookPages.size()-1;
+		}
+		
+		List<String> oldBook = this.pagesAsList();
+		int newBookSize = this.bookPages.size() + this.clipboard.miscPages.size();
+		
+		String pageNewText = "";
+		for (int i=startPos; i<newBookSize; i++){
+			if (i >= this.bookPages.size()){
+				addNewPage();
+			}
+			if (i >= (startPos + this.clipboard.miscPages.size())){
 				pageNewText = oldBook.get(i-this.clipboard.miscPages.size());
 			}
 			else{
 				pageNewText = this.clipboard.miscPages.get(i-startPos);
 			}
-    		this.bookPages.set(i, pageNewText);
-    	}
-    	this.bookChanged(false);
-        printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " pasted");
-    }
+			this.bookPages.set(i, pageNewText);
+		}
+		this.bookChanged(false);
+		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " pasted");
+	}
 	
-    
-    private void addSignaturePages(){
-    	Clipboard temp = new Clipboard();
-    	Clipboard clip = new Clipboard();
+	
+	private void addSignaturePages(){
+		Clipboard temp = new Clipboard();
+		Clipboard clip = new Clipboard();
 		temp.clone(this.clipboard);
 		this.clipboard.clearBook();
 		this.clipboard.miscPages.clear();
-    	FileHandler fh = new FileHandler(clip);
+		FileHandler fh = new FileHandler(clip);
 		File sigFile = new File(this.fileHandler.getSignaturePath(), "default.ghb");
 		if (fh.loadBook(sigFile) && clip.bookInClipboard){
 			addNewPage();
@@ -525,8 +525,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			printer.gamePrint(Printer.RED + "Couldn't load " + sigFile + " Does it exist?");
 		}
 		this.clipboard.clone(temp);
-    }
-    
+	}
+	
 	
 	/**
 	 * Helper function for laying out the color buttons
@@ -562,11 +562,11 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		// Note that you can use the parameter? in the lambda function like this:
 		// pressed_button.x += 20; // neat!
 			
-        int buttonWidth = 120;
-        int buttonHeight = 20;
-        int buttonSideOffset = 5;
-        
-        int rightXPos = this.width-(buttonWidth+buttonSideOffset);
+		int buttonWidth = 120;
+		int buttonHeight = 20;
+		int buttonSideOffset = 5;
+		
+		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
 		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"), (pressed_button) -> {
 			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
@@ -621,7 +621,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, new StringTextComponent("Remove This Page"), (pressed_button) -> {
 			this.removePages(this.selectedPageA, this.selectedPageB);
 		}));
-		                     		
+		
 		//The horror...
 		// TODO: Compress this into a more sensible data structure?
 		int colorButY = this.height - 40;
@@ -711,47 +711,47 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		
 		// Reset invalid selection
 		if (this.selectedPageA < -1 || this.selectedPageA >= this.getPageCount()) {
-    		this.selectedPageA = -1;
-    	}
+			this.selectedPageA = -1;
+		}
 		if (this.selectedPageB < -1 || this.selectedPageB >= this.getPageCount()) {
-    		this.selectedPageB = -1;
-    	}
+			this.selectedPageB = -1;
+		}
 		
-    	if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
-    		// Multi page selection
-    		this.buttonCopySelectedPages.active = true;
-    		String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Pages";
-    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
-    		this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut " + xPages));
-    		this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove " + xPages));
-    		this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
-    		this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
-    	}
-    	else{
-    		this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
-    		this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut This Page"));
-    		this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove This Page"));
-    		this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
-    		this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
-    		if (this.selectedPageA >= 0) {
-    			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
-    		}
-    		if (this.selectedPageB >= 0) {
-    			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
-    		}
-    	}
-    	
-    	this.buttonPasteBook.active = this.clipboard.bookInClipboard;
-        
-        this.buttonPasteMultiplePages.active = (this.clipboard.miscPages.size() > 0);
-        if (this.buttonPasteMultiplePages.active){
-        	this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s")));
-        }
-        else{
-        	this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste Multiple"));
-        }
-        
-        this.buttonDisableAutoReload.visible = this.autoReloadFile != null;
+		if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
+			// Multi page selection
+			this.buttonCopySelectedPages.active = true;
+			String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Pages";
+			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
+			this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut " + xPages));
+			this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove " + xPages));
+			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
+			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
+		}
+		else{
+			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
+			this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut This Page"));
+			this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove This Page"));
+			this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
+			this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
+			if (this.selectedPageA >= 0) {
+				this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
+			}
+			if (this.selectedPageB >= 0) {
+				this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
+			}
+		}
+		
+		this.buttonPasteBook.active = this.clipboard.bookInClipboard;
+		
+		this.buttonPasteMultiplePages.active = (this.clipboard.miscPages.size() > 0);
+		if (this.buttonPasteMultiplePages.active){
+			this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste " + this.clipboard.miscPages.size() + " Page" + ((this.clipboard.miscPages.size()==1)?"":"s")));
+		}
+		else{
+			this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste Multiple"));
+		}
+		
+		this.buttonDisableAutoReload.visible = this.autoReloadFile != null;
 	}
 	
 	
@@ -761,8 +761,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	
 	public void setClipboard(Clipboard _clipboard){
-    	this.clipboard = _clipboard;
-    }
+		this.clipboard = _clipboard;
+	}
 	
 	
 	public void enableAutoReload(File path, Clipboard initalBookState) {

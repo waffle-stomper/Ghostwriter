@@ -143,10 +143,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			}
 			if (this.parentGui instanceof GhostwriterReadBookScreen) {  // TODO: Check that this still works now that we're using the ghostwriter version
 				ItemStack itemstack = this.minecraft.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
-			    if (itemstack.getItem() == Items.WRITTEN_BOOK){
-			    	CompoundNBT compoundnbt = itemstack.getTag();
-			        fauthor = compoundnbt.getString("author"); // TODO: Error handling
-			        ftitle = compoundnbt.getString("title");
+				if (itemstack.getItem() == Items.WRITTEN_BOOK){
+					CompoundNBT compoundnbt = itemstack.getTag();
+					fauthor = compoundnbt.getString("author"); // TODO: Error handling
+					ftitle = compoundnbt.getString("title");
 				}
 			}
 			

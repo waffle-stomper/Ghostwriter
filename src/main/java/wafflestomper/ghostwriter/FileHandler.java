@@ -139,40 +139,40 @@ public class FileHandler {
 			printer.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
 			return null;
 		}
-	    try {
-	        String line = br.readLine();
-	        while (line != null) {
-	        	out.add(line);
-	            line = br.readLine();
-	        }
-	    } 
-	    catch (CharacterCodingException e){
-	    	// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
-	    	if (encoding == "UTF-8"){
-	    		printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
-	    		// Try ISO-8859-15
-	    		try {
+		try {
+			String line = br.readLine();
+			while (line != null) {
+				out.add(line);
+				line = br.readLine();
+			}
+		}
+		catch (CharacterCodingException e){
+			// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
+			if (encoding == "UTF-8"){
+				printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
+				// Try ISO-8859-15
+				try {
 					br.close();
 				} catch (IOException exc) {
 					e.printStackTrace();
 				}
-	    		return readFile(path, "ISO-8859-15");
-	    	}
-	    	printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
-	    	return null;
-	    }
-	    catch (IOException e) {
+				return readFile(path, "ISO-8859-15");
+			}
+			printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
+			return null;
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			printer.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
 			return null;
 		} 
-	    finally {
-	        try {
+		finally {
+			try {
 				br.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-	    }
+		}
 		return out;
 	}
 	
@@ -429,9 +429,9 @@ public class FileHandler {
 	
 	public String getUTC(){
 		TimeZone tz = TimeZone.getTimeZone("UTC");
-	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss'Z'");
-	    df.setTimeZone(tz);
-	    return df.format(new Date());
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss'Z'");
+		df.setTimeZone(tz);
+		return df.format(new Date());
 	}
 	
 	

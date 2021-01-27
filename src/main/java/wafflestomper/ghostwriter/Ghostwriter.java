@@ -38,14 +38,14 @@ public class Ghostwriter{
 	
 	
 	public Ghostwriter() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(this);
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	
 	private void setup(final FMLClientSetupEvent event){
-        LOG.info("Setting up...");
-    }
+		LOG.info("Setting up...");
+	}
 	
 	
 	public static void rateLimitedDebugMessage(String message){
@@ -141,17 +141,17 @@ public class Ghostwriter{
 			ItemStack bookStack = this.mc.player.getHeldItem(Hand.MAIN_HAND); // TODO: Does this need to take the off hand into account too?
 			
 			// Abort if there's nothing in the player's hand (which should be impossible?)
-        	if (bookStack == null){
-        		LOG.error("Aborting GUI replacement - bookStack is null!");
-        		return;
-        	}
-    		Item currItem = bookStack.getItem();
-    		if (currItem == null){
-    			LOG.error("bookStack.getItem() is null!");
-    			return;
-    		}
-    		
-    		// Finally, do the GUI replacement
+			if (bookStack == null){
+				LOG.error("Aborting GUI replacement - bookStack is null!");
+				return;
+			}
+			Item currItem = bookStack.getItem();
+			if (currItem == null){
+				LOG.error("bookStack.getItem() is null!");
+				return;
+			}
+			
+			// Finally, do the GUI replacement
 			if (eventGui instanceof EditBookScreen){
 				LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
 				eventGui = new GhostwriterEditBookScreen(this.mc.player, bookStack, Hand.MAIN_HAND, this.globalClipboard);

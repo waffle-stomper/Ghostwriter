@@ -86,155 +86,155 @@ public class BookUtilities {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
-    /**
-     * Checks if the char code is O-K...lLrRk-o... used to set special formatting.
-     */
-    private static boolean isFormatSpecial(char par0)
-    {
-        return par0 >= 107 && par0 <= 111 || par0 >= 75 && par0 <= 79 || par0 == 114 || par0 == 82;
-    }
-
-    
-    /**
-     * Digests a string for nonprinting formatting characters then returns a string containing only that formatting.
-     */
-    private static String getFormatFromString(String par0Str)
-    {
-        String s1 = "";
-        int i = -1;
-        int j = par0Str.length();
-
-        while ((i = par0Str.indexOf(167, i + 1)) != -1)
-        {
-            if (i < j - 1)
-            {
-                char c0 = par0Str.charAt(i + 1);
-
-                if (isFormatColor(c0))
-                {
-                    s1 = "\u00a7" + c0;
-                }
-                else if (isFormatSpecial(c0))
-                {
-                    s1 = s1 + "\u00a7" + c0;
-                }
-            }
-        }
-
-        return s1;
-    }
-	
-    
 	/**
-     * Checks if the char code is a hexadecimal character, used to set colour.
-     */
-    private static boolean isFormatColor(char par0)
-    {
-        return par0 >= 48 && par0 <= 57 || par0 >= 97 && par0 <= 102 || par0 >= 65 && par0 <= 70;
-    }
+	 * Checks if the char code is O-K...lLrRk-o... used to set special formatting.
+	 */
+	private static boolean isFormatSpecial(char par0)
+	{
+		return par0 >= 107 && par0 <= 111 || par0 >= 75 && par0 <= 79 || par0 == 114 || par0 == 82;
+	}
+
+	
+	/**
+	 * Digests a string for nonprinting formatting characters then returns a string containing only that formatting.
+	 */
+	private static String getFormatFromString(String par0Str)
+	{
+		String s1 = "";
+		int i = -1;
+		int j = par0Str.length();
+
+		while ((i = par0Str.indexOf(167, i + 1)) != -1)
+		{
+			if (i < j - 1)
+			{
+				char c0 = par0Str.charAt(i + 1);
+
+				if (isFormatColor(c0))
+				{
+					s1 = "\u00a7" + c0;
+				}
+				else if (isFormatSpecial(c0))
+				{
+					s1 = s1 + "\u00a7" + c0;
+				}
+			}
+		}
+
+		return s1;
+	}
+	
+	
+	/**
+	 * Checks if the char code is a hexadecimal character, used to set colour.
+	 */
+	private static boolean isFormatColor(char par0)
+	{
+		return par0 >= 48 && par0 <= 57 || par0 >= 97 && par0 <= 102 || par0 >= 65 && par0 <= 70;
+	}
 
 
-    // TODO: It looks like a lot has changed internally in books. Check that this still functions as intended
+	// TODO: It looks like a lot has changed internally in books. Check that this still functions as intended
 	//       It might be worth looking into replacing this with vanilla functions?
 	/**
-     * Determines how many characters from the string will fit into the specified width.
-     */
-    private static int sizeStringToWidth(String par1Str, int par2)
-    {
-        int j = par1Str.length();
-        int k = 0;
-        int l = 0;
-        int i1 = -1;
+	 * Determines how many characters from the string will fit into the specified width.
+	 */
+	private static int sizeStringToWidth(String par1Str, int par2)
+	{
+		int j = par1Str.length();
+		int k = 0;
+		int l = 0;
+		int i1 = -1;
 
-        for (boolean flag = false; l < j; ++l)
-        {
-            char c0 = par1Str.charAt(l);
+		for (boolean flag = false; l < j; ++l)
+		{
+			char c0 = par1Str.charAt(l);
 
-            switch (c0)
-            {
-                case 10:
-                    --l;
-                    break;
-                case 167:
-                    if (l < j - 1)
-                    {
-                        ++l;
-                        char c1 = par1Str.charAt(l);
+			switch (c0)
+			{
+				case 10:
+					--l;
+					break;
+				case 167:
+					if (l < j - 1)
+					{
+						++l;
+						char c1 = par1Str.charAt(l);
 
-                        if (c1 != 108 && c1 != 76)
-                        {
-                            if (c1 == 114 || c1 == 82 || isFormatColor(c1))
-                            {
-                                flag = false;
-                            }
-                        }
-                        else
-                        {
-                            flag = true;
-                        }
-                    }
+						if (c1 != 108 && c1 != 76)
+						{
+							if (c1 == 114 || c1 == 82 || isFormatColor(c1))
+							{
+								flag = false;
+							}
+						}
+						else
+						{
+							flag = true;
+						}
+					}
 
-                    break;
-                case 32:
-                    i1 = l;
-                default:
+					break;
+				case 32:
+					i1 = l;
+				default:
 					// TODO: Does the function still work now that we've replaced getCharWidth with getStringWidth?
 					//       Note that I'm also converting the character back to a string
-                    k += mc.fontRenderer.getStringWidth(String.valueOf(c0));
+					k += mc.fontRenderer.getStringWidth(String.valueOf(c0));
 
-                    if (flag)
-                    {
-                        ++k;
-                    }
-            }
+					if (flag)
+					{
+						++k;
+					}
+			}
 
-            if (c0 == 10)
-            {
-                ++l;
-                i1 = l;
-                break;
-            }
+			if (c0 == 10)
+			{
+				++l;
+				i1 = l;
+				break;
+			}
 
-            if (k > par2)
-            {
-                break;
-            }
-        }
+			if (k > par2)
+			{
+				break;
+			}
+		}
 
-        return l != j && i1 != -1 && i1 < l ? i1 : l;
-    }
+		return l != j && i1 != -1 && i1 < l ? i1 : l;
+	}
 	
-    
-    /**
-     * Inserts splitchar into a string to wrap it within the specified width.
-     */
-    private static String wrapFormattedStringToWidth(String strIn, int maxWidth){
-        int maxCharsInWidth = sizeStringToWidth(strIn, maxWidth);
+	
+	/**
+	 * Inserts splitchar into a string to wrap it within the specified width.
+	 */
+	private static String wrapFormattedStringToWidth(String strIn, int maxWidth){
+		int maxCharsInWidth = sizeStringToWidth(strIn, maxWidth);
 
-        if (strIn.length() <= maxCharsInWidth){
-            return strIn;
-        }
-        else{
-        	//grab the most characters you can fit into maxWidth and put it in s1
-            String s1 = strIn.substring(0, maxCharsInWidth);
-            //grab the very next character after that string and put it in c0
-            char c0 = strIn.charAt(maxCharsInWidth);
-            boolean newlineOrSpace = c0 == 32 || c0 == 10; //Check if it's a newline character or a space
-            String s2 = strIn.substring(maxCharsInWidth + (newlineOrSpace ? 1 : 0));
-            if (newlineOrSpace){s1 += c0;}
-            return s1 + SPLIT_CHAR + wrapFormattedStringToWidth(s2, maxWidth);
-        }
-    }
-    
-    
-    
-    
-    
-    
+		if (strIn.length() <= maxCharsInWidth){
+			return strIn;
+		}
+		else{
+			//grab the most characters you can fit into maxWidth and put it in s1
+			String s1 = strIn.substring(0, maxCharsInWidth);
+			//grab the very next character after that string and put it in c0
+			char c0 = strIn.charAt(maxCharsInWidth);
+			boolean newlineOrSpace = c0 == 32 || c0 == 10; //Check if it's a newline character or a space
+			String s2 = strIn.substring(maxCharsInWidth + (newlineOrSpace ? 1 : 0));
+			if (newlineOrSpace){s1 += c0;}
+			return s1 + SPLIT_CHAR + wrapFormattedStringToWidth(s2, maxWidth);
+		}
+	}
+	
+	
+	
+	
+	
+	
  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 
-    
+	
 	/**
 	 * Removes trailing newline characters then splits the string into a list
 	 * of 116 pixel wide strings (since that's the width of a book).
@@ -346,26 +346,26 @@ public class BookUtilities {
 		 //It looks like it iterates through line by line, converting them and then printing them on the screen
 		 i1 = Math.min(128 / this.fontRendererObj.FONT_HEIGHT, this.field_175386_A.size());
 
-        for (int k1 = 0; k1 < i1; ++k1)
-        {
-            IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
-            this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), k + 36, b0 + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
-        }
+		for (int k1 = 0; k1 < i1; ++k1)
+		{
+			IChatComponent ichatcomponent2 = (IChatComponent)this.field_175386_A.get(k1);
+			this.fontRendererObj.drawString(ichatcomponent2.getUnformattedText(), k + 36, b0 + 16 + 16 + k1 * this.fontRendererObj.FONT_HEIGHT, 0);
+		}
 		 */
 		
 		try{
 			// func_240643_a_() is fromJson()
-    		ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
-    		if (i != null){
-    			// TODO: Verify that the new getString() produces the same results as the old getFormattedText()
-    			String out = i.getString();
-    			return(out);
-    		}
-        }
-        catch (JsonParseException jsonparseexception){
-        	//Do nothing for now
-            //jsonparseexception.printStackTrace();
-        }
+			ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
+			if (i != null){
+				// TODO: Verify that the new getString() produces the same results as the old getFormattedText()
+				String out = i.getString();
+				return(out);
+			}
+		}
+		catch (JsonParseException jsonparseexception){
+			//Do nothing for now
+			//jsonparseexception.printStackTrace();
+		}
 		return(jsonIn);
 	}
 }
