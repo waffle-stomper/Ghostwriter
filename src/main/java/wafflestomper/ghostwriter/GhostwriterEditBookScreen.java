@@ -166,21 +166,19 @@ Mat Oxley
 package wafflestomper.ghostwriter;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.gui.screen.EditBookScreen;
-import net.minecraft.util.text.StringTextComponent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @OnlyIn(Dist.CLIENT)
 public class GhostwriterEditBookScreen extends EditBookScreen {
@@ -209,7 +207,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	private Clipboard autoReloadClipboard;
 	
 	private static final Printer printer = new Printer();
-	private static final Logger LOG = LogManager.getLogger();
 	private final FileHandler fileHandler;
 	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
 	
@@ -244,6 +241,12 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		}
 		
 		this.updateButtons();
+		
+		// field_238748_u_ is the new TextInputUtil. If we don't move the cursor, the game can crash because
+		// text in it doesn't match what's in the current bookPages String
+		// TODO: Do all current page manipulation through the TextInputUtil? Then it should update bookPages itself
+		this.field_238748_u_.moveCursorToEnd();
+		
 		// This is some kind of new display update/refresh function
 		// It must be called every time the book's content changes
 		this.func_238751_C_();
@@ -284,10 +287,9 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 				this.bookPages.set(i, oldPages.get(i + (to-from) + 1));
 			}
 		}
-		
-		// Ensure we're not left with a truely empty book
+
+		// Ensure we're not left with a truly empty book
 		if (this.bookPages.isEmpty()) {
-			printer.gamePrint("Wow, I had to add a page");
 			this.bookPages.add("");
 		}
 		
