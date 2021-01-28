@@ -1,4 +1,4 @@
-/**
+/*
  * 
  * 
 
@@ -185,90 +185,21 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class GhostwriterEditBookScreen extends EditBookScreen {
 	
-	private static final int ID_SAVE_BOOK = 6;
-	private static final int ID_LOAD_BOOK = 7;
-	private static final int ID_COPY_BOOK = 10;
-	private static final int ID_PASTE_BOOK = 11;
-	private static final int ID_CUT_MULTIPLE_PAGES = 14;
-	private static final int ID_SELECT_PAGE_A = 15;
-	private static final int ID_SELECT_PAGE_B = 16;
-	private static final int ID_COPY_SELECTED_PAGES = 17;
-	private static final int ID_PASTE_MULTIPLE_PAGES = 18;
-	private static final int ID_INSERT_PAGE = 19;
-	private static final int ID_COLLAPSE_TOP = 20;
-	private static final int ID_ADD_SIGNATURE_PAGES = 21;
-	private static final int ID_REMOVE_SELECTED_PAGES = 22;
-	private static final int ID_AUTO_RELOAD_BOOK = 23;
+	private static final int BUTTON_HEIGHT = 20;
+	private static final int COLOR_FORMAT_BUTTON_WIDTH = 20;
 	
-	private static final int ID_BLACK = 50;
-	private static final int ID_DARK_BLUE = 51;
-	private static final int ID_DARK_GREEN = 52;
-	private static final int ID_DARK_AQUA = 53;
-	private static final int ID_DARK_RED = 54;
-	private static final int ID_DARK_PURPLE = 55;
-	private static final int ID_GOLD = 56;
-	private static final int ID_GRAY = 57;
-	private static final int ID_DARK_GRAY = 58;
-	private static final int ID_BLUE = 59;
-	private static final int ID_GREEN = 60;
-	private static final int ID_AQUA = 61;
-	private static final int ID_RED = 62;
-	private static final int ID_LIGHT_PURPLE = 63;
-	private static final int ID_YELLOW = 64;
-	private static final int ID_WHITE = 65;
-	private static final int ID_OBFUSCATED = 66;
-	private static final int ID_BOLD = 67;
-	private static final int ID_STRIKETHROUGH = 68;
-	private static final int ID_UNDERLINE = 69;
-	private static final int ID_ITALIC = 70;
-	private static final int ID_RESET_FORMAT = 71;
-	private static final int ID_CURRENT_FORMAT = 72;
-	
-	private Button buttonFileBrowser;
 	private Button buttonDisableAutoReload;
-	private Button buttonCopyBook;
 	private Button buttonPasteBook;
 	private Button buttonCutMultiplePages;
 	private Button buttonSelectPageA;
 	private Button buttonSelectPageB;
 	private Button buttonCopySelectedPages;
 	private Button buttonPasteMultiplePages;
-	private Button buttonInsertPage;
-	private Button buttonCollapseTop;
-	private Button buttonAddSignaturePages;
 	private Button buttonRemoveSelectedPages;
-	
-	private Button formatBlack;
-	private Button formatDarkBlue;
-	private Button formatDarkGreen;
-	private Button formatDarkAqua;
-	private Button formatDarkRed;
-	private Button formatDarkPurple;
-	private Button formatGold;
-	private Button formatGray;
-	private Button formatDarkGray;
-	private Button formatBlue;
-	private Button formatGreen;
-	private Button formatAqua;
-	private Button formatRed;
-	private Button formatLightPurple;
-	private Button formatYellow;
-	private Button formatWhite;
-	private Button formatObfuscated;
-	private Button formatBold;
-	private Button formatStrikethrough;
-	private Button formatUnderline;
-	private Button formatItalic;
-	private Button formatResetFormat;
 	
 	//Used for copying multiple pages at a time
 	private int selectedPageA = -1;
 	private int selectedPageB = -1;
-
-	// Note that end can be less than start if you select text right to left
-	// TODO: Incorporate text selection back into the new version
-	private int selectionEnd = 0;
-	private int selectionStart = 0;
 	
 	private Clipboard clipboard;
 	
@@ -291,7 +222,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	
 	private List<String> pagesAsList(){
-		List<String> pages = new ArrayList<String>();
+		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
 			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
 			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
@@ -305,8 +236,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	private void bookChanged(boolean resetPageSelection){
 		this.bookIsModified = true;
-		this.selectionStart = 0;
-		this.selectionEnd = 0;
 		this.cachedPage = -1;
 		
 		if (resetPageSelection){
@@ -387,9 +316,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		
 		this.bookTitle = fromBook.title;
 		
-		for (int i=0; i<fromBook.pages.size(); i++){
-			this.bookPages.add(fromBook.pages.get(i));
-		}
+		this.bookPages.addAll(fromBook.pages);
 		this.bookIsModified = true;
 		
 		if (this.bookPages.isEmpty()) {
@@ -488,21 +415,20 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		List<String> oldBook = this.pagesAsList();
 		int newBookSize = this.bookPages.size() + this.clipboard.miscPages.size();
 		
-		String pageNewText = "";
 		for (int i=startPos; i<newBookSize; i++){
 			if (i >= this.bookPages.size()){
 				addNewPage();
 			}
 			if (i >= (startPos + this.clipboard.miscPages.size())){
-				pageNewText = oldBook.get(i-this.clipboard.miscPages.size());
+				this.bookPages.set(i, oldBook.get(i-this.clipboard.miscPages.size()));
 			}
 			else{
-				pageNewText = this.clipboard.miscPages.get(i-startPos);
+				this.bookPages.set(i, this.clipboard.miscPages.get(i-startPos));
 			}
-			this.bookPages.set(i, pageNewText);
 		}
 		this.bookChanged(false);
-		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" + (this.clipboard.miscPages.size()==1?"":"s") + " pasted");
+		printer.gamePrint(Printer.GRAY + "" + this.clipboard.miscPages.size() + " page" +
+				(this.clipboard.miscPages.size()==1?"":"s") + " pasted");
 	}
 	
 	
@@ -526,26 +452,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		}
 		this.clipboard.clone(temp);
 	}
-	
-	
-	/**
-	 * Helper function for laying out the color buttons
-	 */
-	public int getColorButX(int buttonNum){
-		int middle = this.width/2;
-		int leftMost = middle - 160;
-		return leftMost + 20 * (buttonNum-50);
-	}
-	
-	
-	/**
-	 * Helper function for laying out the format buttons
-	 */
-	public int getFormatButX(int buttonNum){
-		int middle = this.width/2;
-		int leftMost = middle - 100;
-		return leftMost + 20 * (buttonNum-66);
-	}
 
 
 	// TODO: Check that this works as intended
@@ -553,7 +459,27 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	public void insertTextIntoPage(String text) {
 		this.field_238748_u_.putText(text);
 	}
-
+	
+	/**
+	 * @return X co-ordinate of the next button
+	 */
+	private int addColorFormatButton(int x, int y, String label, String insertChars, int width){
+		this.addButton(new Button(x, y,  width, BUTTON_HEIGHT, new StringTextComponent(label),
+				(pressed_button) -> this.insertTextIntoPage(insertChars)));
+		return x + 20;
+	}
+	
+	
+	/**
+	 * Helper overload so we don't have to specify width for most buttons
+	 * @return X co-ordinate of the next button
+	 */
+	private int addColorFormatButton(int x, int y, String label, String insertChars){
+		return this.addColorFormatButton(x, y, label, insertChars, COLOR_FORMAT_BUTTON_WIDTH);
+	}
+	
+	
+	
 	
 	@Override
 	public void init() {
@@ -563,95 +489,91 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		// pressed_button.x += 20; // neat!
 			
 		int buttonWidth = 120;
-		int buttonHeight = 20;
 		int buttonSideOffset = 5;
-		
 		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.buttonFileBrowser = 			this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"), (pressed_button) -> {
-			this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
-		}));
+		this.addButton(new Button(5, 5, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("File Browser"),(pressed_button) -> {
+					if (this.minecraft != null) {
+						this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
+					}
+				}));
 		
-		this.buttonDisableAutoReload = 		this.addButton(new Button(5, 45, buttonWidth, buttonHeight, new StringTextComponent("Disable AutoReload"), (pressed_button) -> {
-			this.disableAutoReload();
-		}));
+		this.buttonDisableAutoReload = this.addButton(new Button(5, 45, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Disable AutoReload"), (pressed_button) -> this.disableAutoReload()));
 		
-		this.buttonCopyBook = 				this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, new StringTextComponent("Copy Book"), (pressed_button) -> {
-			this.copyBook();
-		}));
+		this.addButton(new Button(rightXPos, 5, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Copy Book"), (pressed_button) -> this.copyBook()));
 		
-		this.buttonPasteBook = 				this.addButton(new Button(rightXPos, 25, buttonWidth, buttonHeight, new StringTextComponent("Paste Book"), (pressed_button) -> {
-			this.pasteBook();
-		}));
+		this.buttonPasteBook = this.addButton(new Button(rightXPos, 25, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Paste Book"), (pressed_button) -> this.pasteBook()));
 		
-		this.buttonSelectPageA = 			this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight, new StringTextComponent("A"), (pressed_button) -> {
+		this.buttonSelectPageA = this.addButton(new Button(rightXPos, 50, buttonWidth/2, BUTTON_HEIGHT,
+				new StringTextComponent("A"), (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonSelectPageB = 			this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2, buttonHeight, new StringTextComponent("B"), (pressed_button) -> {
+		this.buttonSelectPageB = this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2,
+				BUTTON_HEIGHT, new StringTextComponent("B"), (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonCopySelectedPages = 		this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight, new StringTextComponent("Copy This Page"), (pressed_button) -> {
-			this.copySelectedPagesToClipboard();
-		}));
+		this.buttonCopySelectedPages = this.addButton(new Button(rightXPos, 70, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Copy This Page"),
+				(pressed_button) -> this.copySelectedPagesToClipboard()));
 		
-		this.buttonCutMultiplePages = 		this.addButton(new Button(rightXPos, 90, buttonWidth, buttonHeight, new StringTextComponent("Cut This Page"), (pressed_button) -> {
-			this.cutMultiplePages();
-		}));
+		this.buttonCutMultiplePages = this.addButton(new Button(rightXPos, 90, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Cut This Page"), (pressed_button) -> this.cutMultiplePages()));
 		
-		this.buttonPasteMultiplePages = 	this.addButton(new Button(rightXPos, 130, buttonWidth, buttonHeight, new StringTextComponent("Paste This Page"), (pressed_button) -> {
-			this.pasteMultiplePages(this.currPage);
-		}));
+		this.buttonPasteMultiplePages = this.addButton(new Button(rightXPos, 130, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Paste This Page"),
+				(pressed_button) -> this.pasteMultiplePages(this.currPage)));
 		
-		this.buttonInsertPage = 			this.addButton(new Button(rightXPos, 155, buttonWidth, buttonHeight, new StringTextComponent("Insert Blank Page"), (pressed_button) -> {
-			this.insertPage();
-		}));
+		this.addButton(new Button(rightXPos, 155, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Insert Blank Page"), (pressed_button) -> this.insertPage()));
 		
-		this.buttonCollapseTop = 			this.addButton(new Button(rightXPos, 175, buttonWidth, buttonHeight, new StringTextComponent("Remove Top Space"), (pressed_button) -> {
-			this.collapseTop();
-		}));
+		this.addButton(new Button(rightXPos, 175, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Remove Top Space"), (pressed_button) -> this.collapseTop()));
 		
-		this.buttonAddSignaturePages = 		this.addButton(new Button(5, 80, buttonWidth, buttonHeight, new StringTextComponent("Add Signature Pages"), (pressed_button) -> {
-			this.addSignaturePages();
-		}));
+		this.addButton(new Button(5, 80, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Add Signature Pages"), (pressed_button) -> this.addSignaturePages()));
 		
-		this.buttonRemoveSelectedPages = 	this.addButton(new Button(rightXPos, 110, buttonWidth, buttonHeight, new StringTextComponent("Remove This Page"), (pressed_button) -> {
-			this.removePages(this.selectedPageA, this.selectedPageB);
-		}));
+		this.buttonRemoveSelectedPages = this.addButton(new Button(rightXPos, 110, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Remove This Page"),
+				(pressed_button) -> this.removePages(this.selectedPageA, this.selectedPageB)));
 		
-		//The horror...
-		// TODO: Compress this into a more sensible data structure?
+		int colorButX = this.width/2 - (COLOR_FORMAT_BUTTON_WIDTH * 8);
 		int colorButY = this.height - 40;
-		int formatButY = this.height - 20;
-		
-		this.formatBlack =     		this.addButton(new Button(getColorButX(ID_BLACK), 			colorButY, 20, 20, new StringTextComponent("\u00a70A)"), (pressed_button) -> {this.insertTextIntoPage("\u00a70");}));
-		this.formatDarkBlue =  		this.addButton(new Button(getColorButX(ID_DARK_BLUE), 		colorButY, 20, 20, new StringTextComponent("\u00a71A"), (pressed_button) -> {this.insertTextIntoPage("\u00a71");}));
-		this.formatDarkGreen = 		this.addButton(new Button(getColorButX(ID_DARK_GREEN), 		colorButY, 20, 20, new StringTextComponent("\u00a72A"), (pressed_button) -> {this.insertTextIntoPage("\u00a72");}));
-		this.formatDarkAqua =  		this.addButton(new Button(getColorButX(ID_DARK_AQUA),		colorButY, 20, 20, new StringTextComponent("\u00a73A"), (pressed_button) -> {this.insertTextIntoPage("\u00a73");}));
-		this.formatDarkRed = 		this.addButton(new Button(getColorButX(ID_DARK_RED), 		colorButY, 20, 20, new StringTextComponent("\u00a74A"), (pressed_button) -> {this.insertTextIntoPage("\u00a74");}));
-		this.formatDarkPurple = 	this.addButton(new Button(getColorButX(ID_DARK_PURPLE), 	colorButY, 20, 20, new StringTextComponent("\u00a75A"), (pressed_button) -> {this.insertTextIntoPage("\u00a75");}));
-		this.formatGold = 			this.addButton(new Button(getColorButX(ID_GOLD), 			colorButY, 20, 20, new StringTextComponent("\u00a76A"), (pressed_button) -> {this.insertTextIntoPage("\u00a76");}));
-		this.formatGray = 			this.addButton(new Button(getColorButX(ID_GRAY), 			colorButY, 20, 20, new StringTextComponent("\u00a77A"), (pressed_button) -> {this.insertTextIntoPage("\u00a77");}));
-		this.formatDarkGray = 		this.addButton(new Button(getColorButX(ID_DARK_GRAY), 		colorButY, 20, 20, new StringTextComponent("\u00a78A"), (pressed_button) -> {this.insertTextIntoPage("\u007a8");}));
-		this.formatBlue = 			this.addButton(new Button(getColorButX(ID_BLUE), 			colorButY, 20, 20, new StringTextComponent("\u00a79A"), (pressed_button) -> {this.insertTextIntoPage("\u00a79");}));
-		this.formatGreen = 			this.addButton(new Button(getColorButX(ID_GREEN), 			colorButY, 20, 20, new StringTextComponent("\u00a7aA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7a");}));
-		this.formatAqua = 			this.addButton(new Button(getColorButX(ID_AQUA), 			colorButY, 20, 20, new StringTextComponent("\u00a7bA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7b");}));
-		this.formatRed = 			this.addButton(new Button(getColorButX(ID_RED), 			colorButY, 20, 20, new StringTextComponent("\u00a7cA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7c");}));
-		this.formatLightPurple = 	this.addButton(new Button(getColorButX(ID_LIGHT_PURPLE),	colorButY, 20, 20, new StringTextComponent("\u00a7dA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7d");}));
-		this.formatYellow = 		this.addButton(new Button(getColorButX(ID_YELLOW), 			colorButY, 20, 20, new StringTextComponent("\u00a7eA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7e");}));
-		this.formatWhite = 			this.addButton(new Button(getColorButX(ID_WHITE), 			colorButY, 20, 20, new StringTextComponent("\u00a7fA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7f");}));
-		
-		this.formatObfuscated = 	this.addButton(new Button(getFormatButX(ID_OBFUSCATED), 	formatButY, 20, 20, new StringTextComponent("\u00a7kA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7k");}));
-		this.formatBold = 			this.addButton(new Button(getFormatButX(ID_BOLD), 			formatButY, 20, 20, new StringTextComponent("\u00a7lA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7l");}));
-		this.formatStrikethrough = 	this.addButton(new Button(getFormatButX(ID_STRIKETHROUGH),	formatButY, 20, 20, new StringTextComponent("\u00a7mA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7m");}));
-		this.formatUnderline = 		this.addButton(new Button(getFormatButX(ID_UNDERLINE), 		formatButY, 20, 20, new StringTextComponent("\u00a7nA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7n");}));
-		this.formatItalic = 		this.addButton(new Button(getFormatButX(ID_ITALIC), 		formatButY, 20, 20, new StringTextComponent("\u00a7oA"), (pressed_button) -> {this.insertTextIntoPage("\u00a7o");}));
-		this.formatResetFormat = 	this.addButton(new Button(getFormatButX(ID_RESET_FORMAT), 	formatButY, 100, 20, new StringTextComponent("Reset Formatting"), (pressed_button) -> {this.insertTextIntoPage("\u00a7r");}));
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a70A", "\u00a70");  // BLACK
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a71A", "\u00a71");  // DARK_BLUE
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a72A", "\u00a72");  // DARK_GREEN
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a73A", "\u00a73");  // DARK_AQUA
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a74A", "\u00a74");  // DARK_RED
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a75A", "\u00a75");  // DARK_PURPLE
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a76A", "\u00a76");  // GOLD
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a77A", "\u00a77");  // GRAY
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a78A", "\u007a8");  // DARK_GRAY
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a79A", "\u00a79");  // BLUE
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a7aA", "\u00a7a");  // GREEN
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a7bA", "\u00a7b");  // AQUA
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a7cA", "\u00a7c");  // RED
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a7dA", "\u00a7d");  // LIGHT_PURPLE
+		colorButX = addColorFormatButton(colorButX, colorButY, "\u00a7eA", "\u00a7e");  // YELLOW
+		addColorFormatButton(colorButX, colorButY, "\u00a7fA", "\u00a7f");              // WHITE
 
+		int formatButX = this.width/2 - (COLOR_FORMAT_BUTTON_WIDTH * 5);
+		int formatButY = this.height - 20;
+		formatButX = addColorFormatButton(formatButX, formatButY, "\u00a7kA", "\u00a7k");  // OBFUSCATED
+		formatButX = addColorFormatButton(formatButX, formatButY, "\u00a7lA", "\u00a7l");  // BOLD
+		formatButX = addColorFormatButton(formatButX, formatButY, "\u00a7mA", "\u00a7m");  // STRIKETHROUGH
+		formatButX = addColorFormatButton(formatButX, formatButY, "\u00a7nA", "\u00a7n");  // UNDERLINE
+		formatButX = addColorFormatButton(formatButX, formatButY, "\u00a7oA", "\u00a7o");  // ITALIC
+		addColorFormatButton(formatButX, formatButY, "Reset Formatting", "\u00a7r", 100);
+		
 		super.init();
+		
 		// Move standard buttons
 		this.buttonSign.setWidth(buttonWidth);
 		this.buttonFinalize.setWidth(buttonWidth);
@@ -779,11 +701,4 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		printer.gamePrint(Printer.AQUA + "Autoreload disabled");
 		this.updateButtons();
 	}
-	
-//	@Override
-//	public void render(int p_render_1_, int p_render_2_, float p_render_3_) {
-//		super.render(p_render_1_, p_render_2_, p_render_3_);
-//		this.font.drawStringWithShadow("Auto Reload Active!", 5, 45, 0x800888);
-//	}
-
 }

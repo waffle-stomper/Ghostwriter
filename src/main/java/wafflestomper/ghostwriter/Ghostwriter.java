@@ -83,7 +83,7 @@ public class Ghostwriter{
 			}
 
 			LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
-			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookInfo, true, bookStack,
+			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
 					this.globalClipboard, ls.getContainer(), this.mc.player.inventory);
 			this.mc.displayGuiScreen(g);
 			

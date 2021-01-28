@@ -1,19 +1,15 @@
 package wafflestomper.ghostwriter;
 
-import java.io.File;
-import java.util.List;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.collect.Lists;
-
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Based loosely on ServerSelectionList in 1.14
@@ -24,16 +20,15 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	private final FileSelectionList.ParentDirEntry parentDir;
 	private final List<FileSelectionList.PathItemEntry> fileList = Lists.newArrayList();
 	private final GhostwriterFileBrowserScreen owner;
-	private static final Logger LOG = LogManager.getLogger();
+	
 	
 	public FileSelectionList(GhostwriterFileBrowserScreen ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
 		this.owner = ownerIn;
 		this.parentDir = new FileSelectionList.ParentDirEntry(this.owner);
-		// TODO Auto-generated constructor stub
 	}
-
-	// TODO: Verify that this still works
+	
+	
 	public void updateFileList(List<File> displayFiles) {
 		this.fileList.clear();
 		for (File f : displayFiles) {
@@ -150,25 +145,17 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		}
 		
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-			// TODO: Why were we calculating these? They aren't used?
-//	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
-//	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
-		
 			 this.owner.setSelectedSlot(this);
 			 if (Util.milliTime() - this.lastClickTime < 250L) {
-				// TODO: Double click handling
+				// Double click handling
 				 this.lastClickTime = 0; // Prevent triple-click
 				 this.owner.navigateInto(path);
 				 return true;
 			 }
-
-			 this.lastClickTime = Util.milliTime(); // TODO: Is this necessary now that double clicks no longer make sense for this screen?
-			 return false; // TODO: Should this really return false?
+			
+			// TODO: Is this necessary now that double clicks no longer make sense for this screen?
+			 this.lastClickTime = Util.milliTime();
+			 return false;
 		}
-	}
-
-
-	public void setSelectedSlot(PathItemEntry normalEntry) {
-		// TODO Auto-generated method stub
 	}
 }

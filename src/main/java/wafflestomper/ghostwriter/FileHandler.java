@@ -3,33 +3,16 @@
 
 package wafflestomper.ghostwriter;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
+import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.client.Minecraft;
+import java.io.*;
+import java.nio.charset.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class FileHandler {
 	private final File defaultPath;
@@ -41,12 +24,8 @@ public class FileHandler {
 	
 	public File currentPath;
 	public File lastLoadedBook;
-	private List<File> lastListing = new ArrayList<File>();
+	private final List<File> lastListing = new ArrayList<>();
 	private String lastCheckedPath = "";
-	
-	//File formats
-	public static final int FORMAT_GHOSTWRITER = 0;
-	public static final int FORMAT_BOOKWORM = 1;
 	
 	public FileHandler(Clipboard _clipboard){
 		this.clipboard = _clipboard;
@@ -63,11 +42,6 @@ public class FileHandler {
 		this.currentPath = bookSavePath;
 	}
 	
-	
-	public File getDefaultPath(){
-		return this.defaultPath;
-	}
-	
 	public File getSignaturePath(){
 		return this.signaturePath;
 	}
@@ -81,9 +55,10 @@ public class FileHandler {
 			this.lastCheckedPath = path.getAbsolutePath();
 			this.lastListing.clear();
 			File[] newList = path.listFiles();
+			if (newList == null) return this.lastListing;
 			// TODO: Better sorting: https://stackoverflow.com/questions/16898029/how-to-sort-file-names-in-ascending-order
 			Arrays.sort(newList);
-			List<File> files = new ArrayList<File>();
+			List<File> files = new ArrayList<>();
 			for (File f : newList){
 				if (f.isDirectory()){
 					this.lastListing.add(f);
@@ -113,7 +88,7 @@ public class FileHandler {
 	}
 	
 	public List<File> getValidRoots(){
-		List<File> outList = new ArrayList<File>();
+		List<File> outList = new ArrayList<>();
 		for (File root : File.listRoots()){
 			if (root.listFiles() != null){
 				outList.add(root);
@@ -127,8 +102,8 @@ public class FileHandler {
 	}
 	
 	public List<String> readFile(File path, String encoding){
-		List<String> out = new ArrayList<String>();
-		BufferedReader br = null;
+		List<String> out = new ArrayList<>();
+		BufferedReader br;
 		
 		CharsetDecoder decoder = Charset.forName(encoding).newDecoder();
 		decoder.onMalformedInput(CodingErrorAction.REPORT);
@@ -148,7 +123,7 @@ public class FileHandler {
 		}
 		catch (CharacterCodingException e){
 			// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
-			if (encoding == "UTF-8"){
+			if (encoding.equals("UTF-8")){
 				printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
 				// Try ISO-8859-15
 				try {
@@ -242,14 +217,13 @@ public class FileHandler {
 		//Write file
 		if (!failedFlag){
 			try {
-				Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), "UTF-8"));
+				Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));
 				try{
 					for (String s : toWrite){
 						out.write(s + '\n');
 					}
 				}
 				catch (IOException e){
-					failedFlag = true;
 					LOG.error("Ghostwriter: Write failed!");
 					LOG.error(e.getMessage());
 					return false;
@@ -259,7 +233,6 @@ public class FileHandler {
 				}
 			} 
 			catch (IOException e) {
-				failedFlag = true;
 				LOG.error("Ghostwriter: Write failed!");
 				LOG.error(e.getMessage());
 				return false;
@@ -285,7 +258,7 @@ public class FileHandler {
 		//Handle Ghostwriter books in .ghb
 		if (filePath.getName().endsWith(".ghb")){
 			LOG.info("Loading GHB book..." + filePath);
-			if (loadBookFromGHBFile(filePath)){return true;}
+			return loadBookFromGHBFile(filePath);
 		}
 		//This was not a valid book
 		return false;
@@ -316,11 +289,11 @@ public class FileHandler {
 			return false;
 		}
 		//Remove comments and anything else that can't be stored in a Minecraft book
-		String concatFile = "";
+		StringBuilder concatFile = new StringBuilder();
 		for (String line : rawFile){
-			concatFile += line + "\n";
+			concatFile.append(line).append("\n");
 		}
-		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>><<<<>>>><<<<"));
+		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile.toString(), ">>>><<<<>>>><<<<"));
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
 		this.lastLoadedBook = filePath;
@@ -336,14 +309,13 @@ public class FileHandler {
 			return false;
 		}
 		//Remove comments and anything else that can't be stored in a Minecraft book
-		String concatFile = "";
+		StringBuilder concatFile = new StringBuilder();
 		for (String line : rawFile){
-			//TODO: Eliminate this code repetition
 			if (line.toLowerCase().startsWith("title:") && book.title.isEmpty()){
-				if (line.length() >= 7){
+				if (line.length() >= 7) {
 					book.title = cleanGHBString(line.substring(6)).trim();
-					if (line.contains("/*")){
-						concatFile += line.substring(line.indexOf("/*")) + "\\n";
+					if (line.contains("/*")) {
+						concatFile.append(line.substring(line.indexOf("/*"))).append("\\n");
 					}
 				}
 			}
@@ -351,20 +323,20 @@ public class FileHandler {
 				if (line.length() >= 8){
 					book.author = cleanGHBString(line.substring(7)).trim();
 					if (line.contains("/*")){
-						concatFile += line.substring(line.indexOf("/*")) + "\\n";
+						concatFile.append(line.substring(line.indexOf("/*"))).append("\\n");
 					}
 				}
 			}
 			else{
-				concatFile += line + "\n";
+				concatFile.append(line).append("\n");
 			}
 		}
-		concatFile = cleanGHBString(concatFile);
+		String concatFileStr = cleanGHBString(concatFile.toString());
 		
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
-		concatFile = concatFile.replaceAll("##", "\\\n");
+		concatFileStr = concatFileStr.replaceAll("##", "\\\n");
 
-		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile, ">>>>"));
+		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFileStr, ">>>>"));
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
 		this.lastLoadedBook = filePath;
@@ -374,7 +346,7 @@ public class FileHandler {
 	
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		printer.gamePrint(Printer.GRAY + "Saving book to file...");
-		List<String> toWrite = new ArrayList<String>();
+		List<String> toWrite = new ArrayList<>();
 		toWrite.add("//Book saved in GHB format at " + this.getUTC());
 		if (!title.isEmpty()){toWrite.add("title:" + title);}
 		if (!author.isEmpty()){toWrite.add("author:" + author);}
@@ -412,10 +384,10 @@ public class FileHandler {
 	
 	/**
 	 * This supports legacy type saving where the filename and path are automatically generated
-	 * @param title
-	 * @param author
-	 * @param pages
-	 * @return Success
+	 * @param title Book title
+	 * @param author Book author
+	 * @param pages Page content
+	 * @return Success If the book saved successfully
 	 */
 	@Deprecated
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
@@ -433,6 +405,4 @@ public class FileHandler {
 		df.setTimeZone(tz);
 		return df.format(new Date());
 	}
-	
-	
 }
