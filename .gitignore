@@ -3,6 +3,7 @@ Run Server.*
 *.ods
 *.xcf
 Issues
+EditBookScreenMod.java
 
 # eclipse
 bin
