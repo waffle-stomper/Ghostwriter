@@ -309,7 +309,7 @@ public class BookUtilities {
 	public static List<String> stringWithPageBreaksToPages(String str, String pageBreakString){
 		//Remove any page breaks from the beginning of the string
 		while (str.startsWith(pageBreakString)){
-			str = str.substring(pageBreakString.length(), str.length()-1);
+			str = str.substring(pageBreakString.length());
 		}
 		String[] pageBroken = str.split(pageBreakString);
 		List<String> out = new ArrayList<>();
