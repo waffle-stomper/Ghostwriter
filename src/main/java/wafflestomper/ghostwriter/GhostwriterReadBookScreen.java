@@ -59,7 +59,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 		}
 	}
 	
-	
+	// TODO: Is there a reason why we use this for copying, but don't for saving?
 	private List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){

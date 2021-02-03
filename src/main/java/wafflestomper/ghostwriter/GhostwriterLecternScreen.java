@@ -68,7 +68,7 @@ public class GhostwriterLecternScreen extends LecternScreen {
 		}
 	}
 
-
+	@Deprecated  // We should be able to just use bookPages directly now
 	private List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){

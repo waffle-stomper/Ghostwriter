@@ -1,5 +1,6 @@
 //TODO: Standardize function names
 //TODO: Proper logging
+// TODO: Refactor this whole class
 
 package wafflestomper.ghostwriter;
 

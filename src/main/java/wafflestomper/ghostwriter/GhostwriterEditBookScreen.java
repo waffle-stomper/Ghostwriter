@@ -217,7 +217,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.fileHandler = new FileHandler(this.clipboard);
 	}
 	
-	
+	// TODO: Why do we use this for cut/copy/paste but not for saving?
+	@Deprecated  // We should just be able to use bookPages directly now
 	private List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
@@ -244,7 +245,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		
 		// field_238748_u_ is the new TextInputUtil. If we don't move the cursor, the game can crash because
 		// text in it doesn't match what's in the current bookPages String
-		// TODO: Do all current page manipulation through the TextInputUtil? Then it should update bookPages itself
 		this.field_238748_u_.moveCursorToEnd();
 		
 		// This is some kind of new display update/refresh function
