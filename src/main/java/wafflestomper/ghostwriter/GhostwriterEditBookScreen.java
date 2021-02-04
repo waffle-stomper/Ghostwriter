@@ -317,6 +317,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.bookChanged(true);
 		
 		this.bookTitle = fromBook.title;
+		this.field_238749_v_.moveCursorToEnd();  // field_238749_v_ is titleInput
 		
 		this.bookPages.addAll(fromBook.pages);
 		this.bookIsModified = true;
