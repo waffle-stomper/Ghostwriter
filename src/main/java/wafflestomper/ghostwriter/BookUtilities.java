@@ -15,6 +15,89 @@ public class BookUtilities {
 	private static final Minecraft mc = Minecraft.getInstance();
 	
 	
+	// TODO: Find out where the extra format characters are coming from and try to suppress them upstream
+	//       rather than just removing them later. I suspect the issue is books that have been saved on servers
+	//       running old Minecraft versions, but I'm not totally sure
+	/**
+	 * Removes duplicate or unnecessary formatting characters
+	 * Note that a color code will cancel a style code (e.g. §n§cX will just show as red and not underlined)
+	 * I'm using 'style' here to refer to all of the non-color codes (e.g. bold)
+	 * Note that a sequence like Red Bold Red will be preserved because the second red is needed to cancel the bold
+	 */
+	public static String removeRedundantFormatChars(String in, String pageBreakString){
+		// Split the string into pages
+		String[] splitByPage = in.split(pageBreakString);
+		StringBuilder cleanedPage = new StringBuilder();
+		StringBuilder cleanedOut = new StringBuilder();
+		char currentColor = '0';  // Black
+		List<String> currentStyles = new ArrayList<>();  // No style
+		for(int pageNum=0; pageNum < splitByPage.length; pageNum++){
+			String page = splitByPage[pageNum];
+			// Loop through each character of the page, adding all characters except redundant formatting
+			boolean formatPrefixFlag = false;
+			for(int i=0; i<page.length(); i++){
+				char c = page.charAt(i);
+				if (formatPrefixFlag){
+					formatPrefixFlag = false;
+					String lowerChar = String.valueOf(c).toLowerCase();
+					// Previous character was a format prefix.
+					if ("0123456789abcdef".contains(lowerChar)){
+						// Color code (which also cancels any existing style codes)
+						if (currentColor == c && currentStyles.size() == 0){
+							// Color code isn't needed
+							continue;
+						}
+						currentColor = c;
+						currentStyles.clear();
+					}
+					else if ("klmnor".contains(lowerChar)){
+						// Style code
+						if (lowerChar.equals("r")){
+							// Reset char
+							if (currentColor == '0' && currentStyles.size() == 0) {
+								// Reset char isn't required
+								continue;
+							}
+							else{
+								// Reset format
+								currentColor = '0';
+								currentStyles.clear();
+							}
+						}
+						else{
+							// Some other format char
+							if (currentStyles.contains(lowerChar)){
+								// Style character is already active
+								continue;
+							}
+							currentStyles.add(lowerChar);
+						}
+					}
+					// Format character is necessary. Add it to the cleaned string
+					cleanedPage.append('\u00a7').append(c);
+					continue;
+				}
+				else if (c == '\u00a7'){
+					formatPrefixFlag = true;
+					continue;
+				}
+				cleanedPage.append(c);
+			}
+			// Add the page text (and a page break if it's not the last page) to the output
+			// and reset the formatting
+			cleanedOut.append(cleanedPage.toString());
+			if (pageNum < splitByPage.length - 1){
+				cleanedOut.append(pageBreakString);
+			}
+			cleanedPage = new StringBuilder();
+			currentColor = '0';
+			currentStyles.clear();
+		}
+		// Reassemble the cleaned string
+		return cleanedOut.toString();
+	}
+	
+	
 	/**
 	 * Prefix and suffix are optional, but if they are set to anything other than a blank string, they will be counted
 	 * as part of the length of the output string.

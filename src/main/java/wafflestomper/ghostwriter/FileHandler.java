@@ -15,7 +15,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 public class FileHandler {
+	public static final String GHB_PAGE_BREAK = ">>>>";
 	private final File defaultPath;
 	private final File bookSavePath;
 	private final File signaturePath;
@@ -275,7 +277,7 @@ public class FileHandler {
 		//Remove multi-line comments
 		strIn = strIn.replaceAll("(?s)((/\\*).*?((\\*/)|(\\Z)))|(((/\\*)|(\\A)).*?(\\*/))", "");
 		//remove whitespace preceding linebreak and pagebreak characters
-		strIn = strIn.replaceAll("[\\t\\r\\n ]+(##|>>>>)", "$1");
+		strIn = strIn.replaceAll("[\\t\\r\\n ]+(##|" + GHB_PAGE_BREAK + ")", "$1");
 		//remove newline and carriage return characters
 		strIn = strIn.replaceAll("[\\r\\n]", "");
 		return strIn;
@@ -334,10 +336,13 @@ public class FileHandler {
 		}
 		String concatFileStr = cleanGHBString(concatFile.toString());
 		
+		// Strip extra format characters
+		concatFileStr = BookUtilities.removeRedundantFormatChars(concatFileStr, GHB_PAGE_BREAK);
+		
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
 		concatFileStr = concatFileStr.replaceAll("##", "\\\n");
 
-		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFileStr, ">>>>"));
+		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFileStr, GHB_PAGE_BREAK));
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
 		this.lastLoadedBook = filePath;
