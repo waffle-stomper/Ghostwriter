@@ -202,7 +202,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	private Clipboard clipboard;
 	
 	private File autoReloadFile; // Auto Reload is active when this is not null
-	private long autoReloadLastModified = 0;
+	public long autoReloadLastModified = 0;
 	private long autoReloadLastCheck = 0;
 	private Clipboard autoReloadClipboard;
 	
@@ -540,8 +540,15 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.addButton(new Button(rightXPos, 175, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Remove Top Space"), (pressed_button) -> this.collapseTop()));
 		
-		this.addButton(new Button(5, 80, buttonWidth, BUTTON_HEIGHT,
+		this.addButton(new Button(5, 70, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Add Signature Pages"), (pressed_button) -> this.addSignaturePages()));
+		
+		this.addButton(new Button(5, 95, buttonWidth, BUTTON_HEIGHT,
+				new StringTextComponent("Preview Signed Book"), (pressed_button) -> {
+			if (this.minecraft != null) {
+				this.minecraft.displayGuiScreen(new GhostwriterSignedPreviewScreen(this));
+			}
+		}));
 		
 		this.buttonRemoveSelectedPages = this.addButton(new Button(rightXPos, 110, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Remove This Page"),
