@@ -15,6 +15,9 @@ import net.minecraft.util.text.StringTextComponent;
 import java.io.File;
 import java.util.List;
 
+// TODO: Focus on the filename field with the name (and not extension) highlighted to make saving with a custom name
+//       faster
+
 public class GhostwriterFileBrowserScreen extends Screen{
 	
 	private FileSelectionList fileSelectionList;

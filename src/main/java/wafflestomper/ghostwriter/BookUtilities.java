@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BookUtilities {
-	public static final int BOOK_TEXT_WIDTH = 116;
+	public static final int BOOK_TEXT_WIDTH = 116;  // TODO: I think the text width might be 114 pixels now
 	public static final char SPLIT_CHAR = '\u1337';
 	private static final Minecraft mc = Minecraft.getInstance();
 	
@@ -335,10 +335,13 @@ public class BookUtilities {
 		return out;
 	}
 	
-
+	
 	/**
-	 * Splits a monolithic string into a list of strings, each representing one
-	 * book page.
+	 * Splits a monolithic string into a list of strings, each representing one book page.
+	 *
+	 * Note that while the single player version will allow an almost unlimited number of characters
+	 * on the same line, Spigot, (and likely the vanilla server) will only allow 256. This, combined with extra format
+	 * characters being inserted was causing pages to be split in new and strange places
 	 */
 	public static List<String> stringToPages(String str){
 		String wrapped = wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH);
@@ -417,6 +420,7 @@ public class BookUtilities {
 	/**
 	 * Converts the new JSON strings with their escaped quotation marks back into regular old strings
 	 * Hopefully this is just temporary.
+	 * EditBookScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
 	 */
 	public static String deJSONify(String jsonIn){
 		try{

@@ -201,7 +201,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	private Clipboard clipboard;
 	
-	private File autoReloadFile; // Auto Reload is active when this is not nullprivate Clipboard autoReloadBookClipboard;
+	private File autoReloadFile; // Auto Reload is active when this is not null
 	private long autoReloadLastModified = 0;
 	private long autoReloadLastCheck = 0;
 	private Clipboard autoReloadClipboard;

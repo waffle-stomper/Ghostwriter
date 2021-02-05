@@ -350,6 +350,7 @@ public class FileHandler {
 	}
 	
 	
+	// TODO: Add comments with page numbers
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		printer.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList<>();
@@ -363,18 +364,17 @@ public class FileHandler {
 			while (pageAsString.startsWith("\"") && pageAsString.endsWith("\"")){
 				pageAsString = pageAsString.substring(1, pageAsString.length()-1);
 			}
-			// Strip 
-			//convert all escaped newline characters to real newline characters
+			// Convert all escaped newline characters to real newline characters
 			pageAsString = pageAsString.replaceAll("\\\\n", "\\\n");
-			//Split the string into 116 pixel maximum lines
+			// Split the string into 116 pixel maximum lines
 			List<String> currPage = BookUtilities.splitStringIntoLines(pageAsString);
 			// Replace newline characters with double hashes and add the double hashes to the end of each line
 			for (String line : currPage){
 				toWrite.add(line.replaceAll("\\n", "##") + "##");
 			}
-			//Add pagebreaks
+			// Add pagebreaks with line numbers
 			if (i < pages.size()-1){
-				toWrite.add(">>>>");
+				toWrite.add(GHB_PAGE_BREAK + "  // Page " + (i+2));
 			}
 		}
 		if (writeFile(toWrite, savePath)){
