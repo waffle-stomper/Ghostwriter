@@ -272,13 +272,13 @@ public class FileHandler {
 	 * Removes Java-style comments, whitespace preceding linebreak and pagebreak symbols, and newline characters (\n)
 	 */
 	public static String cleanGHBString(String strIn){
-		//Remove single-line comments
-		strIn = strIn.replaceAll("(?s)//.*?((\\n)|(\\r\\n)|(\\Z))","\n");
-		//Remove multi-line comments
+		// Remove single-line comments and any whitespace preceding them
+		strIn = strIn.replaceAll("(?s)[\\t\\r\\n ]*//.*?((\\n)|(\\r\\n)|(\\Z))","\n");
+		// Remove multi-line comments
 		strIn = strIn.replaceAll("(?s)((/\\*).*?((\\*/)|(\\Z)))|(((/\\*)|(\\A)).*?(\\*/))", "");
-		//remove whitespace preceding linebreak and pagebreak characters
+		// Remove whitespace preceding linebreak and pagebreak characters
 		strIn = strIn.replaceAll("[\\t\\r\\n ]+(##|" + GHB_PAGE_BREAK + ")", "$1");
-		//remove newline and carriage return characters
+		// Remove newline and carriage return characters
 		strIn = strIn.replaceAll("[\\r\\n]", "");
 		return strIn;
 	}
@@ -311,7 +311,7 @@ public class FileHandler {
 			//File was not read successfully
 			return false;
 		}
-		//Remove comments and anything else that can't be stored in a Minecraft book
+		// Load title and author (if they exist)
 		StringBuilder concatFile = new StringBuilder();
 		for (String line : rawFile){
 			if (line.toLowerCase().startsWith("title:") && book.title.isEmpty()){
@@ -334,6 +334,8 @@ public class FileHandler {
 				concatFile.append(line).append("\n");
 			}
 		}
+		
+		// Remove comments and newlines
 		String concatFileStr = cleanGHBString(concatFile.toString());
 		
 		// Strip extra format characters
@@ -350,7 +352,6 @@ public class FileHandler {
 	}
 	
 	
-	// TODO: Add comments with page numbers
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		printer.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList<>();
@@ -398,8 +399,8 @@ public class FileHandler {
 	@Deprecated
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
 		String utcTime = getUTC();
-		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
+		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
+		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 		File saveFile = new File(this.bookSavePath, title + "_" + author + "_" + utcTime + ".ghb");
 		return(saveBookToGHBFile(title, author, pages, saveFile));
 	}
