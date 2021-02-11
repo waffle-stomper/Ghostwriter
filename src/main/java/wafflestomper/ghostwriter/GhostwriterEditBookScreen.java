@@ -166,6 +166,8 @@ Mat Oxley
 package wafflestomper.ghostwriter;
 
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.gui.fonts.TextInputUtil;
 import net.minecraft.client.gui.screen.EditBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
@@ -215,6 +217,16 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		super(editingPlayer, book, hand);
 		this.clipboard = clipboard;
 		this.fileHandler = new FileHandler(this.clipboard);
+		
+		// Swap out the title input util for one that allows longer titles
+		// WrittenBookItem.validBookTagContents declares the book invalid if the title is over 32 characters
+		field_238749_v_ = new TextInputUtil(() -> {
+			return this.bookTitle;
+		}, (p_238772_1_) -> {
+			this.bookTitle = p_238772_1_;
+		}, this::func_238773_g_, this::func_238760_a_, (p_238771_0_) -> {
+			return p_238771_0_.length() <= 32;
+		});
 	}
 	
 	// TODO: Why do we use this for cut/copy/paste but not for saving?
@@ -684,6 +696,13 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		}
 		
 		this.buttonDisableAutoReload.visible = this.autoReloadFile != null;
+		
+		// Trim book title to a max of 32 characters. Anything longer an the book will be marked invalid by
+		// the client when you try to read it
+		// updateButtons() is called when the 'sign' button is clicked, so it's a convenient time to check this
+		if (this.bookTitle.length() > 32){
+			this.bookTitle = this.bookTitle.substring(0, 32);
+		}
 	}
 	
 	
@@ -710,5 +729,25 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.autoReloadFile = null;
 		printer.gamePrint(Printer.AQUA + "Autoreload disabled");
 		this.updateButtons();
+	}
+	
+	
+	@Override
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		
+		// Show long title warning
+		if (this.bookGettingSigned && this.bookTitle.length() > 15){
+			String lenText = "Title length: " + this.bookTitle.length();
+			// params are matrixStack, x, y, color
+			this.font.drawString(matrixStack, lenText, 169, 20, 0xFF3333);
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("Warning: the vanilla client restricts titles to 15 characters. ");
+			sb.append("Set longer titles at your own risk");
+			StringTextComponent stc = new StringTextComponent(sb.toString());
+			// params are text, x, y, width, color
+			this.font.func_238418_a_(stc, 153, 116, 114, 0xFF3333);
+		}
 	}
 }

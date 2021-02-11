@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.16.1-recommended": "2.1.7",
+    "1.16.1-recommended": "2.1.8",
     "1.15.2-recommended": "2.0.6",
     "1.15.1-recommended": "2.0.5",
     "1.14.4-recommended": "2.0.4",
@@ -13,6 +13,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.1.8": "Allow titles longer than 15 characters\nThanks Maester Lodish",
     "2.1.7": "Fix bug where page numbers in a loaded book added spaces to the start of pages",
     "2.1.6": "Add signed book preview",
     "2.1.5": "Fix title bug when signing loaded book\nRemove redundant format chars when loading a book (thanks Maester Lodish)\nAdd page numbers to ghb files",
