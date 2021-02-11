@@ -13,6 +13,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,13 +58,12 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		
 		// Swap out the title input util for one that allows longer titles
 		// WrittenBookItem.validBookTagContents declares the book invalid if the title is over 32 characters
-		field_238749_v_ = new TextInputUtil(() -> {
-			return this.bookTitle;
-		}, (p_238772_1_) -> {
-			this.bookTitle = p_238772_1_;
-		}, this::func_238773_g_, this::func_238760_a_, (p_238771_0_) -> {
-			return p_238771_0_.length() <= 32;
-		});
+		field_238749_v_ = new TextInputUtil(
+				() -> this.bookTitle,
+				(p_238772_1_) -> this.bookTitle = p_238772_1_,
+				this::func_238773_g_,  // getClipboardText
+				this::func_238760_a_,  // setClipboardText
+				(p_238771_0_) -> p_238771_0_.length() <= 32);
 	}
 	
 	// TODO: Why do we use this for cut/copy/paste but not for saving?
@@ -73,7 +73,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		for (int i=0; i<this.getPageCount(); i++){
 			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
 			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
 			String pageText = BookUtilities.deJSONify(this.bookPages.get(i));
 			pages.add(pageText);
 		}
@@ -107,7 +107,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		int to = Math.max(start, end);
 		
 		// Switch to single page mode if necessary
-		if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+		if (from < 0 || from >= this.bookPages.size() || to >= this.bookPages.size()) {
 			from = this.currPage;
 			to = this.currPage;
 		}
@@ -179,7 +179,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	
 	private void copyBook(){
-		this.clipboard.author = ""; // TODO: Do I need this field any more? Was this.author in old versions
+		this.clipboard.author = "";
 		this.clipboard.title = this.bookTitle;
 		this.clipboard.pages.clear();
 		this.clipboard.pages.addAll(this.pagesAsList());
@@ -219,7 +219,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		int to = Math.max(this.selectedPageA, this.selectedPageB);
 		
 		// Switch to single page mode if necessary
-		if (from < 0 || from >= this.bookPages.size() || to < 0 || to >= this.bookPages.size()) {
+		if (from < 0 || from >= this.bookPages.size() || to >= this.bookPages.size()) {
 			from = this.currPage;
 			to = this.currPage;
 		}
@@ -465,7 +465,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	@Override
 	public void tick() {
-		// Handle autoreload
+		// Handle auto reload
 		if (this.autoReloadFile != null && System.currentTimeMillis()-this.autoReloadLastCheck > 1000) {
 			if (this.autoReloadFile.exists()) {
 				if (this.autoReloadFile.lastModified() != this.autoReloadLastModified) {
@@ -566,8 +566,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	}
 	
 	
-	public void enableAutoReload(File path, Clipboard initalBookState) {
-		this.autoReloadClipboard = initalBookState;
+	public void enableAutoReload(File path, Clipboard initialBookState) {
+		this.autoReloadClipboard = initialBookState;
 		this.autoReloadFile = path;
 		this.autoReloadLastModified = path.lastModified();
 		this.autoReloadLastCheck = System.currentTimeMillis();
@@ -577,13 +577,14 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	public void disableAutoReload() {
 		this.autoReloadFile = null;
-		printer.gamePrint(Printer.AQUA + "Autoreload disabled");
+		printer.gamePrint(Printer.AQUA + "Auto reload disabled");
 		this.updateButtons();
 	}
 	
 	
 	@Override
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	@ParametersAreNonnullByDefault
+	public void render(MatrixStack matrixStack , int mouseX, int mouseY, float partialTicks) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// Show long title warning

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.EditBookScreen;
 import net.minecraft.client.gui.screen.LecternScreen;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.WritableBookItem;
 import net.minecraft.item.WrittenBookItem;
@@ -27,7 +28,7 @@ public class Ghostwriter{
 	
 	private final Minecraft mc = Minecraft.getInstance();
 	public Clipboard globalClipboard = new Clipboard();
-	private static final Logger LOG = LogManager.getLogger();
+	public static final Logger LOG = LogManager.getLogger();
 	public static File currentPath; 
 	private boolean lecternArmed = false;
 	
@@ -70,14 +71,8 @@ public class Ghostwriter{
 			ItemStack bookStack = ls.getContainer().getBook();
 			LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
 			
-			ReadBookScreen.IBookInfo bookInfo;
-			if (bookStack.getItem() instanceof WritableBookItem){
-				bookInfo = new ReadBookScreen.UnwrittenBookInfo(bookStack);
-			}
-			else if (bookStack.getItem() instanceof WrittenBookItem) {
-				bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
-			}
-			else {
+			Item bookItem = bookStack.getItem();
+			if (!(bookItem instanceof WritableBookItem) && ! (bookItem instanceof WrittenBookItem)){
 				LOG.error("Unknown book type on lectern!");
 				return;
 			}
@@ -113,7 +108,7 @@ public class Ghostwriter{
 		
 		// Abort if the player is crouching
 		if (this.mc.player.isCrouching()) {
-			LOG.debug("Aborting GUI replacement becuase the player is crouching");
+			LOG.debug("Aborting GUI replacement because the player is crouching");
 			return;
 		}
 
@@ -130,13 +125,11 @@ public class Ghostwriter{
 		if (eventGui instanceof EditBookScreen){
 			LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
 			eventGui = new GhostwriterEditBookScreen(this.mc.player, bookStack, Hand.MAIN_HAND, this.globalClipboard);
-//				new Printer().gamePrint(Printer.RED + "Warning: using EditBookScreenMod!");
-//				eventGui = new EditBookScreenMod(this.mc.player, bookStack, Hand.MAIN_HAND);
 		}
-		else if (eventGui instanceof ReadBookScreen) {
+		else {
 			LOG.debug("Replacing the current screen with a GhostwriterReadBookScreen");
 			ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
-			eventGui = new GhostwriterReadBookScreen(bookInfo, true, bookStack, this.globalClipboard);
+			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack, this.globalClipboard);
 		}
 		event.setGui(eventGui);
 		LOG.debug("GUI swap done!");

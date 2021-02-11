@@ -74,7 +74,7 @@ public class GhostwriterLecternScreen extends LecternScreen {
 		for (int i=0; i<this.getPageCount(); i++){
 			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
 			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
 			String pageText = BookUtilities.deJSONify(this.bookPages().get(i)); // TODO: Should this use the getPage function from IBookInfo instead?
 			pages.add(pageText);
 		}
@@ -161,7 +161,7 @@ public class GhostwriterLecternScreen extends LecternScreen {
 		super.init();
 		this.updateButtons();
 		// This is a hack based on LecternScreen.func_214176_h()
-		// Books can be left open to a specitic page on a lectern. This displays that page.
+		// Books can be left open to a specific page on a lectern. This displays that page.
 		// Otherwise we'd just be showing the first page every time
 		this.showPage(this.LECTERN_CONTAINER.getPage());
 	}

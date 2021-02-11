@@ -1,5 +1,6 @@
 package wafflestomper.ghostwriter;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.ITextProperties;
@@ -33,8 +34,8 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 		}
 	}
 	
-	// TODO: Add 'preview' text
 	
+	@MethodsReturnNonnullByDefault
 	public static class PreviewBookInfo implements ReadBookScreen.IBookInfo {
 		private final GhostwriterEditBookScreen PARENT;
 		

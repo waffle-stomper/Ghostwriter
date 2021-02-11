@@ -8,6 +8,7 @@ import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	public FileSelectionList(GhostwriterFileBrowserScreen ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
 		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
 		this.owner = ownerIn;
-		this.parentDir = new FileSelectionList.ParentDirEntry(this.owner);
+		this.parentDir = new ParentDirEntry(this.owner);
 	}
 	
 	
@@ -47,7 +48,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	public static abstract class Entry extends ExtendedList.AbstractListEntry<FileSelectionList.Entry> {}
 	
 	
-	public class ParentDirEntry extends FileSelectionList.Entry{
+	public static class ParentDirEntry extends FileSelectionList.Entry{
 		protected long lastClickTime;
 		protected final GhostwriterFileBrowserScreen owner;
 		protected final Minecraft mc;
@@ -59,8 +60,8 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			this.mc = Minecraft.getInstance();	
 		}
 		
-		// TODO: Verify that this still works
 		@Override
+		@ParametersAreNonnullByDefault
 		public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
 						   int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
 			this.mc.fontRenderer.drawString(matrixStack, "..", (float)(p_render_3_ ), (float)(p_render_2_ + 1), 0x00FF00); // Params are string, x, y, color
@@ -68,9 +69,6 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		
 		
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-			// TODO: Why were we calculating these? They're not used?
-//	         double d0 = p_mouseClicked_1_ - (double)FileSelectionList.this.getRowLeft();
-//	         double d1 = p_mouseClicked_3_ - (double)FileSelectionList.this.getRowTop(FileSelectionList.this.children().indexOf(this));
 			 this.owner.setSelectedSlot(this);
 			 if (Util.milliTime() - this.lastClickTime < 250L) {
 				// TODO: Double click handling
@@ -82,12 +80,11 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			 this.lastClickTime = Util.milliTime();
 			 return false;
 		 }
-
 	}
 
 	
 	@OnlyIn(Dist.CLIENT)
-	public class PathItemEntry extends FileSelectionList.Entry {
+	public static class PathItemEntry extends FileSelectionList.Entry {
 		public File path;
 		protected long lastClickTime;
 		protected final GhostwriterFileBrowserScreen owner;
@@ -105,17 +102,17 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		 * @param p_render_2_ some kind of y... maybe top?
 		 * @param slotX slotX?
 		 * @param slotWidth slotWidth?
-		 * @param p_render_5_ 
+		 * @param p_render_5_ No idea
 		 * @param tickLengthMaybe tickLength i think
 		 * 
 		 */
 		@Override
+		@ParametersAreNonnullByDefault
 		public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
 				int mouseX, int mouseY, boolean mouseIsOver, float tickLengthMaybe) {
-
 			
 			int color = 0xFFFFFF;
-			if (!path.exists()) { // TODO: do we really need to do do this every render tick?
+			if (!path.exists()) {
 				color = 0x333333;
 				this.owner.setDirectoryDirty();
 			}
@@ -152,8 +149,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 				 this.owner.navigateInto(path);
 				 return true;
 			 }
-			
-			// TODO: Is this necessary now that double clicks no longer make sense for this screen?
+			 
 			 this.lastClickTime = Util.milliTime();
 			 return false;
 		}

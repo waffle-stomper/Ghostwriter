@@ -12,6 +12,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private File cachedPath;
 	private File selectedFile = null;
 	
-	private final Screen PARENT_GUI; // TODO: genericize somehow?
+	private final Screen PARENT_GUI; // TODO: add a generic interface so we don't have to check cast before saving
 	private final Clipboard TEMP_CLIPBOARD = new Clipboard();
 	private static final Printer PRINTER = new Printer();
 	
@@ -107,15 +108,15 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	
 	private void saveClicked() {
 		// Template for this found in the delete button on MultiplayerScreen
-		File savepath = new File(this.FILE_HANDLER.currentPath, this.filenameField.getText());
-		if (savepath.exists()){
-			ITextComponent itextcomponent = new StringTextComponent("Are you sure you wish to overwrite this file?");
-			ITextComponent itextcomponent1 = new StringTextComponent(this.filenameField.getText());
+		File save_path = new File(this.FILE_HANDLER.currentPath, this.filenameField.getText());
+		if (save_path.exists()){
+			ITextComponent overwriteText = new StringTextComponent("Are you sure you wish to overwrite this file?");
+			ITextComponent filenameText = new StringTextComponent(this.filenameField.getText());
 			ITextComponent s1 = new StringTextComponent("Yes");
 			ITextComponent s2 = new StringTextComponent("Cancel");
 			Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
 			assert this.minecraft != null;
-			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, itextcomponent, itextcomponent1, s1, s2));
+			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, overwriteText, filenameText, s1, s2));
 		}
 		else {
 			this.saveBook();
@@ -133,26 +134,26 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT, new StringTextComponent("filename"));
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
-			String ftitle = "";
-			String fauthor = "";
+			String file_title = "";
+			String file_author = "";
 			if (this.PARENT_GUI instanceof GhostwriterEditBookScreen) {
 				GhostwriterEditBookScreen parentBook = (GhostwriterEditBookScreen)this.PARENT_GUI;
-				ftitle = parentBook.getBookTitle();
+				file_title = parentBook.getBookTitle();
 			}
 			if (this.PARENT_GUI instanceof GhostwriterReadBookScreen && this.minecraft.player != null) {
 				ItemStack itemstack = this.minecraft.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
 				if (itemstack.getItem() == Items.WRITTEN_BOOK){
 					CompoundNBT compoundnbt = itemstack.getTag();
 					if (compoundnbt != null) {
-						fauthor = compoundnbt.getString("author");
-						ftitle = compoundnbt.getString("title");
+						file_author = compoundnbt.getString("author");
+						file_title = compoundnbt.getString("title");
 					}
 				}
 			}
 			
-			ftitle = ftitle.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-			fauthor = fauthor.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9\\.]", "");
-			String defaultFilename = ftitle + "_" + fauthor + "_" + this.FILE_HANDLER.getUTC() + ".ghb";
+			file_title = file_title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
+			file_author = file_author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
+			String defaultFilename = file_title + "_" + file_author + "_" + this.FILE_HANDLER.getUTC() + ".ghb";
 			this.filenameField.setText(defaultFilename);
 			this.initialized = true;
 		}
@@ -215,8 +216,9 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		return !fn.equals("");
 	}
 	
-	// TODO: Check that this still works
+	
 	@Override
+	@ParametersAreNonnullByDefault
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)  {
 		this.displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
 		this.btnSave.active = this.isFilenameValid();

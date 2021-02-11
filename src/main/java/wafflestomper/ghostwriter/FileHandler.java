@@ -18,10 +18,9 @@ import java.util.*;
 
 public class FileHandler {
 	public static final String GHB_PAGE_BREAK = ">>>>";
-	private final File defaultPath;
 	private final File bookSavePath;
 	private final File signaturePath;
-	private static final Printer printer = new Printer();
+	private static final Printer PRINTER = new Printer();
 	private final Clipboard clipboard;
 	private static final Logger LOG = LogManager.getLogger();
 	
@@ -36,13 +35,18 @@ public class FileHandler {
 		if (path.endsWith(".")){
 			path = path.substring(0, path.length()-2);
 		}
-		this.defaultPath = new File(path, "mods" + File.separator + "Ghostwriter");
-		if (!this.defaultPath.exists()) this.defaultPath.mkdirs();
+		// Create directories if necessary
+		boolean dirSuccess = true;
+		File defaultPath = new File(path, "mods" + File.separator + "Ghostwriter");
+		if (!defaultPath.exists() && !defaultPath.mkdirs()) dirSuccess = false;
 		this.bookSavePath = new File(defaultPath, "SavedBooks");
-		if (!this.bookSavePath.exists()) this.bookSavePath.mkdirs();
+		if (!this.bookSavePath.exists() && !this.bookSavePath.mkdirs()) dirSuccess = false;
 		this.signaturePath = new File(defaultPath, "Signatures");
-		if (!this.signaturePath.exists()) this.signaturePath.mkdirs();
+		if (!this.signaturePath.exists() && this.signaturePath.mkdirs()) dirSuccess = false;
 		this.currentPath = bookSavePath;
+		if (!dirSuccess){
+			PRINTER.gamePrint(Printer.RED + "Couldn't create one or more directories. Things will probably break");
+		}
 	}
 	
 	public File getSignaturePath(){
@@ -114,7 +118,7 @@ public class FileHandler {
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(path), decoder));
 		} catch (FileNotFoundException e) {
-			printer.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
+			PRINTER.gamePrint(Printer.RED + "File not found! " + path.getAbsolutePath());
 			return null;
 		}
 		try {
@@ -127,7 +131,7 @@ public class FileHandler {
 		catch (CharacterCodingException e){
 			// ICEBERG! It seems we've hit a character that's not encoded with the specified encoding
 			if (encoding.equals("UTF-8")){
-				printer.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
+				PRINTER.gamePrint(Printer.DARK_GRAY + path.getAbsolutePath() + " doesn't seem to be UTF-8 encoded...");
 				// Try ISO-8859-15
 				try {
 					br.close();
@@ -136,12 +140,12 @@ public class FileHandler {
 				}
 				return readFile(path, "ISO-8859-15");
 			}
-			printer.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
+			PRINTER.gamePrint(Printer.RED + "Couldn't find a suitable decoder for " + path.getAbsolutePath());
 			return null;
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-			printer.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
+			PRINTER.gamePrint(Printer.RED + "Error reading file! " + path.getAbsolutePath());
 			return null;
 		} 
 		finally {
@@ -156,32 +160,11 @@ public class FileHandler {
 	
 	/**
 	 * Loads a bookworm book from filePath into the clipboard
+	 *
+	 *
 	 */
 	private boolean loadBookwormBook(File filePath){
 		List<String> f = readFile(filePath);
-		
-		/*
-		Bookworm format:
-		
-		<id number>
-		<title>
-		<author>
-		(optional)|!|hidden_key_n>|<hidden_data_n> (this may be repeated on successive lines)
-		<Book text as a single line>
-		<empty line>
-		
-		e.g.
-		###################################
-		46
-		Valentino Rossi - Portrait of a speed god
-		Mat Oxley
-		|!|hiddenkey0|hiddendata0
-		|!|hiddenkey1|hiddendata1
-		"The first time you ride the 500, it's like, F**K!" -Valentino Rossi ::This is the next paragraph.
-
-		###################################
-		*/
-		
 		//Bookworm txt files are always at least 4 lines long
 		//The first line is the ID number
 		if (f.size() >= 4 && StringUtils.isNumeric(f.get(0))){	
@@ -219,23 +202,11 @@ public class FileHandler {
 		
 		//Write file
 		if (!failedFlag){
-			try {
-				Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8));
-				try{
-					for (String s : toWrite){
-						out.write(s + '\n');
-					}
+			try (Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
+				for (String s : toWrite) {
+					out.write(s + '\n');
 				}
-				catch (IOException e){
-					LOG.error("Ghostwriter: Write failed!");
-					LOG.error(e.getMessage());
-					return false;
-				}
-				finally{
-					out.close();
-				}
-			} 
-			catch (IOException e) {
+			} catch (IOException e) {
 				LOG.error("Ghostwriter: Write failed!");
 				LOG.error(e.getMessage());
 				return false;
@@ -243,7 +214,7 @@ public class FileHandler {
 		}
 		
 		if (failedFlag){
-			printer.gamePrint(Printer.RED + "WRITING TO DISK FAILED!");
+			PRINTER.gamePrint(Printer.RED + "WRITING TO DISK FAILED!");
 			return false;
 		}		
 		return true;
@@ -269,14 +240,14 @@ public class FileHandler {
 	
 	
 	/**
-	 * Removes Java-style comments, whitespace preceding linebreak and pagebreak symbols, and newline characters (\n)
+	 * Removes Java-style comments, whitespace preceding linebreak and page break symbols, and newline characters (\n)
 	 */
 	public static String cleanGHBString(String strIn){
 		// Remove single-line comments and any whitespace preceding them
 		strIn = strIn.replaceAll("(?s)[\\t\\r\\n ]*//.*?((\\n)|(\\r\\n)|(\\Z))","\n");
 		// Remove multi-line comments
 		strIn = strIn.replaceAll("(?s)((/\\*).*?((\\*/)|(\\Z)))|(((/\\*)|(\\A)).*?(\\*/))", "");
-		// Remove whitespace preceding linebreak and pagebreak characters
+		// Remove whitespace preceding linebreak and page break characters
 		strIn = strIn.replaceAll("[\\t\\r\\n ]+(##|" + GHB_PAGE_BREAK + ")", "$1");
 		// Remove newline and carriage return characters
 		strIn = strIn.replaceAll("[\\r\\n]", "");
@@ -353,7 +324,7 @@ public class FileHandler {
 	
 	
 	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
-		printer.gamePrint(Printer.GRAY + "Saving book to file...");
+		PRINTER.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList<>();
 		toWrite.add("//Book saved in GHB format at " + this.getUTC());
 		if (!title.isEmpty()){toWrite.add("title:" + title);}
@@ -373,17 +344,17 @@ public class FileHandler {
 			for (String line : currPage){
 				toWrite.add(line.replaceAll("\\n", "##") + "##");
 			}
-			// Add pagebreaks with line numbers
+			// Add page breaks with line numbers
 			if (i < pages.size()-1){
 				toWrite.add(GHB_PAGE_BREAK + "  // Page " + (i+2));
 			}
 		}
 		if (writeFile(toWrite, savePath)){
-			printer.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
+			PRINTER.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
 			return true;
 		}
 		else{
-			printer.gamePrint(Printer.RED + "WRITING BOOK TO DISK FAILED!");
+			PRINTER.gamePrint(Printer.RED + "WRITING BOOK TO DISK FAILED!");
 			return false;
 		}
 	}

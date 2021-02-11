@@ -115,14 +115,23 @@ Please double-check anything you find here to make sure it's still relevant.
 	writer.newLine();
 	writer.close();
 
-I imagine the files look like this:
 
+Bookworm format:
+
+<id number>
+<title>
+<author>
+(optional)|!|hidden_key_n>|<hidden_data_n> (this may be repeated on successive lines)
+<Book text as a single line>
+<empty line>
+
+e.g.
 ###################################
 46
 Valentino Rossi - Portrait of a speed god
 Mat Oxley
 |!|hiddenkey0|hiddendata0
 |!|hiddenkey1|hiddendata1
-"The first time you ride the 500, it's like, FUCK!" -Valentino Rossi
+"The first time you ride the 500, it's like, F**K!" -Valentino Rossi ::This is the next paragraph.
 
 ###################################

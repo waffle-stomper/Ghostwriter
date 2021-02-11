@@ -27,7 +27,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 	private String bookAuthor = "";
 
 
-	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, boolean pageTurnSoundsIn,
+	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn,
 									 ItemStack currStack, Clipboard globalClipboard) {
 		super(bookInfoIn);  // TODO: Page sound control has been disabled because that constructor is private
 		this.CLIPBOARD = globalClipboard;
@@ -65,7 +65,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 		for (int i=0; i<this.getPageCount(); i++){
 			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
 			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to oldschool formatting codes
+			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
 			String pageText = BookUtilities.deJSONify(this.bookPages().get(i)); // TODO: Should this use the getPage function from IBookInfo instead?
 			pages.add(pageText);
 		}
@@ -111,21 +111,9 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 	
 	@Override
 	public void init() {
-		// TODO: Should this only happen once? (i.e. have an initialized field)
-		
-		// Note that you can use the parameter? in the lambda function like this:
-		// pressed_button.x += 20; // neat!
-		
-		//KeyboardHelper.enableRepeatEvents(true);
-		
 		int buttonWidth = 120;
 		int buttonHeight = 20;
 		int buttonSideOffset = 5;
-		
-		// Is this no longer a thing?
-		//ScaledResolution scaledResolution = new ScaledResolution(this.mc);
-		//int rightXPos = scaledResolution.getScaledWidth() - (buttonWidth + buttonSideOffset);
-		// Temporary hack
 		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
 		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"),
@@ -162,7 +150,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++) {
 			// func_230456_a_ is the old getPageText
-			// TODO: Verify that getString is returning formatting codes (the old function was getFormattedText())
+			// Its getString() method returns the page with old-school formatting codes
 			String s = this.bookInfo.func_230456_a_(i).getString();
 			pages.add(s);
 		}
