@@ -32,6 +32,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	private Button buttonCopySelectedPages;
 	private Button buttonPasteMultiplePages;
 	private Button buttonRemoveSelectedPages;
+	private final List<Button> buttonsHideWhileSigning = new ArrayList<>();
 	
 	//Used for copying multiple pages at a time
 	private int selectedPageA = -1;
@@ -313,6 +314,15 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.field_238748_u_.putText(text);
 	}
 	
+	/**
+	 * Helper method for buttons that need to be hidden when the signing screen is active
+	 */
+	protected Button addPageButton(Button button) {
+		Button b = super.addButton(button);
+		this.buttonsHideWhileSigning.add(b);
+		return b;
+	}
+	
 	
 	/**
 	 * @return X co-ordinate of the next button
@@ -333,75 +343,70 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	}
 	
 	
-	
-	
 	@Override
-	public void init() {
-		// TODO: Should this only happen once? (i.e. have an initialized field)
+	public void init(){
+		this.buttonsHideWhileSigning.clear();
 		
-		// Note that you can use the parameter? in the lambda function like this:
-		// pressed_button.x += 20; // neat!
-			
 		int buttonWidth = 120;
 		int buttonSideOffset = 5;
 		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 		
-		this.addButton(new Button(5, 5, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(5, 5, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("File Browser"),(pressed_button) -> {
 					if (this.minecraft != null) {
 						this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 					}
 				}));
 		
-		this.buttonDisableAutoReload = this.addButton(new Button(5, 45, buttonWidth, BUTTON_HEIGHT,
+		this.buttonDisableAutoReload = this.addPageButton(new Button(5, 45, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Disable AutoReload"), (pressed_button) -> this.disableAutoReload()));
 		
-		this.addButton(new Button(rightXPos, 5, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(rightXPos, 5, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Copy Book"), (pressed_button) -> this.copyBook()));
 		
-		this.buttonPasteBook = this.addButton(new Button(rightXPos, 25, buttonWidth, BUTTON_HEIGHT,
+		this.buttonPasteBook = this.addPageButton(new Button(rightXPos, 25, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Paste Book"), (pressed_button) -> this.pasteBook()));
 		
-		this.buttonSelectPageA = this.addButton(new Button(rightXPos, 50, buttonWidth/2, BUTTON_HEIGHT,
+		this.buttonSelectPageA = this.addPageButton(new Button(rightXPos, 50, buttonWidth/2, BUTTON_HEIGHT,
 				new StringTextComponent("A"), (pressed_button) -> {
 			this.selectedPageA = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonSelectPageB = this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2,
+		this.buttonSelectPageB = this.addPageButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2,
 				BUTTON_HEIGHT, new StringTextComponent("B"), (pressed_button) -> {
 			this.selectedPageB = this.currPage;
 			this.updateButtons();
 		}));
 		
-		this.buttonCopySelectedPages = this.addButton(new Button(rightXPos, 70, buttonWidth, BUTTON_HEIGHT,
+		this.buttonCopySelectedPages = this.addPageButton(new Button(rightXPos, 70, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Copy This Page"),
 				(pressed_button) -> this.copySelectedPagesToClipboard()));
 		
-		this.buttonCutMultiplePages = this.addButton(new Button(rightXPos, 90, buttonWidth, BUTTON_HEIGHT,
+		this.buttonCutMultiplePages = this.addPageButton(new Button(rightXPos, 90, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Cut This Page"), (pressed_button) -> this.cutMultiplePages()));
 		
-		this.buttonPasteMultiplePages = this.addButton(new Button(rightXPos, 130, buttonWidth, BUTTON_HEIGHT,
+		this.buttonPasteMultiplePages = this.addPageButton(new Button(rightXPos, 130, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Paste This Page"),
 				(pressed_button) -> this.pasteMultiplePages(this.currPage)));
 		
-		this.addButton(new Button(rightXPos, 155, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(rightXPos, 155, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Insert Blank Page"), (pressed_button) -> this.insertPage()));
 		
-		this.addButton(new Button(rightXPos, 175, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(rightXPos, 175, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Remove Top Space"), (pressed_button) -> this.collapseTop()));
 		
-		this.addButton(new Button(5, 70, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(5, 70, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Add Signature Pages"), (pressed_button) -> this.addSignaturePages()));
 		
-		this.addButton(new Button(5, 95, buttonWidth, BUTTON_HEIGHT,
+		this.addPageButton(new Button(5, 95, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Preview Signed Book"), (pressed_button) -> {
 			if (this.minecraft != null) {
 				this.minecraft.displayGuiScreen(new GhostwriterSignedPreviewScreen(this));
 			}
 		}));
 		
-		this.buttonRemoveSelectedPages = this.addButton(new Button(rightXPos, 110, buttonWidth, BUTTON_HEIGHT,
+		this.buttonRemoveSelectedPages = this.addPageButton(new Button(rightXPos, 110, buttonWidth, BUTTON_HEIGHT,
 				new StringTextComponent("Remove This Page"),
 				(pressed_button) -> this.removePages(this.selectedPageA, this.selectedPageB)));
 		
@@ -492,6 +497,12 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	public void updateButtons() {
 		super.updateButtons();
 		
+		// Set visibility for buttons hidden while signing
+		// This has to be done first because some buttons will be hidden below (e.g. disable auto reload)
+		for (Button b: this.buttonsHideWhileSigning){
+			b.visible = !this.bookGettingSigned;
+		}
+		
 		// Reset invalid selection
 		if (this.selectedPageA < -1 || this.selectedPageA >= this.getPageCount()) {
 			this.selectedPageA = -1;
@@ -534,7 +545,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste Multiple"));
 		}
 		
-		this.buttonDisableAutoReload.visible = this.autoReloadFile != null;
+		this.buttonDisableAutoReload.visible = this.autoReloadFile != null && !this.bookGettingSigned;
 		
 		// Trim book title to a max of 32 characters. Anything longer an the book will be marked invalid by
 		// the client when you try to read it
