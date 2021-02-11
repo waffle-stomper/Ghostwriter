@@ -1,174 +1,10 @@
-/*
- * 
- * 
-
-NNNNNNNN        NNNNNNNN     OOOOOOOOO     TTTTTTTTTTTTTTTTTTTTTTTEEEEEEEEEEEEEEEEEEEEEE   SSSSSSSSSSSSSSS 
-N:::::::N       N::::::N   OO:::::::::OO   T:::::::::::::::::::::TE::::::::::::::::::::E SS:::::::::::::::S
-N::::::::N      N::::::N OO:::::::::::::OO T:::::::::::::::::::::TE::::::::::::::::::::ES:::::SSSSSS::::::S
-N:::::::::N     N::::::NO:::::::OOO:::::::OT:::::TT:::::::TT:::::TEE::::::EEEEEEEEE::::ES:::::S     SSSSSSS
-N::::::::::N    N::::::NO::::::O   O::::::OTTTTTT  T:::::T  TTTTTT  E:::::E       EEEEEES:::::S            
-N:::::::::::N   N::::::NO:::::O     O:::::O        T:::::T          E:::::E             S:::::S            
-N:::::::N::::N  N::::::NO:::::O     O:::::O        T:::::T          E::::::EEEEEEEEEE    S::::SSSS         
-N::::::N N::::N N::::::NO:::::O     O:::::O        T:::::T          E:::::::::::::::E     SS::::::SSSSS    
-N::::::N  N::::N:::::::NO:::::O     O:::::O        T:::::T          E:::::::::::::::E       SSS::::::::SS  
-N::::::N   N:::::::::::NO:::::O     O:::::O        T:::::T          E::::::EEEEEEEEEE          SSSSSS::::S 
-N::::::N    N::::::::::NO:::::O     O:::::O        T:::::T          E:::::E                         S:::::S
-N::::::N     N:::::::::NO::::::O   O::::::O        T:::::T          E:::::E       EEEEEE            S:::::S
-N::::::N      N::::::::NO:::::::OOO:::::::O      TT:::::::TT      EE::::::EEEEEEEE:::::ESSSSSSS     S:::::S
-N::::::N       N:::::::N OO:::::::::::::OO       T:::::::::T      E::::::::::::::::::::ES::::::SSSSSS:::::S
-N::::::N        N::::::N   OO:::::::::OO         T:::::::::T      E::::::::::::::::::::ES:::::::::::::::SS 
-NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEEEEEEEEEE SSSSSSSSSSSSSSS  
-
-
-
-
-#########################################################################
-#																		#
-#                  FEATURE REQUESTS & STUFF TO DO                       #
-#																		#
-#########################################################################
-
-TODO: Figure out what to do with books over 50 pages long (maybe put them in miscPages?)
-
-TODO: text justification somehow?
-  
-  -automatically generate title page?
-  
-
-
-#########################################################################
-#																		#
-#                             BOOK FORMATS                              #
-#																		#
-#########################################################################
-
-  ~~~~~~~~~~~~~~~~~~~~
-  | GHB File format! |
-  ~~~~~~~~~~~~~~~~~~~~
-  * Java style comments, both single and multi-line, either of which are allowed to start at any point though a line (not just at the start)
-  * Author and title are optional, but they must each be on their own line, and prefaced by author: and title: respectively
-	For example:
-	  title:Kicking Over Sandcastles
-	  author:HCF_Kids
-	The title and author keys can appear anywhere within the file, and are case insensitive
-	Whitespace on either side of the value (e.g. 'title: The day of the Triffids ') will be ignored (the title would be read as 'The day of the Triffids')
-	Only the first instance of each title and author will be accepted. Subsequent lines will be treated as part of the book.
-  * Linebreaks are indicated by a pair of hashes (##) which can be repeated as many times as the user wants. The can be separated by a space but don't have to
-	be. Any whitespace preceding a pair of hashes will be removed.
-  * Ordinary linebreaks will be ignored
-  * Pagebreaks are denoted by four 'greater than' angled brackets (>>>>)
-	Whitespace preceding a pagebreak will be removed.
-  * The linebreak and pagebreak symbols can be escaped with a single backslash if they need to be used literally
-  * Blank lines will be removed
-  * Whitespace at the end of a page will be removed
-	
-  Example file:
-  
-	//This is a single line comment by waffle_stomper on 2014-05-28. It will not appear in the book
-	author:PETN //Comments can start at any point on a line
-	title:Truncating excessively long names
-	/* This is a multi-line comment
-	   None of this will be included in the book
-	   Please note that I had to put a space between the asterisk
-	   and forward-slash to prevent it from terminating the
-	   comment that this is being posted in. In practice there should
-	   be no space between those two
-	* /
-	This is the first page.##
-	This is going to be on a new line!
-	>>>>
-	This is the second page. The pagebreak character can go on the end of the line if you'd like.>>>>
-	This is the third page.
-	You
-	can
-	use
-	as
-	many
-	lines
-	as
-	you
-	like
-	but anything between pagebreaks will be considered as one page (unless it's too long to fit on a single page).
-	Also, don't forget to insert a space
-	if you're splitting a line //See the space there?
-	otherwise your words will be joined together.
-	>>>>
-	title: This is considered to be part of the text for the book.
-
-
-- Inserting signature pages
-
-- Get rid of the singlePage string in the clipboard. It should be handled in miscPages instead
-
-
-- GUI pops up with the opening of both a signed and unsigned book (I found it unnecessary to have to press a key for that).
-
-- Separate buttons for the formatting codes or some other way of easily entering them:
-  1) Italic 2) Bold 3) Underline 4) Strikethrough 5) Obfuscated 6) Reset
-  (and all the colours, if possible)
-  
- - Some method to copy over the .txt format BookWorm books more easily, if at all possible
- 
- 
-- Bookworm uses a double colon (::) as a paragraph break. We need to find a suitable substitute. Single linebreaks aren't enough, but page breaks are too
-  much, espeically if someone uses a bunch of paragraph breaks in a row. (currently using hybrid approach)
-
-
-#########################################################################
-#																		#
-#                          OTHER NOTES                                  #
-#																		#
-#########################################################################
-
-Note on these notes: Some of the following information may be out of date. 
-Mojang loves to change things for seemingly no reason.
-Please double-check anything you find here to make sure it's still relevant.
-
- - TITLES CANNOT BE OVER 16 CHARACTERS LONG. THIS IS GOING TO BE AN ISSUE (for now I'm truncating them)
-
- - There is a 256 character/page limit. Thanks Mojang!
-
- - Are Bookworm pagebreaks always preceded by a space?
-
- - 13 lines long, but the font isn't monospaced, so there are an arbitrary number of characters on each line.
-
- - If you set the title before you hit the signing screen, the book is automatically signed. This probably isn't a huge issue though.
-
- - Bookworm save algorithm:
-	writer.write(id+"");
-	writer.newLine();
-	writer.write(title);
-	writer.newLine();
-	writer.write(author);
-	writer.newLine();
-	for (String s : hiddenData.keySet()) {
-			writer.write("|!|" + s + "|" + hiddenData.get(s));
-			writer.newLine();
-	}
-	writer.write(text);
-	writer.newLine();
-	writer.close();
-	
-I imagine the files look like this:
-
-###################################
-46
-Valentino Rossi - Portrait of a speed god
-Mat Oxley
-|!|hiddenkey0|hiddendata0
-|!|hiddenkey1|hiddendata1
-"The first time you ride the 500, it's like, FUCK!" -Valentino Rossi
-
-###################################
- */
-
-
 package wafflestomper.ghostwriter;
 
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.fonts.TextInputUtil;
 import net.minecraft.client.gui.screen.EditBookScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -468,12 +304,15 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 		this.clipboard.clone(temp);
 	}
 
-
-	// TODO: Check that this works as intended
-	// TODO: The 1.15 version of this used to delete selected text. Does that still happen?
+	
 	public void insertTextIntoPage(String text) {
+		if (this.bookGettingSigned){
+			this.field_238749_v_.putText(text);
+			return;
+		}
 		this.field_238748_u_.putText(text);
 	}
+	
 	
 	/**
 	 * @return X co-ordinate of the next button
@@ -742,12 +581,21 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			// params are matrixStack, x, y, color
 			this.font.drawString(matrixStack, lenText, 169, 20, 0xFF3333);
 			
-			StringBuilder sb = new StringBuilder();
-			sb.append("Warning: the vanilla client restricts titles to 15 characters. ");
-			sb.append("Set longer titles at your own risk");
-			StringTextComponent stc = new StringTextComponent(sb.toString());
+			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
+					   "Set longer titles at your own risk";
+			StringTextComponent stc = new StringTextComponent(s);
 			// params are text, x, y, width, color
 			this.font.func_238418_a_(stc, 153, 116, 114, 0xFF3333);
 		}
+	}
+	
+	
+	@Override
+	public boolean keyPressedInTitle(int keyCode, int scanCode, int modifiers) {
+		if (Screen.isPaste(keyCode)) {
+			this.field_238749_v_.insertClipboardText();
+			return true;
+		}
+		return super.keyPressedInTitle(keyCode, scanCode, modifiers);
 	}
 }
