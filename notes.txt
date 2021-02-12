@@ -16,10 +16,9 @@ N::::::N        N::::::N   OO:::::::::OO         T:::::::::T      E:::::::::::::
 NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEEEEEEEEEE SSSSSSSSSSSSSSS
 
 
-
-
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
+Mappings can be found in External Libraries > net.minecraft:mappings_snapshot... > mcp_snapshot...
 
 
 #########################################################################
@@ -81,40 +80,24 @@ Key codes can be found at the bottom of net.minecraft.client.util.InputMappings 
 	>>>>
 	title: This is considered to be part of the text for the book.
 
+  ~~~~~~~~~~~~~~~~~~~~~~~~~
+  | Bookworm File format! |
+  ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#########################################################################
-#																		#
-#                          OTHER NOTES                                  #
-#																		#
-#########################################################################
-
-Note on these notes: Some of the following information may be out of date.
-Mojang loves to change things for seemingly no reason.
-Please double-check anything you find here to make sure it's still relevant.
-
- - TITLES CANNOT BE OVER 16 CHARACTERS LONG. THIS IS GOING TO BE AN ISSUE (for now I'm truncating them)
-
- - There is a 256 character/page limit. Thanks Mojang!
-
- - Are Bookworm pagebreaks always preceded by a space?
-
- - 13 lines long, but the font isn't monospaced, so there are an arbitrary number of characters on each line.
-
- - Bookworm save algorithm:
-	writer.write(id+"");
-	writer.newLine();
-	writer.write(title);
-	writer.newLine();
-	writer.write(author);
-	writer.newLine();
-	for (String s : hiddenData.keySet()) {
-			writer.write("|!|" + s + "|" + hiddenData.get(s));
-			writer.newLine();
-	}
-	writer.write(text);
-	writer.newLine();
-	writer.close();
-
+== Bookworm save algorithm: ==
+    writer.write(id+"");
+    writer.newLine();
+    writer.write(title);
+    writer.newLine();
+    writer.write(author);
+    writer.newLine();
+    for (String s : hiddenData.keySet()) {
+            writer.write("|!|" + s + "|" + hiddenData.get(s));
+            writer.newLine();
+    }
+    writer.write(text);
+    writer.newLine();
+    writer.close();
 
 Bookworm format:
 
@@ -135,3 +118,25 @@ Mat Oxley
 "The first time you ride the 500, it's like, F**K!" -Valentino Rossi ::This is the next paragraph.
 
 ###################################
+
+#########################################################################
+#																		#
+#                          OTHER NOTES                                  #
+#																		#
+#########################################################################
+
+Note on these notes: Some of the following information may be out of date.
+Mojang loves to change things for seemingly no reason.
+Please double-check anything you find here to make sure it's still relevant.
+
+ - The vanilla client restricts titles to 15 characters (as of 1.16.1), but the server will accept many more
+
+ - The vanilla client will mark any book with a title longer than 32 characters as invalid and will refuse to display it
+
+ - There is a 256 character/page limit for multiplayer servers (as of 1.16.1)
+   Single player saves have a much higher limit
+
+ - A standard page is 13 lines long, but the font isn't monospaced so there are an arbitrary
+   number of characters on each line
+
+ - Under some conditions you can write up to 15 lines, but as of 1.16.1 the ReadBookScreen will only display 14 lines
