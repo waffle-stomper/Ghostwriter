@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BookUtilities {
-	public static final int BOOK_TEXT_WIDTH = 116;  // TODO: I think the text width might be 114 pixels now
+	public static final int BOOK_TEXT_WIDTH = 114;
 	public static final char SPLIT_CHAR = '\u1337';
 	private static final Minecraft mc = Minecraft.getInstance();
 	
