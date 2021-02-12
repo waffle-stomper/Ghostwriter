@@ -10,10 +10,13 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -52,7 +55,10 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	private final FileHandler fileHandler;
 	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
 	
-
+	private int currPageLineCount = 0;
+	private long lastPageLineCountUpdate = 0;
+	
+	
 	public GhostwriterEditBookScreen(PlayerEntity editingPlayer, ItemStack book, Hand hand, Clipboard clipboard) {
 		super(editingPlayer, book, hand);
 		this.clipboard = clipboard;
@@ -584,6 +590,27 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	}
 	
 	
+	/**
+	 * Counts the lines on the current page, returning a cached version most of the time
+	 *
+	 * Unfortunately the vanilla code makes it borderline impossible to extract the word-wrapped lines that
+	 * EditBookScreen uses in render(), so we have to split it ourselves
+	 *
+	 * Note that this will need to be updated periodically so that it matches the code in EditBookScreen
+	 */
+	public int getCurrPageLineCount(){
+		if (System.currentTimeMillis() - lastPageLineCountUpdate >= 250) {
+			MutableInt lineCount = new MutableInt();
+			CharacterManager charactermanager = this.font.func_238420_b_();
+			charactermanager.func_238353_a_(this.getCurrPageText(), 114, Style.EMPTY, true,
+					(p_238762_6_, p_238762_7_, p_238762_8_) -> lineCount.getAndIncrement());
+			this.currPageLineCount = lineCount.getValue();
+			this.lastPageLineCountUpdate = System.currentTimeMillis();
+		}
+		return this.currPageLineCount;
+	}
+	
+	
 	@Override
 	@ParametersAreNonnullByDefault
 	public void render(MatrixStack matrixStack , int mouseX, int mouseY, float partialTicks) {
@@ -613,6 +640,23 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			StringTextComponent lengthWarning = new StringTextComponent(s);
 			// params are text, x, y, width, color
 			this.font.func_238418_a_(lengthWarning, 153, 116, 114, 0xFF3333);
+		}
+		
+		// Add warnings about character and line limits
+		// Things get weird over 256 characters, so we don't bother showing the line warning in that case
+		if (!this.bookGettingSigned) {
+			String warning = "";
+			if (this.getCurrPageText().length() > 256){
+				warning = "Over 256 char limit!";
+			}
+			else if (this.getCurrPageLineCount() > 13){
+				warning = "Over 13 line limit!";
+			}
+			
+			if (warning.length() > 0) {
+				this.font.drawString(matrixStack, "Warning:", 5, 176, 0xFF3333);
+				this.font.drawString(matrixStack, warning, 5, 185, 0xFF3333);
+			}
 		}
 	}
 	
