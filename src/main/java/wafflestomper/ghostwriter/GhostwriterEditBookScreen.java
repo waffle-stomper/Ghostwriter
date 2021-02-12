@@ -2,6 +2,7 @@ package wafflestomper.ghostwriter;
 
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.fonts.TextInputUtil;
 import net.minecraft.client.gui.screen.EditBookScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -10,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -587,17 +589,30 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	public void render(MatrixStack matrixStack , int mouseX, int mouseY, float partialTicks) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
-		// Show long title warning
+		// Render long title and warning (if necessary)
 		if (this.bookGettingSigned && this.bookTitle.length() > 15){
-			String lenText = "Title length: " + this.bookTitle.length();
+			// Show the title length
+			String textLen = "Title length: " + this.bookTitle.length();
 			// params are matrixStack, x, y, color
-			this.font.drawString(matrixStack, lenText, 169, 20, 0xFF3333);
+			this.font.drawString(matrixStack, textLen, 169, 20, 0xFF3333);
 			
+			// Add extra background width amd re-render the title because the new background covers up the vanilla title
+			String textTitle = this.bookTitle;
+			textTitle += (this.updateCount / 6 % 2 == 0 ? TextFormatting.BLACK : TextFormatting.GRAY) + "_";
+			int bookLeftSide = (this.width - 192) / 2;
+			int titleWidth = this.getTextWidth(textTitle);
+			int titleMinX = bookLeftSide + 36 + (114 - titleWidth) / 2;
+			int titleMaxX = titleMinX + titleWidth;
+			// color for the fill() method is MSB->LSB: alpha, r, g, b, (each 8 bits)
+			AbstractGui.fill(matrixStack, titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
+			this.font.drawString(matrixStack, textTitle, (float)(titleMinX), 50.0F, 0);
+			
+			// Show the long title warning
 			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
 					   "Set longer titles at your own risk";
-			StringTextComponent stc = new StringTextComponent(s);
+			StringTextComponent lengthWarning = new StringTextComponent(s);
 			// params are text, x, y, width, color
-			this.font.func_238418_a_(stc, 153, 116, 114, 0xFF3333);
+			this.font.func_238418_a_(lengthWarning, 153, 116, 114, 0xFF3333);
 		}
 	}
 	
