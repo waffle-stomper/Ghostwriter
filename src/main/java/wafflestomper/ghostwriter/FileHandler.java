@@ -338,7 +338,7 @@ public class FileHandler {
 			}
 			// Convert all escaped newline characters to real newline characters
 			pageAsString = pageAsString.replaceAll("\\\\n", "\\\n");
-			// Split the string into 116 pixel maximum lines
+			// Split the string into book width lines
 			List<String> currPage = BookUtilities.splitStringIntoLines(pageAsString);
 			// Replace newline characters with double hashes and add the double hashes to the end of each line
 			for (String line : currPage){

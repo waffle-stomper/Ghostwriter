@@ -247,6 +247,8 @@ public class BookUtilities {
 	/**
 	 * Inserts splitchar into a string to wrap it within the specified width.
 	 */
+	// TODO: Why does this insert SPLIT_CHAR instead of returning an array of line start positions or an array of
+	//       line strings? Maybe it's worth doing something like the new vanilla code?
 	private static String wrapFormattedStringToWidth(String strIn, int maxWidth){
 		int maxCharsInWidth = sizeStringToWidth(strIn, maxWidth);
 
@@ -266,17 +268,9 @@ public class BookUtilities {
 	}
 	
 	
-	
-	
-	
-	
- //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-
-	
 	/**
 	 * Removes trailing newline characters then splits the string into a list
-	 * of 116 pixel wide strings (since that's the width of a book).
+	 * of book width strings
 	 * Note: this won't split it up into pages. If you want to do that too,
 	 * you should use stringToPages()
 	 * Note 2: this preserves trailing whitespace (unlike FontRenderer.listFormattedStringToWidth())
@@ -301,7 +295,7 @@ public class BookUtilities {
 	 * Splits a monolithic string into a list of strings, each representing one book page.
 	 *
 	 * Note that while the single player version will allow an almost unlimited number of characters
-	 * on the same line, Spigot, (and likely the vanilla server) will only allow 256. This, combined with extra format
+	 * on the same page, Spigot, (and likely the vanilla server) will only allow 256. This, combined with extra format
 	 * characters being inserted was causing pages to be split in new and strange places
 	 */
 	public static List<String> stringToPages(String str){
@@ -348,7 +342,7 @@ public class BookUtilities {
 	
 	/**
 	 * Splits a monolithic string into a list of strings, each representing one 
-	 * book page. New pages are started after 13 lines, 256 character, or the page break symbol (whichever is first)
+	 * book page. New pages are started after 13 lines, 256 characters, or the page break symbol (whichever is first)
 	 * @param str Input string
 	 * @param pageBreakString The symbol that denotes a page break (this will be removed during conversion)
 	 * @return ArrayList of Strings representing pages

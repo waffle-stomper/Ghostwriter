@@ -140,3 +140,5 @@ Please double-check anything you find here to make sure it's still relevant.
    number of characters on each line
 
  - Under some conditions you can write up to 15 lines, but as of 1.16.1 the ReadBookScreen will only display 14 lines
+
+ - Lines used to be 116 pixels wide but now seem to be 114 (as of 1.16.1)
