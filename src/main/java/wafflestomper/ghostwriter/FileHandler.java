@@ -342,7 +342,7 @@ public class FileHandler {
 			List<String> currPage = BookUtilities.splitStringIntoLines(pageAsString);
 			// Replace newline characters with double hashes and add the double hashes to the end of each line
 			for (String line : currPage){
-				toWrite.add(line.replaceAll("\\n", "##") + "##");
+				toWrite.add(line.replaceAll("\\n", "##"));
 			}
 			// Add page breaks with line numbers
 			if (i < pages.size()-1){

@@ -283,8 +283,14 @@ public class BookUtilities {
 		//Split string at newline characters
 		String[] lines = str.split("\\n");
 		List<String> out = new ArrayList<>();
-		for (String line : lines){
-			out.addAll(Arrays.asList(wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR)));
+		for (int i=0; i<lines.length; i++){
+			String line = lines[i];
+			// Add newline characters back in
+			if (i < lines.length - 1){
+				line += "\n";
+			}
+			String splitLine = wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH);
+			out.addAll(Arrays.asList(splitLine.split("" + SPLIT_CHAR)));
 		}
 		//return Arrays.asList(wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR));
 		return out;
