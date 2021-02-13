@@ -649,8 +649,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			if (this.getCurrPageText().length() > 256){
 				warning = "Over 256 char limit!";
 			}
-			else if (this.getCurrPageLineCount() > 13){
-				warning = "Over 13 line limit!";
+			else if (this.getCurrPageLineCount() > 14){
+				warning = "Over 14 line limit!";
 			}
 			
 			if (warning.length() > 0) {
