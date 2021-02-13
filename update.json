@@ -1,7 +1,7 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.16.1-recommended": "2.2.1",
+    "1.16.1-recommended": "2.2.2",
     "1.15.2-recommended": "2.0.6",
     "1.15.1-recommended": "2.0.5",
     "1.14.4-recommended": "2.0.4",
@@ -13,6 +13,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.2.2": "Modernize line splitting algorithm (for saving and loading)\nBump page size warning to 14 lines",
     "2.2.1": "Add warnings about excessive characters and lines on a page\nStop inserting GHB line breaks at the end of every line when saving\nDecrease expected page width to 114 pixels to match vanilla",
     "2.2.0": "Hide unused buttons when signing\nAdd extra background for contrast when entering long titles",
     "2.1.9": "Format buttons can now be used when setting the title\nAdded pasting from the clipboard into the title",

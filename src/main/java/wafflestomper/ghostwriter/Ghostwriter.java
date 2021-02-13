@@ -27,7 +27,7 @@ import java.io.File;
 public class Ghostwriter{
 	
 	private final Minecraft mc = Minecraft.getInstance();
-	public Clipboard globalClipboard = new Clipboard();
+	public final Clipboard globalClipboard = new Clipboard();
 	public static final Logger LOG = LogManager.getLogger();
 	public static File currentPath; 
 	private boolean lecternArmed = false;
@@ -44,7 +44,6 @@ public class Ghostwriter{
 	}
 
 
-	// TODO: Is this even right? We're closing the container I think?
 	// TODO: Add check for 'air' stack instead of book (I think there's a race condition where this might get called too early)
 	// TODO: Refactor this to remove the duplicated code with guiOpen() below
 	/**

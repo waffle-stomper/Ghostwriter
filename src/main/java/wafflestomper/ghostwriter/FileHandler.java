@@ -165,20 +165,21 @@ public class FileHandler {
 	 */
 	private boolean loadBookwormBook(File filePath){
 		List<String> f = readFile(filePath);
-		//Bookworm txt files are always at least 4 lines long
-		//The first line is the ID number
+		// Bookworm txt files are always at least 4 lines long
+		// The first line is the ID number
 		if (f.size() >= 4 && StringUtils.isNumeric(f.get(0))){	
-			//There's a good chance this is a bookworm book
+			// There's a good chance this is a bookworm book
 			this.clipboard.clearBook();
 			this.clipboard.title = BookUtilities.truncateStringChars(f.get(1), "..", 16, false);
 			this.clipboard.author = f.get(2);
 			String bookText = f.get(f.size()-1);
 			
-			//split the book string anywhere there are two or more double colons
+			// Split the book string anywhere there are two or more double colons, then split those into minecraft pages
 			String[] largePages = bookText.split("(\\s::){2,}");
 			for (String largePage : largePages){
 				largePage = largePage.replaceAll("\\s*::\\s*", "\n  ");
-				this.clipboard.pages.addAll(BookUtilities.stringToPages(largePage));
+				BookUtilities.Pages pages = BookUtilities.splitIntoPages(largePage, BookUtilities.BOOK_MAX_LINES);
+				this.clipboard.pages.addAll(pages.asStrings());
 			}
 			
 			this.clipboard.bookInClipboard = true;
@@ -262,12 +263,16 @@ public class FileHandler {
 			//File was not read successfully
 			return false;
 		}
-		//Remove comments and anything else that can't be stored in a Minecraft book
+		// Add newline characters back in
 		StringBuilder concatFile = new StringBuilder();
 		for (String line : rawFile){
 			concatFile.append(line).append("\n");
 		}
-		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFile.toString(), ">>>><<<<>>>><<<<"));
+		// Split into pages
+		String pageBreak = ">>>><<<<>>>><<<<";
+		BookUtilities.Pages splitPages;
+		splitPages = BookUtilities.splitIntoPages(concatFile.toString(), BookUtilities.BOOK_MAX_LINES, pageBreak);
+		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
 		this.lastLoadedBook = filePath;
@@ -314,8 +319,9 @@ public class FileHandler {
 		
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
 		concatFileStr = concatFileStr.replaceAll("##", "\\\n");
-
-		book.pages.addAll(BookUtilities.stringWithPageBreaksToPages(concatFileStr, GHB_PAGE_BREAK));
+		BookUtilities.Pages splitPages;
+		splitPages = BookUtilities.splitIntoPages(concatFileStr, BookUtilities.BOOK_MAX_LINES, GHB_PAGE_BREAK);
+		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
 		this.lastLoadedBook = filePath;
@@ -323,7 +329,7 @@ public class FileHandler {
 	}
 	
 	
-	public boolean saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
+	public void saveBookToGHBFile(String title, String author, List<String> pages, File savePath){
 		PRINTER.gamePrint(Printer.GRAY + "Saving book to file...");
 		List<String> toWrite = new ArrayList<>();
 		toWrite.add("//Book saved in GHB format at " + this.getUTC());
@@ -338,12 +344,16 @@ public class FileHandler {
 			}
 			// Convert all escaped newline characters to real newline characters
 			pageAsString = pageAsString.replaceAll("\\\\n", "\\\n");
-			// Split the string into book width lines
-			List<String> currPage = BookUtilities.splitStringIntoLines(pageAsString);
-			// Replace newline characters with double hashes and add the double hashes to the end of each line
-			for (String line : currPage){
+			
+			// Split the string into book width lines. Since the text should be coming from a valid
+			// book page, we shouldn't have to split it into pages
+			BookUtilities.PageDetails currPage = BookUtilities.splitIntoPages(pageAsString, 0).get(0);
+			
+			// Replace newline characters with double hashes
+			for (String line : currPage.lines){
 				toWrite.add(line.replaceAll("\\n", "##"));
 			}
+			
 			// Add page breaks with line numbers
 			if (i < pages.size()-1){
 				toWrite.add(GHB_PAGE_BREAK + "  // Page " + (i+2));
@@ -351,29 +361,10 @@ public class FileHandler {
 		}
 		if (writeFile(toWrite, savePath)){
 			PRINTER.gamePrint(Printer.GREEN + "Book saved to: " + savePath);
-			return true;
 		}
 		else{
 			PRINTER.gamePrint(Printer.RED + "WRITING BOOK TO DISK FAILED!");
-			return false;
 		}
-	}
-	
-	
-	/**
-	 * This supports legacy type saving where the filename and path are automatically generated
-	 * @param title Book title
-	 * @param author Book author
-	 * @param pages Page content
-	 * @return Success If the book saved successfully
-	 */
-	@Deprecated
-	public boolean saveBookToGHBFile(String title, String author, List<String> pages){
-		String utcTime = getUTC();
-		title = title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
-		author = author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
-		File saveFile = new File(this.bookSavePath, title + "_" + author + "_" + utcTime + ".ghb");
-		return(saveBookToGHBFile(title, author, pages, saveFile));
 	}
 	
 	

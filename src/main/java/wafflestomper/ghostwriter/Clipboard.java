@@ -7,10 +7,10 @@ public class Clipboard {
 	//Stores entire books
 	public String title = ""; 
 	public String author = ""; // TODO: Remove author now that we can't set it?
-	public List<String> pages = new ArrayList<>();
+	public final List<String> pages = new ArrayList<>();
 	public boolean bookInClipboard = false;
 	/** Used for copying one or more pages (so we don't have to wipe out a book in the clipboard) */
-	public List<String> miscPages = new ArrayList<>();
+	public final List<String> miscPages = new ArrayList<>();
 	
 	
 	public Clipboard(){}

@@ -1,23 +1,26 @@
 package wafflestomper.ghostwriter;
 
 import com.google.gson.JsonParseException;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+
 public class BookUtilities {
-	public static final int BOOK_TEXT_WIDTH = 114;
-	public static final char SPLIT_CHAR = '\u1337';
+	public static final int BOOK_TEXT_WIDTH = 114;  // TODO: Find any hardcoded values and replace them
+	public static final int BOOK_MAX_LINES = 14;  // TODO: find any hardcoded values and replace them
 	private static final Minecraft mc = Minecraft.getInstance();
 	
 	
-	// TODO: Find out where the extra format characters are coming from and try to suppress them upstream
-	//       rather than just removing them later. I suspect the issue is books that have been saved on servers
-	//       running old Minecraft versions, but I'm not totally sure
 	/**
 	 * Removes duplicate or unnecessary formatting characters
 	 * Note that a color code will cancel a style code (e.g. §n§cX will just show as red and not underlined)
@@ -25,6 +28,9 @@ public class BookUtilities {
 	 * Note that a sequence like Red Bold Red will be preserved because the second red is needed to cancel the bold
 	 */
 	public static String removeRedundantFormatChars(String in, String pageBreakString){
+		// TODO: Find out where the extra format characters are coming from and try to suppress them upstream
+		//       rather than just removing them later. I suspect the issue is books that have been saved on servers
+		//       running old Minecraft versions, but I'm not totally sure
 		// Split the string into pages
 		String[] splitByPage = in.split(pageBreakString);
 		StringBuilder cleanedPage = new StringBuilder();
@@ -99,12 +105,74 @@ public class BookUtilities {
 	
 	
 	/**
-	 * Prefix and suffix are optional, but if they are set to anything other than a blank string, they will be counted
+	 * Splits a string into pages of word-wrapped lines
+	 * Inspired by code in EditBookScreen that splits the current page for rendering
+	 * Note that this function preserves newline characters at the end of lines, where the vanilla code removes them
+	 *
+	 * @param inStr String to split
+	 * @param maxLinesPerPage Maximum number of lines on a single page (<= 0 if you want all lines on a single page)
+	 * @return List of pages
+	 */
+	public static Pages splitIntoPages(String inStr, int maxLinesPerPage){
+		// TODO: Does this work correctly with signed books?
+		Pages pages = new Pages();
+		IntList lineStartIndices = new IntArrayList();
+		List<String> lines = new ArrayList<>();
+		List<ITextComponent> stylizedLines = new ArrayList<>();
+		MutableInt pageStartPos = new MutableInt(0);
+		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.func_238420_b_();
+		charactermanager.func_238353_a_(inStr, BOOK_TEXT_WIDTH, Style.EMPTY, true,
+				(style, start, end) -> {
+			lineStartIndices.add(start - pageStartPos.getValue());
+			String line = inStr.substring(start, end);
+			lines.add(line);
+			stylizedLines.add(new StringTextComponent(line).setStyle(style));
+			
+			if (lines.size() == maxLinesPerPage){
+				// The current page is full. Store it and start a new one
+				String currPageText = inStr.substring(pageStartPos.getValue(), end);
+				pages.add(new PageDetails(currPageText, lineStartIndices, lines, stylizedLines));
+				pageStartPos.setValue(end);
+				lineStartIndices.clear();
+				lines.clear();
+				stylizedLines.clear();
+			}
+		});
+		
+		// Add anything remaining to last page
+		if (lines.size() > 0) {
+			String currPageText = inStr.substring(pageStartPos.getValue());
+			pages.add(new PageDetails(currPageText, lineStartIndices, lines, stylizedLines));
+		}
+		
+		return pages;
+	}
+	
+	
+	/**
+	 * Helper function that first splits by page break, then into book sized pages and lines
+	 * @param strIn String to split
+	 * @param maxLinesPerPage Maximum number of lines to allow on a single page. 0 is infinite
+	 * @param pageBreak Page break symbol
+	 */
+	public static Pages splitIntoPages(String strIn, int maxLinesPerPage, String pageBreak){
+		Pages pages = new Pages();
+		for (String pageBroken: strIn.split(pageBreak)){
+			pages.addAll(splitIntoPages(pageBroken, maxLinesPerPage));
+		}
+		return pages;
+	}
+	
+	
+	/**
+	 * Shortens a string to a specific width
+	 * Substitute chars are optional, but if they are set to anything other than a blank string, they will be counted
 	 * as part of the length of the output string.
 	 * KeepRightSide determines whether the right (end of the string) or left (start of the string) should be kept
 	 * (i.e. that the opposite end should be removed).
 	 */
 	public static String truncateStringPixels(String strIn, String substituteChars, int maxWidth, boolean keepRightSide){
+		// TODO: find out if we can replace some of this code with a vanilla method
 		FontRenderer f = mc.fontRenderer;
 		if (f.getStringWidth(strIn) <= maxWidth){
 			return strIn;
@@ -163,220 +231,6 @@ public class BookUtilities {
 	
 	
 	/**
-	 * Checks if the char code is a hexadecimal character, used to set colour.
-	 */
-	private static boolean isFormatColor(char par0)
-	{
-		return par0 >= 48 && par0 <= 57 || par0 >= 97 && par0 <= 102 || par0 >= 65 && par0 <= 70;
-	}
-
-
-	// TODO: It looks like a lot has changed internally in books. Check that this still functions as intended
-	//       It might be worth looking into replacing this with vanilla functions?
-	/**
-	 * Determines how many characters from the string will fit into the specified width.
-	 */
-	private static int sizeStringToWidth(String par1Str, int par2)
-	{
-		int j = par1Str.length();
-		int k = 0;
-		int l = 0;
-		int i1 = -1;
-
-		for (boolean flag = false; l < j; ++l)
-		{
-			char c0 = par1Str.charAt(l);
-
-			switch (c0)
-			{
-				case 10:
-					--l;
-					break;
-				case 167:
-					if (l < j - 1)
-					{
-						++l;
-						char c1 = par1Str.charAt(l);
-
-						if (c1 != 108 && c1 != 76)
-						{
-							if (c1 == 114 || c1 == 82 || isFormatColor(c1))
-							{
-								flag = false;
-							}
-						}
-						else
-						{
-							flag = true;
-						}
-					}
-
-					break;
-				case 32:
-					i1 = l;
-				default:
-					// TODO: Does the function still work now that we've replaced getCharWidth with getStringWidth?
-					//       Note that I'm also converting the character back to a string
-					k += mc.fontRenderer.getStringWidth(String.valueOf(c0));
-
-					if (flag)
-					{
-						++k;
-					}
-			}
-
-			if (c0 == 10)
-			{
-				++l;
-				i1 = l;
-				break;
-			}
-
-			if (k > par2)
-			{
-				break;
-			}
-		}
-
-		return l != j && i1 != -1 && i1 < l ? i1 : l;
-	}
-	
-	
-	/**
-	 * Inserts splitchar into a string to wrap it within the specified width.
-	 */
-	// TODO: Why does this insert SPLIT_CHAR instead of returning an array of line start positions or an array of
-	//       line strings? Maybe it's worth doing something like the new vanilla code?
-	private static String wrapFormattedStringToWidth(String strIn, int maxWidth){
-		int maxCharsInWidth = sizeStringToWidth(strIn, maxWidth);
-
-		if (strIn.length() <= maxCharsInWidth){
-			return strIn;
-		}
-		else{
-			//grab the most characters you can fit into maxWidth and put it in s1
-			String s1 = strIn.substring(0, maxCharsInWidth);
-			//grab the very next character after that string and put it in c0
-			char c0 = strIn.charAt(maxCharsInWidth);
-			boolean newlineOrSpace = c0 == 32 || c0 == 10; //Check if it's a newline character or a space
-			String s2 = strIn.substring(maxCharsInWidth + (newlineOrSpace ? 1 : 0));
-			if (newlineOrSpace){s1 += c0;}
-			return s1 + SPLIT_CHAR + wrapFormattedStringToWidth(s2, maxWidth);
-		}
-	}
-	
-	
-	/**
-	 * Removes trailing newline characters then splits the string into a list
-	 * of book width strings
-	 * Note: this won't split it up into pages. If you want to do that too,
-	 * you should use stringToPages()
-	 * Note 2: this preserves trailing whitespace (unlike FontRenderer.listFormattedStringToWidth())
-	 */
-	public static List<String> splitStringIntoLines(String str){
-		//Trim trailing newline characters
-		while (str.endsWith("\n") || str.endsWith(" ")){
-			str = str.substring(0, str.length() - 1);
-		}
-		//Split string at newline characters
-		String[] lines = str.split("\\n");
-		List<String> out = new ArrayList<>();
-		for (int i=0; i<lines.length; i++){
-			String line = lines[i];
-			// Add newline characters back in
-			if (i < lines.length - 1){
-				line += "\n";
-			}
-			String splitLine = wrapFormattedStringToWidth(line, BOOK_TEXT_WIDTH);
-			out.addAll(Arrays.asList(splitLine.split("" + SPLIT_CHAR)));
-		}
-		//return Arrays.asList(wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH).split("" + SPLIT_CHAR));
-		return out;
-	}
-	
-	
-	/**
-	 * Splits a monolithic string into a list of strings, each representing one book page.
-	 *
-	 * Note that while the single player version will allow an almost unlimited number of characters
-	 * on the same page, Spigot, (and likely the vanilla server) will only allow 256. This, combined with extra format
-	 * characters being inserted was causing pages to be split in new and strange places
-	 */
-	public static List<String> stringToPages(String str){
-		String wrapped = wrapFormattedStringToWidth(str, BOOK_TEXT_WIDTH);
-		List<String> pages = new ArrayList<>();
-		int newLineCount = 0;
-		int charCount = 0;
-		char currChar;
-		int lastSubstringEnd = 0;
-		for (int i=0; i<wrapped.length(); i++){
-			currChar = wrapped.charAt(i);
-			if (currChar == SPLIT_CHAR){
-				newLineCount++;
-			}
-			else{
-				charCount++;
-			}
-			
-			if (newLineCount == 13){
-				//we can throw away this line break
-				pages.add(wrapped.substring(lastSubstringEnd, i).replaceAll("" + SPLIT_CHAR, ""));
-				lastSubstringEnd = i+1;
-				newLineCount = 0;
-				charCount = 0;
-			}
-			else if (charCount == 256){
-				//go back and find the last instance of a space or newline
-				while(i>=0 && currChar != '\n' && currChar != ' ' && currChar != SPLIT_CHAR){
-					i--;
-					currChar = wrapped.charAt(i);
-				}
-				pages.add(wrapped.substring(lastSubstringEnd, i).replaceAll("" + SPLIT_CHAR, ""));
-				lastSubstringEnd = i+1;
-				newLineCount = 0;
-				charCount = 0;
-			}
-			//add the last little bit of the string as a page
-			if (i == wrapped.length()-1 && lastSubstringEnd < i){
-				pages.add(wrapped.substring(lastSubstringEnd).replaceAll("" + SPLIT_CHAR, ""));
-			}
-		}
-		return pages;
-	}
-	
-	/**
-	 * Splits a monolithic string into a list of strings, each representing one 
-	 * book page. New pages are started after 13 lines, 256 characters, or the page break symbol (whichever is first)
-	 * @param str Input string
-	 * @param pageBreakString The symbol that denotes a page break (this will be removed during conversion)
-	 * @return ArrayList of Strings representing pages
-	 */
-	public static List<String> stringWithPageBreaksToPages(String str, String pageBreakString){
-		//Remove any page breaks from the beginning of the string
-		while (str.startsWith(pageBreakString)){
-			str = str.substring(pageBreakString.length());
-		}
-		String[] pageBroken = str.split(pageBreakString);
-		List<String> out = new ArrayList<>();
-		for (String largePage : pageBroken){
-			out.addAll(stringToPages(largePage));
-		}
-		
-		// This is a quick hack to remove blank pages until I can figure out why they're
-		//   being inserted erroneously
-		// TODO: FIX THIS PROPERLY
-		List<String> cleanedOut = new ArrayList<>();
-		for (String page : out){
-			if (page.replaceAll("[ \n\r\t]|(\\u00A7.)", "").length() > 0){
-				cleanedOut.add(page);
-			}
-		}
-		
-		return cleanedOut;
-	}
-	
-	
-	/**
 	 * Converts the new JSON strings with their escaped quotation marks back into regular old strings
 	 * Hopefully this is just temporary.
 	 * EditBookScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
@@ -390,8 +244,70 @@ public class BookUtilities {
 			}
 		}
 		catch (JsonParseException jsonparseexception){
-			//Do nothing for now
+			// jsonIn was probably just a normal string, so there's no need to freak out the end user
 		}
 		return(jsonIn);
+	}
+	
+	
+	static class PageDetails{
+		public final String fullPageText;
+		public final int[] lineStartIndices;
+		public final String[] lines;
+		public final ITextComponent[] stylizedLines;
+		
+		PageDetails(String fullPageText, IntList lineStartIndices, List<String> lines, List<ITextComponent> stylizedLines){
+			this.fullPageText = fullPageText;
+			this.lineStartIndices = lineStartIndices.toIntArray();
+			this.lines = lines.toArray(new String[0]);
+			this.stylizedLines = stylizedLines.toArray(new ITextComponent[0]);
+		}
+	}
+	
+	
+	static class Pages{
+		private final List<BookUtilities.PageDetails> pages = new ArrayList<>();
+		
+		/**
+		 * @return The requested page, or a blank page if index is invalid
+		 */
+		public BookUtilities.PageDetails get(int index){
+			if (index >= 0 && index < this.pages.size()){
+				return this.pages.get(index);
+			}
+			// Return an empty page
+			IntList lineStartIndices = new IntArrayList();
+			lineStartIndices.add(0);
+			List<String> lines = new ArrayList<>();
+			lines.add("");
+			List<ITextComponent> stylizedLines = new ArrayList<>();
+			stylizedLines.add(new StringTextComponent(""));
+			return new PageDetails("", lineStartIndices, lines, stylizedLines);
+		}
+		
+		
+		/**
+		 * Returns the pages as a list of strings
+		 */
+		public List<String> asStrings() {
+			List<String> pageStrings = new ArrayList<>();
+			for (BookUtilities.PageDetails page: this.pages){
+				pageStrings.add(page.fullPageText);
+			}
+			return pageStrings;
+		}
+		
+		
+		public void add(BookUtilities.PageDetails page){
+			this.pages.add(page);
+		}
+		
+		
+		public void addAll(Pages pagesToAdd){
+			for (int i=0; i < pagesToAdd.pages.size(); i++){
+				// TODO: Does this deep copy the pages? Does it matter?
+				this.add(pagesToAdd.get(i));
+			}
+		}
 	}
 }

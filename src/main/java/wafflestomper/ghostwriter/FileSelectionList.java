@@ -85,7 +85,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 	
 	@OnlyIn(Dist.CLIENT)
 	public static class PathItemEntry extends FileSelectionList.Entry {
-		public File path;
+		public final File path;
 		protected long lastClickTime;
 		protected final GhostwriterFileBrowserScreen owner;
 		protected final Minecraft mc;
