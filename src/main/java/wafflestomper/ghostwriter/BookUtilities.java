@@ -16,8 +16,8 @@ import java.util.List;
 
 
 public class BookUtilities {
-	public static final int BOOK_TEXT_WIDTH = 114;  // TODO: Find any hardcoded values and replace them
-	public static final int BOOK_MAX_LINES = 14;  // TODO: find any hardcoded values and replace them
+	public static final int BOOK_TEXT_WIDTH = 114;
+	public static final int BOOK_MAX_LINES = 14;
 	private static final Minecraft mc = Minecraft.getInstance();
 	
 	

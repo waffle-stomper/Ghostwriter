@@ -600,11 +600,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	 */
 	public int getCurrPageLineCount(){
 		if (System.currentTimeMillis() - lastPageLineCountUpdate >= 250) {
-			MutableInt lineCount = new MutableInt();
-			CharacterManager charactermanager = this.font.func_238420_b_();
-			charactermanager.func_238353_a_(this.getCurrPageText(), 114, Style.EMPTY, true,
-					(p_238762_6_, p_238762_7_, p_238762_8_) -> lineCount.getAndIncrement());
-			this.currPageLineCount = lineCount.getValue();
+			this.currPageLineCount = BookUtilities.splitIntoPages(this.getCurrPageText(), 0).get(0).lines.length;
 			this.lastPageLineCountUpdate = System.currentTimeMillis();
 		}
 		return this.currPageLineCount;
@@ -649,8 +645,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			if (this.getCurrPageText().length() > 256){
 				warning = "Over 256 char limit!";
 			}
-			else if (this.getCurrPageLineCount() > 14){
-				warning = "Over 14 line limit!";
+			else if (this.getCurrPageLineCount() > BookUtilities.BOOK_MAX_LINES){
+				warning = "Over " + BookUtilities.BOOK_MAX_LINES + " line limit!";
 			}
 			
 			if (warning.length() > 0) {
