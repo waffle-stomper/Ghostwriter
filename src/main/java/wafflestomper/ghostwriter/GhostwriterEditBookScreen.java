@@ -75,7 +75,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	}
 	
 	// TODO: Why do we use this for cut/copy/paste but not for saving?
-	@Deprecated  // We should just be able to use bookPages directly now
+	@Deprecated  // I don't think this is needed for unsigned books. As far as I can tell, JSON is only used for signed
 	private List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
