@@ -2,16 +2,29 @@ package wafflestomper.ghostwriter;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 
-public class SelectableTextField extends TextFieldWidget {
+public class SelectableFilenameField extends TextFieldWidget {
 	private final CharacterManager CHARACTER_MANAGER;
-	public SelectableTextField(FontRenderer p_i232260_1_, int p_i232260_2_, int p_i232260_3_, int p_i232260_4_, int p_i232260_5_, ITextComponent p_i232260_6_, CharacterManager characterManager) {
+	private long lastClickTime = 0;
+	
+	public SelectableFilenameField(FontRenderer p_i232260_1_, int p_i232260_2_, int p_i232260_3_, int p_i232260_4_, int p_i232260_5_, ITextComponent p_i232260_6_, CharacterManager characterManager) {
 		super(p_i232260_1_, p_i232260_2_, p_i232260_3_, p_i232260_4_, p_i232260_5_, p_i232260_6_);
 		this.CHARACTER_MANAGER = characterManager;
 	}
+	
+	
+	/**
+	 * Selects the filename without the extension
+	 */
+	public void highlightFilename(){
+		this.setCursorPositionZero();
+		this.setSelectionPos(this.getText().length()-4);
+	}
+	
 	
 	/**
 	 * Cancels text selection on mouse click
@@ -24,14 +37,21 @@ public class SelectableTextField extends TextFieldWidget {
 	 */
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
 		if (super.mouseClicked(mouseX, mouseY, button)){
-			// Mouse was clicked within this component. Cancel the selection
-			this.setSelectionPos(this.getCursorPosition());
+			// Mouse was clicked within this component.
+			if (Util.milliTime() - this.lastClickTime < 250L) {
+				// Double click - highlight the filename without the extension
+				this.highlightFilename();
+				this.lastClickTime = 0; // Prevent triple-click
+			}
+			else {
+				this.lastClickTime = Util.milliTime();
+				this.setSelectionPos(this.getCursorPosition());
+			}
 			return true;
 		}
 		return false;
 	}
 	
-	// TODO: Double click to select
 	
 	/**
 	 * Handles text selection

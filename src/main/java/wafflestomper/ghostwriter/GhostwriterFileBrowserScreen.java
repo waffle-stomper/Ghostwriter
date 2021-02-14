@@ -19,7 +19,7 @@ import java.util.List;
 public class GhostwriterFileBrowserScreen extends Screen{
 	
 	private FileSelectionList fileSelectionList;
-	private SelectableTextField filenameField;
+	private SelectableFilenameField filenameField;
 	
 	private boolean directoryDirty = false;
 	private File cachedPath;
@@ -129,7 +129,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		if (!this.initialized) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.filenameField = new SelectableTextField(this.minecraft.fontRenderer, this.width/2-125,
+			this.filenameField = new SelectableFilenameField(this.minecraft.fontRenderer, this.width/2-125,
 					this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT,
 					new StringTextComponent("filename"), this.font.func_238420_b_());
 			this.filenameField.setMaxStringLength(100);
@@ -158,8 +158,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			
 			// Focus on the filename field and highlight the filename (without the extension)
 			this.filenameField.setFocused2(true);
-			this.filenameField.setCursorPositionZero();
-			this.filenameField.setSelectionPos(this.filenameField.getText().length()-4);
+			this.filenameField.highlightFilename();
 			
 			// Prevent re-initializing element on resize
 			this.initialized = true;
