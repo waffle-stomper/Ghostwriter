@@ -114,7 +114,6 @@ public class BookUtilities {
 	 * @return List of pages
 	 */
 	public static Pages splitIntoPages(String inStr, int maxLinesPerPage){
-		// TODO: Does this work correctly with signed books?
 		Pages pages = new Pages();
 		IntList lineStartIndices = new IntArrayList();
 		List<String> lines = new ArrayList<>();
@@ -172,7 +171,6 @@ public class BookUtilities {
 	 * (i.e. that the opposite end should be removed).
 	 */
 	public static String truncateStringPixels(String strIn, String substituteChars, int maxWidth, boolean keepRightSide){
-		// TODO: find out if we can replace some of this code with a vanilla method
 		FontRenderer f = mc.fontRenderer;
 		if (f.getStringWidth(strIn) <= maxWidth){
 			return strIn;
@@ -305,7 +303,6 @@ public class BookUtilities {
 		
 		public void addAll(Pages pagesToAdd){
 			for (int i=0; i < pagesToAdd.pages.size(); i++){
-				// TODO: Does this deep copy the pages? Does it matter?
 				this.add(pagesToAdd.get(i));
 			}
 		}

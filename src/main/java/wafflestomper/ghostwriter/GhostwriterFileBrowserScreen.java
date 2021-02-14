@@ -16,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.List;
 
+// TODO: Use a TextInputUtil for the filename field
 // TODO: Focus on the filename field with the name (and not extension) highlighted to make saving with a custom name
 //       faster
 
@@ -50,7 +51,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	
 
 	public GhostwriterFileBrowserScreen(Screen _parentGui){
-		super(new StringTextComponent("Title I think?")); // TODO
+		super(new StringTextComponent("Ghostwriter File Browser"));
 		this.PARENT_GUI = _parentGui;
 		this.FILE_HANDLER = new FileHandler(this.TEMP_CLIPBOARD);
 		if (Ghostwriter.currentPath == null) {
@@ -180,9 +181,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		int rootNum = 100;
 		List<File> roots = this.FILE_HANDLER.getValidRoots();
 		for (File root : roots){
-			this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20, new StringTextComponent(root.getAbsolutePath()), (pressedButton)->{
-				this.driveButtonClicked(root); // TODO: Test this to make sure it actually works
-			}));
+			this.addButton(new Button(5, 35 + 21*(rootNum-100), 50, 20,
+					new StringTextComponent(root.getAbsolutePath()), (pressedButton)->
+				this.driveButtonClicked(root)
+			));
 			rootNum++;
 		}
 		

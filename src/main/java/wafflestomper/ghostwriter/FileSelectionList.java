@@ -71,7 +71,6 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
 			 this.owner.setSelectedSlot(this);
 			 if (Util.milliTime() - this.lastClickTime < 250L) {
-				// TODO: Double click handling
 				 this.lastClickTime = 0; // Prevent triple-click
 				 this.owner.navigateUp();
 				 return true;
@@ -103,13 +102,13 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 		 * @param slotX slotX?
 		 * @param slotWidth slotWidth?
 		 * @param p_render_5_ No idea
-		 * @param tickLengthMaybe tickLength i think
+		 * @param partialTicks Partial ticks
 		 * 
 		 */
 		@Override
 		@ParametersAreNonnullByDefault
 		public void render(MatrixStack matrixStack, int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
-				int mouseX, int mouseY, boolean mouseIsOver, float tickLengthMaybe) {
+				int mouseX, int mouseY, boolean mouseIsOver, float partialTicks) {
 			
 			int color = 0xFFFFFF;
 			if (!path.exists()) {
@@ -124,7 +123,7 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			}
 			
 			// Draw the trimmed filename in the slot
-			// TODO: I think func_238412_a_ is the new trimStringToWidth but I'm not sure
+			// I think func_238412_a_ is the new trimStringToWidth but I'm not sure
 			String s = this.mc.fontRenderer.func_238412_a_(this.path.getName(), slotWidth);
 			this.mc.fontRenderer.drawString(matrixStack, s,(float)(slotX ), (float)(p_render_2_ + 1), color);
 			

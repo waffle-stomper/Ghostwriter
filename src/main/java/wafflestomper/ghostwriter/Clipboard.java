@@ -6,7 +6,7 @@ import java.util.List;
 public class Clipboard {
 	//Stores entire books
 	public String title = ""; 
-	public String author = ""; // TODO: Remove author now that we can't set it?
+	public String author = "";  // Even though we can't set it when signing, this is still read from signed books
 	public final List<String> pages = new ArrayList<>();
 	public boolean bookInClipboard = false;
 	/** Used for copying one or more pages (so we don't have to wipe out a book in the clipboard) */

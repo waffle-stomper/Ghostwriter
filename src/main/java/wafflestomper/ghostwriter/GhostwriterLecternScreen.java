@@ -35,7 +35,7 @@ public class GhostwriterLecternScreen extends LecternScreen {
 	public GhostwriterLecternScreen(ItemStack currStack,
 									Clipboard globalClipboard, LecternContainer LECTERN_CONTAINER,
 									PlayerInventory playerInventory) {
-		// TODO: What's the text param for?
+		// Not sure why it needs the inventory and text. Both params are ignored by the constructor
 		super(LECTERN_CONTAINER, playerInventory, new StringTextComponent(""));
 		this.LECTERN_CONTAINER = LECTERN_CONTAINER;
 		this.CLIPBOARD = globalClipboard;
@@ -119,18 +119,9 @@ public class GhostwriterLecternScreen extends LecternScreen {
 
 	@Override
 	public void init() {
-		// TODO: Should this only happen once? (i.e. have an initialized field)
-
-		//KeyboardHelper.enableRepeatEvents(true);
-
 		int buttonWidth = 120;
 		int buttonHeight = 20;
 		int buttonSideOffset = 5;
-
-		// Is this no longer a thing?
-		//ScaledResolution scaledResolution = new ScaledResolution(this.mc);
-		//int rightXPos = scaledResolution.getScaledWidth() - (buttonWidth + buttonSideOffset);
-		// Temporary hack
 		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
 
 		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"), (pressed_button) -> {
@@ -170,8 +161,7 @@ public class GhostwriterLecternScreen extends LecternScreen {
 	public void saveBookToDisk(File filepath) {
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++) {
-			// func_230456_a_ is the old getPageText
-			// TODO: Verify that getString is returning formatting codes (the old function was getFormattedText())
+			// func_230456_a_ is the old getPageText and getString() converts it to a string with formatting codes
 			String s = this.bookInfo.func_230456_a_(i).getString();
 			pages.add(s);
 		}

@@ -467,7 +467,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	
 	public void saveBookToDisk(File filepath) {
-		this.fileHandler.saveBookToGHBFile("", "", this.bookPages, filepath); // TODO: Populate the author and title params with something?
+		this.fileHandler.saveBookToGHBFile("", "", this.bookPages, filepath);
 	}
 	
 	

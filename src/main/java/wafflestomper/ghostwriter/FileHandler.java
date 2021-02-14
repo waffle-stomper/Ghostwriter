@@ -1,7 +1,3 @@
-//TODO: Standardize function names
-//TODO: Proper logging
-// TODO: Refactor this whole class
-
 package wafflestomper.ghostwriter;
 
 import net.minecraft.client.Minecraft;
@@ -63,7 +59,6 @@ public class FileHandler {
 			this.lastListing.clear();
 			File[] newList = path.listFiles();
 			if (newList == null) return this.lastListing;
-			// TODO: Better sorting: https://stackoverflow.com/questions/16898029/how-to-sort-file-names-in-ascending-order
 			Arrays.sort(newList);
 			List<File> files = new ArrayList<>();
 			for (File f : newList){
@@ -86,7 +81,7 @@ public class FileHandler {
 		if (this.currentPath.getParentFile() == null) {
 			return;
 		}
-		for (File root : File.listRoots()){ // TODO: Is this still required now that we have the check above?
+		for (File root : File.listRoots()){
 			if (this.currentPath.equals(root)){
 				return;
 			}
@@ -160,8 +155,6 @@ public class FileHandler {
 	
 	/**
 	 * Loads a bookworm book from filePath into the clipboard
-	 *
-	 *
 	 */
 	private boolean loadBookwormBook(File filePath){
 		List<String> f = readFile(filePath);
