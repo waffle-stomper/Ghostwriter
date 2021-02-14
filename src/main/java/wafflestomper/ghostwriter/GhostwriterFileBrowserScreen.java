@@ -3,7 +3,6 @@ package wafflestomper.ghostwriter;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -16,14 +15,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
 import java.util.List;
 
-// TODO: Use a TextInputUtil for the filename field
-// TODO: Focus on the filename field with the name (and not extension) highlighted to make saving with a custom name
-//       faster
 
 public class GhostwriterFileBrowserScreen extends Screen{
 	
 	private FileSelectionList fileSelectionList;
-	private TextFieldWidget filenameField;
+	private SelectableTextField filenameField;
+	
 	private boolean directoryDirty = false;
 	private File cachedPath;
 	private File selectedFile = null;
@@ -132,7 +129,9 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		if (!this.initialized) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.filenameField = new TextFieldWidget(this.minecraft.fontRenderer, this.width/2-125, this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT, new StringTextComponent("filename"));
+			this.filenameField = new SelectableTextField(this.minecraft.fontRenderer, this.width/2-125,
+					this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT,
+					new StringTextComponent("filename"), this.font.func_238420_b_());
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
 			String file_title = "";
@@ -156,6 +155,13 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			file_author = file_author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 			String defaultFilename = file_title + "_" + file_author + "_" + this.FILE_HANDLER.getUTC() + ".ghb";
 			this.filenameField.setText(defaultFilename);
+			
+			// Focus on the filename field and highlight the filename (without the extension)
+			this.filenameField.setFocused2(true);
+			this.filenameField.setCursorPositionZero();
+			this.filenameField.setSelectionPos(this.filenameField.getText().length()-4);
+			
+			// Prevent re-initializing element on resize
 			this.initialized = true;
 		}
 		
