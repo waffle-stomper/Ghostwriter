@@ -15,9 +15,6 @@ import java.util.List;
 
 
 public class BookUtilities {
-	public static final int BOOK_TEXT_WIDTH = 114;
-	public static final int BOOK_MAX_LINES = 14;
-	
 	
 	/**
 	 * Removes duplicate or unnecessary formatting characters
@@ -118,7 +115,7 @@ public class BookUtilities {
 		List<ITextComponent> stylizedLines = new ArrayList<>();
 		MutableInt pageStartPos = new MutableInt(0);
 		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.func_238420_b_();
-		charactermanager.func_238353_a_(inStr, BOOK_TEXT_WIDTH, Style.EMPTY, true,
+		charactermanager.func_238353_a_(inStr, SharedConstants.BOOK_TEXT_WIDTH, Style.EMPTY, true,
 				(style, start, end) -> {
 			lineStartIndices.add(start - pageStartPos.getValue());
 			String line = inStr.substring(start, end);

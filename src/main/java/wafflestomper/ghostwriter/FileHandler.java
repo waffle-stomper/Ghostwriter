@@ -176,7 +176,7 @@ public class FileHandler {
 			String[] largePages = bookText.split("(\\s::){2,}");
 			for (String largePage : largePages){
 				largePage = largePage.replaceAll("\\s*::\\s*", "\n  ");
-				BookUtilities.Pages pages = BookUtilities.splitIntoPages(largePage, BookUtilities.BOOK_MAX_LINES);
+				BookUtilities.Pages pages = BookUtilities.splitIntoPages(largePage, SharedConstants.BOOK_MAX_LINES);
 				this.clipboard.pages.addAll(pages.asStrings());
 			}
 			
@@ -269,7 +269,7 @@ public class FileHandler {
 		// Split into pages
 		String pageBreak = ">>>><<<<>>>><<<<";
 		BookUtilities.Pages splitPages;
-		splitPages = BookUtilities.splitIntoPages(concatFile.toString(), BookUtilities.BOOK_MAX_LINES, pageBreak);
+		splitPages = BookUtilities.splitIntoPages(concatFile.toString(), SharedConstants.BOOK_MAX_LINES, pageBreak);
 		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);
@@ -318,7 +318,7 @@ public class FileHandler {
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
 		concatFileStr = concatFileStr.replaceAll("##", "\\\n");
 		BookUtilities.Pages splitPages;
-		splitPages = BookUtilities.splitIntoPages(concatFileStr, BookUtilities.BOOK_MAX_LINES, GHB_PAGE_BREAK);
+		splitPages = BookUtilities.splitIntoPages(concatFileStr, SharedConstants.BOOK_MAX_LINES, GHB_PAGE_BREAK);
 		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
 		this.clipboard.clone(book);

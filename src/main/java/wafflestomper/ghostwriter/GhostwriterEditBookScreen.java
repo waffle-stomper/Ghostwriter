@@ -641,8 +641,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 			if (this.getCurrPageText().length() > 256){
 				warning = "Over 256 char limit!";
 			}
-			else if (this.getCurrPageLineCount() > BookUtilities.BOOK_MAX_LINES){
-				warning = "Over " + BookUtilities.BOOK_MAX_LINES + " line limit!";
+			else if (this.getCurrPageLineCount() > SharedConstants.BOOK_MAX_LINES){
+				warning = "Over " + SharedConstants.BOOK_MAX_LINES + " line limit!";
 			}
 			
 			if (warning.length() > 0) {
