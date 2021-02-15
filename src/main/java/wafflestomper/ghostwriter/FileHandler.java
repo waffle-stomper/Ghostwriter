@@ -13,9 +13,9 @@ import java.util.*;
 
 
 public class FileHandler {
-	private static final int BOOK_TITLE_MAX_LEN = Constants.BOOK_TITLE_MAX_LEN;
-	public static final String GHB_PAGE_BREAK = ">>>>";
-	public static final String GHB_FILE_EXTENSION = ".ghb";
+	private static final int BOOK_TITLE_MAX_LEN = SharedConstants.BOOK_TITLE_MAX_LEN;
+	public static final String GHB_PAGE_BREAK = SharedConstants.GHB_PAGE_BREAK;
+	public static final String GHB_FILE_EXTENSION = SharedConstants.GHB_FILE_EXTENSION;
 	private final File bookSavePath;
 	private final File signaturePath;
 	private static final Printer PRINTER = new Printer();

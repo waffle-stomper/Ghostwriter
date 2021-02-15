@@ -10,13 +10,10 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.lang3.mutable.MutableInt;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -53,7 +50,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	private static final Printer printer = new Printer();
 	private final FileHandler fileHandler;
-	private static final int MAX_BOOK_PAGES = 100; // Find this magic number inside EditBookScreen.addNewPage()
+	private static final int MAX_BOOK_PAGES = SharedConstants.MAX_BOOK_PAGES;
 	
 	private int currPageLineCount = 0;
 	private long lastPageLineCountUpdate = 0;
