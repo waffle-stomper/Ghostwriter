@@ -13,6 +13,7 @@ import java.util.*;
 
 
 public class FileHandler {
+	private static final int BOOK_TITLE_MAX_LEN = Constants.BOOK_TITLE_MAX_LEN;
 	public static final String GHB_PAGE_BREAK = ">>>>";
 	public static final String GHB_FILE_EXTENSION = ".ghb";
 	private final File bookSavePath;
@@ -164,7 +165,10 @@ public class FileHandler {
 		if (f.size() >= 4 && StringUtils.isNumeric(f.get(0))){	
 			// There's a good chance this is a bookworm book
 			this.clipboard.clearBook();
-			this.clipboard.title = BookUtilities.truncateStringChars(f.get(1), "..", 16, false);
+			this.clipboard.title = f.get(1);
+			if (this.clipboard.title.length() > BOOK_TITLE_MAX_LEN){
+				this.clipboard.title = this.clipboard.title.substring(0, BOOK_TITLE_MAX_LEN - 2) + "..";
+			}
 			this.clipboard.author = f.get(2);
 			String bookText = f.get(f.size()-1);
 			

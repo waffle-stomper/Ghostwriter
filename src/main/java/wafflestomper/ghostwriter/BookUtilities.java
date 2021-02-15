@@ -211,24 +211,6 @@ public class BookUtilities {
 	
 	
 	/**
-	 * Truncates a string to the number of characters in maxChars
-	 * The character count includes the substitute characters (which will only be added if the string is truncated)
-	 */
-	public static String truncateStringChars(String strIn, String substituteChars, int maxChars, boolean keepRightSide){
-		if (strIn.length() <= maxChars){return strIn;}
-		strIn = strIn.replaceAll(" ", "");
-		if (strIn.length() <= maxChars){return strIn;}
-		if (keepRightSide){
-			strIn = substituteChars + strIn.substring(strIn.length()-(maxChars-substituteChars.length()));
-		}
-		else{
-			strIn = strIn.substring(0, maxChars-substituteChars.length()) + substituteChars;
-		}
-		return strIn;
-	}
-	
-	
-	/**
 	 * Converts the new JSON strings with their escaped quotation marks back into regular old strings
 	 * Hopefully this is just temporary.
 	 * EditBookScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
