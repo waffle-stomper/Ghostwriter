@@ -314,8 +314,8 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	
 	
 	private void goBackToParentGui(){
+		if (this.minecraft == null) return;
 		Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
-		assert this.minecraft != null;
 		this.minecraft.displayGuiScreen(this.PARENT_GUI);
 	}
 	
@@ -345,15 +345,17 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	 * Handles everything, which eventually filters down to charTyped if the key is printable
 	 */
 	@Override
-	public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
-		if (super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_)) {
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		if (keyCode == SharedConstants.KEY_ESC){
+			goBackToParentGui();
 			return true;
 		}
-		// TODO: Escape should kick back to the parent GUI
-		// TODO: Add ctrl+s to save, maybe ctrl+d to load?
+		
+		if (super.keyPressed(keyCode, scanCode, modifiers)) return true;
+		
 		this.TEMP_CLIPBOARD.clearBook();
 		this.updateButtons();
-		return this.filenameField.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_);
+		return this.filenameField.keyPressed(keyCode, scanCode, modifiers);
 	}
 	
 	
