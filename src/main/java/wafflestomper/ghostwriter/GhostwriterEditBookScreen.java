@@ -50,7 +50,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	private static final Printer printer = new Printer();
 	private final FileHandler fileHandler;
-	private static final int MAX_BOOK_PAGES = SharedConstants.MAX_BOOK_PAGES;
 	
 	private int currPageLineCount = 0;
 	private long lastPageLineCountUpdate = 0;
@@ -68,7 +67,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 				(p_238772_1_) -> this.bookTitle = p_238772_1_,
 				this::func_238773_g_,  // getClipboardText
 				this::func_238760_a_,  // setClipboardText
-				(p_238771_0_) -> p_238771_0_.length() <= 32);
+				(p_238771_0_) -> p_238771_0_.length() <= SharedConstants.BOOK_TITLE_MAX_LEN);
 	}
 	
 	// TODO: Why do we use this for cut/copy/paste but not for saving?
@@ -242,13 +241,13 @@ public class GhostwriterEditBookScreen extends EditBookScreen {
 	
 	
 	private void insertPage() {
-		if (this.bookPages.size() < MAX_BOOK_PAGES) {
+		if (this.bookPages.size() < SharedConstants.MAX_BOOK_PAGES) {
 			this.bookPages.add(this.currPage, "");
 			printer.gamePrint(Printer.GRAY + "Page inserted");
 			this.bookChanged(false);
 		}
 		else {
-			printer.gamePrint(Printer.RED + "Cannot add another page! Book is already " + MAX_BOOK_PAGES + " pages long!");
+			printer.gamePrint(Printer.RED + "Cannot add another page! Book is full!");
 		}
 	}
 	
