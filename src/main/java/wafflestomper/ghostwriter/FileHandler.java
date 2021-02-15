@@ -14,6 +14,7 @@ import java.util.*;
 
 public class FileHandler {
 	public static final String GHB_PAGE_BREAK = ">>>>";
+	public static final String GHB_FILE_EXTENSION = ".ghb";
 	private final File bookSavePath;
 	private final File signaturePath;
 	private static final Printer PRINTER = new Printer();
@@ -224,7 +225,7 @@ public class FileHandler {
 			if (loadPlainText(filePath)){return true;}
 		}
 		//Handle Ghostwriter books in .ghb
-		if (filePath.getName().endsWith(".ghb")){
+		if (filePath.getName().endsWith(GHB_FILE_EXTENSION)){
 			LOG.info("Loading GHB book..." + filePath);
 			return loadBookFromGHBFile(filePath);
 		}
