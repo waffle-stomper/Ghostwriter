@@ -20,6 +20,8 @@ Key codes can be found at the bottom of net.minecraft.client.util.InputMappings 
 
 Mappings can be found in External Libraries > net.minecraft:mappings_snapshot... > mcp_snapshot...
 
+Signatures can be found in <project dir>/build/createSrgToMcp/output.srg
+
 
 #########################################################################
 #																		#
