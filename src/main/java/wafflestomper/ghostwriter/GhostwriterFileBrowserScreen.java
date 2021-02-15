@@ -40,6 +40,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private Button btnAutoReload;
 	private Button btnLoad;
 	private Button btnSave;
+	private Button btnEditExtension;
 	
 	private boolean initialized = false;
 	private boolean enableLoading = false;
@@ -131,7 +132,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			
 			this.filenameField = new SelectableFilenameField(this.minecraft.fontRenderer, this.width/2-125,
 					this.height-BORDER_HEIGHT-BUTTON_HEIGHT, 250, BUTTON_HEIGHT,
-					new StringTextComponent("filename"), this.font.func_238420_b_());
+					new StringTextComponent("filename"));
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
 			String file_title = "";
@@ -192,6 +193,14 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			));
 			rootNum++;
 		}
+		
+		// Add button for enabling file extension editing
+		this.btnEditExtension = this.addButton(new Button(this.filenameField.x+this.filenameField.getWidth() + 3,
+				this.filenameField.y, 25, this.filenameField.getHeight(), new StringTextComponent("EXT"),
+				(pressedButton) -> {
+					this.filenameField.toggleExtensionModifications();
+					this.updateButtons();
+				}));
 		
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
@@ -311,6 +320,13 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			this.btnAutoReload.visible = false;
 			this.btnLoad.active = false;
 			this.btnLoad.visible = false;
+		}
+		
+		if (this.filenameField.allowExtensionModifications){
+			this.btnEditExtension.setMessage(new StringTextComponent("EXT"));
+		}
+		else{
+			this.btnEditExtension.setMessage(new StringTextComponent("\u00a7mEXT"));
 		}
 	}
 	
