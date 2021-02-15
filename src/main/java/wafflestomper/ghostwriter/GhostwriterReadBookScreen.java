@@ -29,7 +29,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 
 	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn,
 									 ItemStack currStack, Clipboard globalClipboard) {
-		super(bookInfoIn);  // TODO: Page sound control has been disabled because that constructor is private
+		super(bookInfoIn);
 		this.CLIPBOARD = globalClipboard;
 		this.fileHandler = new FileHandler(this.CLIPBOARD);
 		if (currStack != null){

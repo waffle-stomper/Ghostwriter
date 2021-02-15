@@ -12,11 +12,6 @@ public class SelectableFilenameField extends TextFieldWidget {
 	private final CharacterManager CHARACTER_MANAGER;
 	private long lastClickTime = 0;
 	public boolean allowExtensionModifications = false;
-	private static final int KEY_DEL = 261;
-	private static final int KEY_RIGHT = 262;
-	private static final int KEY_DOWN = 264;
-	private static final int KEY_UP = 265;
-	private static final int KEY_END = 269;
 	
 	public SelectableFilenameField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent text){
 		super(fontRenderer, x, y, width, height, text);
@@ -67,7 +62,6 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * to type upper case text would erroneously select text
 	 */
 	public void updateShiftKeyStatus(){
-		// TODO: Occasionally check if this bug has been fixed so we can remove this method
 		this.field_212956_h = Screen.hasShiftDown();
 	}
 	
@@ -89,17 +83,17 @@ public class SelectableFilenameField extends TextFieldWidget {
 		
 		switch(keyCode){
 			
-			case KEY_DEL:
-			case KEY_RIGHT:
+			case SharedConstants.KEY_DEL:
+			case SharedConstants.KEY_RIGHT:
 				if (this.getCursorPosition() >= this.getEditableLength()) return false;
 				break;
 				
-			case KEY_DOWN:
-			case KEY_END:
+			case SharedConstants.KEY_DOWN:
+			case SharedConstants.KEY_END:
 				this.setCursorPosition(this.getEditableLength());
 				return true;
 				
-			case KEY_UP:
+			case SharedConstants.KEY_UP:
 				this.setCursorPositionZero();
 				return true;
 		}
@@ -150,14 +144,13 @@ public class SelectableFilenameField extends TextFieldWidget {
 	/**
 	 * Handles text selection
 	 * Co-ords are relative to the game window
-	 * called by mouseDragged() when it's the left button
+	 * Called by mouseDragged() when the left mouse button is held
 	 * @param mouseX Current horizontal position
 	 * @param mouseY Current vertical position
 	 * @param dragX How far the mouse was dragged horizontally (usually < 1 pixel)
 	 * @param dragY How far the mouse was dragged vertically (usually < 1 pixel)
 	 */
 	protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-		// TODO: Keep an eye on Widget.onDrag() because future versions will probably implement code like this
 		// Bail out if the drag didn't start in this component
 		if (!this.isFocused()) return;
 		
