@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -30,12 +31,12 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private static final Printer PRINTER = new Printer();
 	
 	private final FileHandler FILE_HANDLER;
-	private String displayPath = "";
 	
 	private static final int BORDER_HEIGHT = 2;
 	private static final int BUTTON_WIDTH = 60;
 	private static final int BUTTON_HEIGHT = 20;
 	private static final int SLOT_HEIGHT = 12;
+	private static final int DISPLAY_PATH_WIDTH = 200;
 	
 	private Button btnAutoReload;
 	private Button btnLoad;
@@ -222,7 +223,6 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	public void navigateUp() {
 		this.FILE_HANDLER.navigateUp();
 		this.directoryDirty = true;
-		this.displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
 	}
 	
 	
@@ -236,19 +236,30 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	@Override
 	@ParametersAreNonnullByDefault
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)  {
-		this.displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
 		this.btnSave.active = this.isFilenameValid();
 		this.hoveringText = null;
 		this.fileSelectionList.render(matrixStack, mouseX, mouseY, partialTicks);
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
-		if (this.minecraft == null) return;
-		this.drawCenteredString(matrixStack, this.minecraft.fontRenderer, BookUtilities.truncateStringPixels(this.displayPath,"...", 200, true), this.width / 2, 20, 0xDDDDDD);
+		
+		// Render the current directory, truncating the left side if it becomes too long
+		String displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
+		int displayPathSize = this.font.getStringWidth(displayPath);
+		if (displayPathSize > DISPLAY_PATH_WIDTH){
+			int allowedSize = DISPLAY_PATH_WIDTH - this.font.getStringWidth("...");
+			String reversed = new StringBuilder(displayPath).reverse().toString();
+			// func_238361_b_() is trimStringToWidth()
+			reversed = this.font.func_238420_b_().func_238361_b_(reversed, allowedSize, Style.EMPTY);
+			displayPath = "..." + new StringBuilder(reversed).reverse().toString();
+		}
+		this.drawCenteredString(matrixStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
+		
 		this.filenameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// Draw tooltip if the path is hovered
 		if (mouseX >= this.width/2-100 && mouseX <= this.width/2+100 && mouseY >= 20 && mouseY <= 27) {
-			this.renderTooltip(matrixStack, new StringTextComponent(this.displayPath), 0, 0);
+			this.renderTooltip(matrixStack, new StringTextComponent(displayPath), 0, 0);
 		}
+		// Draw any other hover text
 		else if (this.hoveringText != null) {
 			this.renderTooltip(matrixStack, new StringTextComponent(this.hoveringText), mouseX, mouseY);
 		}

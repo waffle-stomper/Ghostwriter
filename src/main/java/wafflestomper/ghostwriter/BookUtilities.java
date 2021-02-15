@@ -4,7 +4,6 @@ import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -18,7 +17,6 @@ import java.util.List;
 public class BookUtilities {
 	public static final int BOOK_TEXT_WIDTH = 114;
 	public static final int BOOK_MAX_LINES = 14;
-	private static final Minecraft mc = Minecraft.getInstance();
 	
 	
 	/**
@@ -160,53 +158,6 @@ public class BookUtilities {
 			pages.addAll(splitIntoPages(pageBroken, maxLinesPerPage));
 		}
 		return pages;
-	}
-	
-	
-	/**
-	 * Shortens a string to a specific width
-	 * Substitute chars are optional, but if they are set to anything other than a blank string, they will be counted
-	 * as part of the length of the output string.
-	 * KeepRightSide determines whether the right (end of the string) or left (start of the string) should be kept
-	 * (i.e. that the opposite end should be removed).
-	 */
-	public static String truncateStringPixels(String strIn, String substituteChars, int maxWidth, boolean keepRightSide){
-		FontRenderer f = mc.fontRenderer;
-		if (f.getStringWidth(strIn) <= maxWidth){
-			return strIn;
-		}
-		String strOut = "";
-		int subCharsWidth = f.getStringWidth(substituteChars);
-		
-		int startPos = 0;
-		int endPos = strIn.length()-1;
-		int direction = 1;
-		if (keepRightSide){
-			startPos = strIn.length()-1;
-			endPos = -1;
-			direction = -1;
-		}
-		for (int i=startPos; i!=endPos; i+=direction){
-			char c = strIn.charAt(i);
-			if (f.getStringWidth(c + strOut) + subCharsWidth <= maxWidth){
-				if (keepRightSide){
-					strOut = c + strOut;
-				}
-				else{
-					strOut = strOut + c;
-				}
-			}
-			else{
-				break;
-			}
-		}
-		if (keepRightSide){
-			return substituteChars + strOut;
-		}
-		else{
-			return strOut + substituteChars;
-		}
-		
 	}
 	
 	
