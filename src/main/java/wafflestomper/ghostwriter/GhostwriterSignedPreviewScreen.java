@@ -7,12 +7,12 @@ import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
 
 public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
-	private final GhostwriterEditBookScreen PARENT;
+	private final GhostwriterEditBookScreen parent;
 	
 	public GhostwriterSignedPreviewScreen(GhostwriterEditBookScreen parent){
-		this.PARENT = parent;
-		this.bookInfo = new PreviewBookInfo(this.PARENT);
-		this.currPage = this.PARENT.currPage;
+		this.parent = parent;
+		this.bookInfo = new PreviewBookInfo(this.parent);
+		this.currPage = this.parent.currPage;
 	}
 	
 	@Override
@@ -20,15 +20,15 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 		this.addButton(new Button(this.width / 2 - 100, 196, 200, 20,
 				new StringTextComponent("Back to editor"), (p_214161_1_) -> {
 			if (this.minecraft == null) return;
-			this.minecraft.displayGuiScreen(this.PARENT);
+			this.minecraft.displayGuiScreen(this.parent);
 		}));
 	}
 	
 	@Override
 	public void tick() {
-		long lastFileMod = this.PARENT.autoReloadLastModified;
-		this.PARENT.tick(); // Is something going to break if we do this?
-		if (lastFileMod != this.PARENT.autoReloadLastModified){
+		long lastFileMod = this.parent.ghostLayer.autoReloadLastModified;
+		this.parent.tick(); // Is something going to break if we do this?
+		if (lastFileMod != this.parent.ghostLayer.autoReloadLastModified){
 			// File has been reloaded
 			this.cachedPage = -1;
 		}

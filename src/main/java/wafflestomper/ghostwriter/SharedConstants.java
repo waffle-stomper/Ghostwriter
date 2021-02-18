@@ -29,4 +29,9 @@ public class SharedConstants {
 	///////////////////////////
 	public static final String GHB_PAGE_BREAK = ">>>>";
 	public static final String GHB_FILE_EXTENSION = ".ghb";
+	
+	public static final int LARGE_BUTTON_WIDTH = 120;
+	public static final int BUTTON_HEIGHT = 20;
+	public static final int BUTTON_SIDE_OFFSET = 5;
+	static final int COLOR_FORMAT_BUTTON_WIDTH = 20;
 }

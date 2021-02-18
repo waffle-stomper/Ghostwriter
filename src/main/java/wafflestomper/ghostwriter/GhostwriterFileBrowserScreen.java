@@ -82,7 +82,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		}
 	}
 	
-	
+	// TODO: I'm sure we can refactor this to get rid of the casts now that we have IGhostBook
 	private void loadClicked(boolean autoReload) {
 		// The book should already be in the temp clipboard at this point, right?
 		if (!this.TEMP_CLIPBOARD.bookInClipboard) {
@@ -91,11 +91,11 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		else if (this.PARENT_GUI instanceof GhostwriterEditBookScreen) {
 			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.PARENT_GUI;
 			if (autoReload) {
-				parent.enableAutoReload(this.FILE_HANDLER.lastLoadedBook, this.TEMP_CLIPBOARD);
-				parent.clipboardToBook(this.TEMP_CLIPBOARD);
+				parent.ghostLayer.enableAutoReload(this.FILE_HANDLER.lastLoadedBook, this.TEMP_CLIPBOARD);
+				parent.ghostLayer.clipboardToBook(this.TEMP_CLIPBOARD);
 			}
 			else {
-				parent.setClipboard(this.TEMP_CLIPBOARD);
+				Ghostwriter.GLOBAL_CLIPBOARD.clone(this.TEMP_CLIPBOARD);
 				new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
 			}
 		}

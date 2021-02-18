@@ -4,48 +4,34 @@ import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.StringTextComponent;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GhostwriterReadBookScreen extends ReadBookScreen {
+public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostBook{
 	
-	private Button buttonSelectPageA;
-	private Button buttonSelectPageB;
+	private final GhostLayer ghostLayer;
 	
-	//Used for copying multiple pages at a time
-	private int selectedPageA = -1;
-	private int selectedPageB = -1;
-	
-	private final Clipboard CLIPBOARD;
-	private static final Printer PRINTER = new Printer();
-	private final FileHandler fileHandler;
-	private Button buttonCopySelectedPages;
-	private String bookTitle = "";
-	private String bookAuthor = "";
 
-
-	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn,
-									 ItemStack currStack, Clipboard globalClipboard) {
+	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, ItemStack currStack){
 		super(bookInfoIn);
-		this.CLIPBOARD = globalClipboard;
-		this.fileHandler = new FileHandler(this.CLIPBOARD);
+		this.ghostLayer = new GhostLayer(this, this, false);
 		if (currStack != null){
 			CompoundNBT compoundnbt = currStack.getTag();
 			if (compoundnbt != null) {
-				this.bookTitle = compoundnbt.getString("title");
-				this.bookAuthor = compoundnbt.getString("author");
+				this.ghostLayer.setTitleAuthor(compoundnbt.getString("title"), compoundnbt.getString("author"));
 			}
 		}
 	}
 	
 	
 	/**
-	 * Helper function that extracts the pages from the read book until I find a cleaner way to do this
+	 * Helper function that extracts the pages from the book until I find a cleaner way to do this
 	 */
-	public List<String> bookPages(){
+	private List<String> extractBookPages(){
+		// TODO: Perhaps we should use the getPage() method provided by IBookInfo instead? I think that would negate the
+		//       JSON weirdness we get from some read books
 		if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
 			ReadBookScreen.WrittenBookInfo b = (ReadBookScreen.WrittenBookInfo)this.bookInfo;
 			return b.pages;
@@ -59,135 +45,135 @@ public class GhostwriterReadBookScreen extends ReadBookScreen {
 		}
 	}
 	
-	// TODO: Is there a reason why we use this for copying, but don't for saving?
-	private List<String> pagesAsList(){
+	
+	/**
+	 * Called by file browser
+	 */
+	public void saveBookToDisk(File savePath){
+		// TODO: Refactor this away
+		this.ghostLayer.saveBookToDisk(savePath);
+	}
+	
+	/**
+	 * Override from ReadBookScreen
+	 */
+	@Override
+	public void init(){
+		super.init();
+		this.ghostLayer.init();
+		this.updateButtons();
+	}
+	
+	/**
+	 * Override from ReadBookScreen
+	 */
+	@Override
+	public void updateButtons(){
+		this.ghostLayer.updateButtons();
+	}
+	
+	
+	/**
+	 * Called by GhostLayer
+	 */
+	@Override
+	public List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
 			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
 			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
 			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
-			String pageText = BookUtilities.deJSONify(this.bookPages().get(i)); // TODO: Should this use the getPage function from IBookInfo instead?
+			String pageText = BookUtilities.deJSONify(this.extractBookPages().get(i));
 			pages.add(pageText);
 		}
 		return pages;
 	}
 	
 	
-	private void copyBook() {
-		this.CLIPBOARD.author = this.bookAuthor;
-		this.CLIPBOARD.title = this.bookTitle;
-		this.CLIPBOARD.pages.clear();
-		this.CLIPBOARD.pages.addAll(this.pagesAsList());
-		this.CLIPBOARD.bookInClipboard = true;
-		PRINTER.gamePrint(Printer.GRAY + "Book copied");
-		this.updateButtons();
-	}
-	
-	
-	private void copySelectedPagesToClipboard(){
-		int firstPage = Math.min(this.selectedPageA, this.selectedPageB);
-		int lastPage = Math.max(this.selectedPageA, this.selectedPageB);
-		
-		// Handle the case where A or B is -1 (i.e. no selection)
-		if (firstPage == -1 || lastPage == -1) {
-			firstPage = this.currPage;
-			lastPage = this.currPage;
-		}
-		
-		if (firstPage >= 0 && lastPage >= firstPage && lastPage < this.bookPages().size()){
-			this.CLIPBOARD.miscPages.clear();
-			List<String> pagesAsList = this.pagesAsList();
-			for (int i=firstPage; i<=lastPage; i++){
-				this.CLIPBOARD.miscPages.add(pagesAsList.get(i));
-			}
-			PRINTER.gamePrint(Printer.GRAY + "Selection copied");
-		}
-		else{
-			PRINTER.gamePrint(Printer.RED + "Invalid selection! Copy aborted.");
-		}
-		this.updateButtons();
-	}
-	
-	
+	/**
+	 * Called by GhostLayer
+	 */
 	@Override
-	public void init() {
-		int buttonWidth = 120;
-		int buttonHeight = 20;
-		int buttonSideOffset = 5;
-		int rightXPos = this.width-(buttonWidth+buttonSideOffset);
-		
-		this.addButton(new Button(5, 5, buttonWidth, buttonHeight, new StringTextComponent("File Browser"),
-				(pressed_button) -> {
-			if (this.minecraft != null) {
-				this.minecraft.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
-			}
-		}));
-		
-		this.addButton(new Button(rightXPos, 5, buttonWidth, buttonHeight, new StringTextComponent("Copy Book"),
-				(pressed_button) -> this.copyBook()));
-		
-		this.buttonSelectPageA = this.addButton(new Button(rightXPos, 50, buttonWidth/2, buttonHeight,
-				new StringTextComponent("A"), (pressed_button) -> {
-			this.selectedPageA = this.currPage;
-			this.updateButtons();
-		}));
-		
-		this.buttonSelectPageB = this.addButton(new Button(rightXPos+buttonWidth/2, 50, buttonWidth/2,
-				buttonHeight, new StringTextComponent("B"), (pressed_button) -> {
-			this.selectedPageB = this.currPage;
-			this.updateButtons();
-		}));
-		
-		this.buttonCopySelectedPages = this.addButton(new Button(rightXPos, 70, buttonWidth, buttonHeight,
-				new StringTextComponent("Copy This Page"), (pressed_button) -> this.copySelectedPagesToClipboard()));
-
-		super.init();		
-		this.updateButtons();
+	public int getBookPageCount(){
+		return this.getPageCount();
 	}
 	
 	
-	public void saveBookToDisk(File filepath) {
-		List<String> pages = new ArrayList<>();
-		for (int i=0; i<this.getPageCount(); i++) {
-			// func_230456_a_ is the old getPageText
-			// Its getString() method returns the page with old-school formatting codes
-			String s = this.bookInfo.func_230456_a_(i).getString();
-			pages.add(s);
-		}
-		this.fileHandler.saveBookToGHBFile(this.bookTitle, this.bookAuthor, pages, filepath);
-	}
-	
-	
+	/**
+	 * Called by GhostLayer
+	 */
 	@Override
-	public void updateButtons() {
+	public void updateVanillaButtons(){
 		super.updateButtons();
-		
-		// Reset invalid selection
-		if (this.selectedPageA < -1 || this.selectedPageA >= this.getPageCount()) {
-			this.selectedPageA = -1;
-		}
-		if (this.selectedPageB < -1 || this.selectedPageB >= this.getPageCount()) {
-			this.selectedPageB = -1;
-		}
-		
-		if (this.selectedPageA >= 0 && this.selectedPageB >= 0 && this.selectedPageA != this.selectedPageB){
-			// Multi page selection
-			this.buttonCopySelectedPages.active = true;
-			String xPages = (Math.abs(this.selectedPageB-this.selectedPageA)+1) + " Pages";
-			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
-			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
-			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
-		}
-		else{
-			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
-			this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
-			this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
-			if (this.selectedPageA >= 0) {
-				this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA+1)));
-			}
-			if (this.selectedPageB >= 0) {
-				this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB+1)));
-			}
-		}
+	}
+	
+	
+	/**
+	 * Called by GhostLayer
+	 */
+	@Override
+	public Button addGhostButton(Button button) {
+		return this.addButton(button);
+	}
+	
+	
+	@Override
+	public String getPageText(int pageNum) {
+		// func_238806_b_() either returns the page text or a blank ITextComponent
+		return this.bookInfo.func_238806_b_(pageNum).toString();
+	}
+	
+	
+	/**
+	 * Called by GhostLayer
+	 */
+	@Override
+	public int getCurrPage() {
+		return this.currPage;
+	}
+	
+	@Override
+	public void setCurrPage(int pageNum) {
+	
+	}
+	
+	/**
+	 * Called by GhostLayer
+	 * Unused because signed books are read-only
+	 */
+	@Override
+	public void insertTextIntoPage(String insertChars) {}
+	
+	@Override
+	public void insertNewPage(int atPageNum, String pageText) {}
+	
+	@Override
+	public void removePage(int pageNum) {}
+	
+	@Override
+	public void replaceBookPages(List<String> newPages) {}
+	
+
+	@Override
+	public void setPageText(int pageNum, String pageText) {
+	
+	}
+	
+	@Override
+	public boolean isBookBeingSigned() {
+		return false;
+	}
+	
+	
+	@Override
+	public void setBookTitle(String title) {}
+	
+	@Override
+	public void bookChanged() {}
+	
+	
+	@Override
+	public String getBookTitle() {
+		return this.ghostLayer.bookTitle;
 	}
 }

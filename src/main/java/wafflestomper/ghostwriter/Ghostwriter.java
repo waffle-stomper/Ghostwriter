@@ -25,12 +25,13 @@ import java.io.File;
 
 @Mod("ghostwriter")
 public class Ghostwriter{
-	
-	private final Minecraft mc = Minecraft.getInstance();
-	public final Clipboard globalClipboard = new Clipboard();
+	private static final Minecraft MC = Minecraft.getInstance();
+	public static final Clipboard GLOBAL_CLIPBOARD = new Clipboard();
+	public static final Printer PRINTER = new Printer();
 	public static final Logger LOG = LogManager.getLogger();
 	public static File currentPath; 
 	private boolean lecternArmed = false;
+	public static final FileHandler FILE_HANDLER = new FileHandler(GLOBAL_CLIPBOARD);
 	
 	
 	public Ghostwriter() {
@@ -51,22 +52,22 @@ public class Ghostwriter{
 	 */
 	@SubscribeEvent
 	public void tick(TickEvent event) {
-		if (this.mc.currentScreen instanceof LecternScreen && lecternArmed) {
+		if (MC.currentScreen instanceof LecternScreen && lecternArmed) {
 			lecternArmed = false;
 			LOG.debug("Lectern screen detected!");
 
-			if (this.mc.player == null){
+			if (MC.player == null){
 				LOG.error("Aborting GUI replacement because the player is null");
 				return;
 			}
 
 			// Abort if the player is crouching
-			if (this.mc.player.isCrouching()) {
+			if (MC.player.isCrouching()) {
 				LOG.debug("Aborting GUI replacement because the player is crouching");
 				return;
 			}
 			
-			LecternScreen ls = (LecternScreen)this.mc.currentScreen;
+			LecternScreen ls = (LecternScreen)MC.currentScreen;
 			ItemStack bookStack = ls.getContainer().getBook();
 			LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
 			
@@ -78,8 +79,8 @@ public class Ghostwriter{
 
 			LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
 			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
-					this.globalClipboard, ls.getContainer(), this.mc.player.inventory);
-			this.mc.displayGuiScreen(g);
+					ls.getContainer(), MC.player.inventory);
+			MC.displayGuiScreen(g);
 			
 			LOG.debug("Lectern GUI swap done!");
 		}
@@ -100,13 +101,13 @@ public class Ghostwriter{
 			return;
 		}
 			
-		if (this.mc.player == null){
+		if (MC.player == null){
 			LOG.error("Minecraft.player is null. Cannot continue with GUI swap");
 			return;
 		}
 		
 		// Abort if the player is crouching
-		if (this.mc.player.isCrouching()) {
+		if (MC.player.isCrouching()) {
 			LOG.debug("Aborting GUI replacement because the player is crouching");
 			return;
 		}
@@ -118,17 +119,17 @@ public class Ghostwriter{
 		}
 		
 		// TODO: Does this need to take the off hand into account too?
-		ItemStack bookStack = this.mc.player.getHeldItem(Hand.MAIN_HAND);
+		ItemStack bookStack = MC.player.getHeldItem(Hand.MAIN_HAND);
 		
 		// Finally, do the GUI replacement
 		if (eventGui instanceof EditBookScreen){
 			LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
-			eventGui = new GhostwriterEditBookScreen(this.mc.player, bookStack, Hand.MAIN_HAND, this.globalClipboard);
+			eventGui = new GhostwriterEditBookScreen(MC.player, bookStack, Hand.MAIN_HAND);
 		}
 		else {
 			LOG.debug("Replacing the current screen with a GhostwriterReadBookScreen");
 			ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
-			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack, this.globalClipboard);
+			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack);
 		}
 		event.setGui(eventGui);
 		LOG.debug("GUI swap done!");

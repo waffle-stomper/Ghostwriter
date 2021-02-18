@@ -13,18 +13,13 @@ public class Clipboard {
 	public final List<String> miscPages = new ArrayList<>();
 	
 	
-	public Clipboard(){}
-	
-	public Clipboard(Clipboard _clipboard){
-		this.clone(_clipboard);
-	}
-	
 	public void clearBook(){
 		this.title = "";
 		this.author = "";
 		this.pages.clear();
 		this.bookInClipboard = false;
 	}
+	
 	
 	public void clone(Clipboard _clipboard){
 		this.title = _clipboard.title;

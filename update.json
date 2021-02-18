@@ -13,6 +13,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.16.1":{
+    "2.2.4": "Add optional protection to filename extension in file browser\nRemove 16 character title limit when loading bookworm books\nRefactor constants\nRemove some single use functions\nPressing escape in file browser now reverts back to the book, rather than exiting completely\nMassive internal code shuffle to make the project easier to maintain",
     "2.2.3": "Add text selection to filename field in file browser",
     "2.2.2": "Modernize line splitting algorithm (for saving and loading)\nBump page size warning to 14 lines",
     "2.2.1": "Add warnings about excessive characters and lines on a page\nStop inserting GHB line breaks at the end of every line when saving\nDecrease expected page width to 114 pixels to match vanilla",
