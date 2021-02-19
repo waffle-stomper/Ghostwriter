@@ -5,7 +5,6 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
