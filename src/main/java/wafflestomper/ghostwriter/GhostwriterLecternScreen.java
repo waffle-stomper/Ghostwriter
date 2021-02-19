@@ -101,11 +101,6 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	}
 	
 	@Override  // From IGhostBook
-	public String getBookTitle() {
-		return this.ghostLayer.bookTitle;
-	}
-	
-	@Override  // From IGhostBook
 	public void setBookTitle(String title) {
 	}
 	

@@ -90,11 +90,6 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	}
 	
 	@Override  // From IGhostBook
-	public String getBookTitle() {
-		return this.ghostLayer.bookTitle;
-	}
-	
-	@Override  // From IGhostBook
 	public void setBookTitle(String title) {
 	}
 	

@@ -45,10 +45,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Override from vanilla EditBookScreen
-	 */
-	@Override
+	@Override  // From EditBookScreen
 	public void init() {
 		super.init();
 		this.ghostLayer.init();
@@ -71,20 +68,14 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Override from vanilla EditBookScreen
-	 */
-	@Override
+	@Override  // From EditBookScreen
 	public void tick() {
 		this.ghostLayer.tick();
 		super.tick();
 	}
 	
 	
-	/**
-	 * Override from vanilla
-	 */
-	@Override
+	@Override // From EditBookScreen
 	public void updateButtons() {
 		this.ghostLayer.updateButtons();
 	}
@@ -114,7 +105,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * - Warn when the page is over the multiplayer 256 character limit
 	 * - Add a high contrast background behind extended length titles
 	 */
-	@Override
+	@Override  // From EditBookScreen
 	@ParametersAreNonnullByDefault
 	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -166,7 +157,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	/**
 	 * Patch to enable pasting from the clipboard into the title of a book when signing it
 	 */
-	@Override
+	@Override  // From EditBookScreen
 	public boolean keyPressedInTitle(int keyCode, int scanCode, int modifiers) {
 		if (Screen.isPaste(keyCode)) {
 			this.field_238749_v_.insertClipboardText();
@@ -175,9 +166,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		return super.keyPressedInTitle(keyCode, scanCode, modifiers);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
+	
+	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
 		// As of 1.16.1, unsigned books just use plain strings for book pages so we don't need to remove
 		// any JSON weirdness
@@ -185,10 +175,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Called by GhostLayer to insert text
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public void insertText(String text) {
 		if (this.bookGettingSigned) {
 			// Put the text into the title
@@ -200,12 +187,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 * Used to update the vanilla book after a change is made without using the vanilla TextInputUtil
-	 * e.g. removing a page
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public void bookChanged(boolean setModifiedFlag) {
 		if (setModifiedFlag) this.bookIsModified = true;
 		this.cachedPage = -1;
@@ -219,47 +201,37 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.func_238751_C_();
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public boolean isBookBeingSigned() {
 		return this.bookGettingSigned;
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public void insertNewPage(int atPageNum, String pageText) {
 		// TODO: idiot proofing
 		this.bookPages.add(atPageNum, pageText);
 		this.bookChanged(true);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public void setPageText(int pageNum, String pageText) {
 		// TODO: idiot proofing
 		this.bookPages.set(pageNum, pageText);
 		this.bookChanged(true);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
 		// TODO: idiot proofing
 		return this.bookPages.get(pageNum);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public void removePage(int pageNum) {
 		// TODO: idiot proofing
 		this.bookPages.remove(pageNum);
@@ -268,10 +240,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookChanged(true);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public void replaceBookPages(List<String> newPages) {
 		// TODO: idiot proofing
 		this.bookPages.clear();
@@ -280,62 +250,40 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookChanged(true);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
-	public String getBookTitle() {
-		return this.bookTitle;
-	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public void setBookTitle(String title) {
 		this.bookTitle = title;
 		this.field_238749_v_.moveCursorToEnd();  // field_238749_v_ is titleInput
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public Button addGhostButton(Button button) {
 		return this.addButton(button);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public int getCurrPage() {
 		return this.currPage;
 	}
 	
-	/**
-	 * Called by GhostLayer to set the current page
-	 */
-	@Override
+	
+	@Override  // From IGhostBook
 	public void setCurrPage(int pageNum) {
 		// TODO: idiot proofing
 		this.currPage = pageNum;
 		this.bookChanged(false);
 	}
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public int getBookPageCount() {
 		return this.getPageCount();
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public void updateVanillaButtons() {
 		super.updateButtons();
 	}
