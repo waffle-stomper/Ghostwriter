@@ -32,8 +32,6 @@ public interface IGhostBook {
 	
 	boolean isBookBeingSigned();
 	
-	String getBookTitle();
-	
 	void setBookTitle(String title);
 	
 	/**

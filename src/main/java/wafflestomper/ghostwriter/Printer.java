@@ -26,8 +26,4 @@ public class Printer {
 	public void print(String toPrint) {
 		LOG.info(toPrint);
 	}
-	
-	public void print(float toPrint) {
-		print(String.format("%.2f", toPrint));
-	}
 }

@@ -53,38 +53,36 @@ public class Ghostwriter {
 	 */
 	@SubscribeEvent
 	public void tick(TickEvent event) {
-		if (MC.currentScreen instanceof LecternScreen && lecternArmed) {
-			lecternArmed = false;
-			LOG.debug("Lectern screen detected!");
-			
-			if (MC.player == null) {
-				LOG.error("Aborting GUI replacement because the player is null");
-				return;
-			}
-			
-			// Abort if the player is crouching
-			if (MC.player.isCrouching()) {
-				LOG.debug("Aborting GUI replacement because the player is crouching");
-				return;
-			}
-			
-			LecternScreen ls = (LecternScreen) MC.currentScreen;
-			ItemStack bookStack = ls.getContainer().getBook();
-			LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
-			
-			Item bookItem = bookStack.getItem();
-			if (!(bookItem instanceof WritableBookItem) && !(bookItem instanceof WrittenBookItem)) {
-				LOG.error("Unknown book type on lectern!");
-				return;
-			}
-			
-			LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
-			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
-					ls.getContainer(), MC.player.inventory);
-			MC.displayGuiScreen(g);
-			
-			LOG.debug("Lectern GUI swap done!");
+		if (MC.currentScreen == null) return;
+		if (!lecternArmed || MC.currentScreen.getClass().equals(LecternScreen.class)) return;
+		
+		lecternArmed = false;
+		LOG.debug("Lectern screen detected!");
+		
+		if (MC.player == null) {
+			LOG.error("Aborting GUI replacement because the player is null");
+			return;
+		} else if (MC.player.isCrouching()) {
+			LOG.debug("Aborting GUI replacement because the player is crouching");
+			return;
 		}
+		
+		LecternScreen ls = (LecternScreen) MC.currentScreen;
+		ItemStack bookStack = ls.getContainer().getBook();
+		LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
+		
+		Item bookItem = bookStack.getItem();
+		if (!(bookItem instanceof WritableBookItem) && !(bookItem instanceof WrittenBookItem)) {
+			LOG.error("Unknown book type on lectern!");
+			return;
+		}
+		
+		LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
+		GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
+				ls.getContainer(), MC.player.inventory);
+		MC.displayGuiScreen(g);
+		
+		LOG.debug("Lectern GUI swap done!");
 	}
 	
 	
@@ -107,21 +105,15 @@ public class Ghostwriter {
 		if (MC.player == null) {
 			LOG.error("Minecraft.player is null. Cannot continue with GUI swap");
 			return;
-		}
-		
-		// Abort if the player is crouching
-		if (MC.player.isCrouching()) {
+		} else if (MC.player.isCrouching()) {
 			LOG.debug("Aborting GUI replacement because the player is crouching");
 			return;
-		}
-		
-		if (eventGui instanceof LecternScreen) {
+		} else if (eventGui instanceof LecternScreen) {
 			LOG.info("Aborting early GUI replacement (target is a lectern). Setting lectern swap flag");
 			lecternArmed = true;
 			return;
 		}
 		
-		// TODO: Does this need to take the off hand into account too?
 		ItemStack bookStack = MC.player.getHeldItem(Hand.MAIN_HAND);
 		
 		// Finally, do the GUI replacement
@@ -136,5 +128,4 @@ public class Ghostwriter {
 		event.setGui(eventGui);
 		LOG.debug("GUI swap done!");
 	}
-	
 }
