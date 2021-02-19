@@ -40,7 +40,9 @@ public class GhostLayer {
 	private final Screen screen;
 	private final boolean editButtonsEnabled;
 	
-	public String bookTitle = "";  // TODO: EditBookScreen has its own bookTitle. Do we really need to store it here? What about ReadBookScreen and LecternScreen?
+	// These are mostly used for loaded books
+	// Note that EditBookScreen has its own bookTitle field that we need to keep track of
+	public String bookTitle = "";
 	public String bookAuthor = "";
 	
 	private boolean buttonsInitialized = false;

@@ -29,6 +29,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	/**
 	 * Helper function that extracts the pages from the book until I find a cleaner way to do this
 	 */
+	// TODO: We can probably drop this in favor of pagesAsList, which should use the IBookInfo methods to get the page text
 	private List<String> extractBookPages(){
 		// TODO: Perhaps we should use the getPage() method provided by IBookInfo instead? I think that would negate the
 		//       JSON weirdness we get from some read books

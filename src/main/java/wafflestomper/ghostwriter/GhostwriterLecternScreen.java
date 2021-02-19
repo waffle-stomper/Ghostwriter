@@ -38,6 +38,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	 * Helper function that extracts the pages from the read book until I find a cleaner way to do this
 	 * @return Pages as a list of Strings
 	 */
+	// TODO: We can probably drop this in favor of pagesAsList, which should use the IBookInfo methods to get the page text
 	public List<String> extractBookPages(){
 		if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
 			ReadBookScreen.WrittenBookInfo b = (ReadBookScreen.WrittenBookInfo)this.bookInfo;
