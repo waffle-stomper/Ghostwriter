@@ -24,14 +24,14 @@ import java.io.File;
 
 
 @Mod("ghostwriter")
-public class Ghostwriter{
-	private static final Minecraft MC = Minecraft.getInstance();
+public class Ghostwriter {
 	public static final Clipboard GLOBAL_CLIPBOARD = new Clipboard();
 	public static final Printer PRINTER = new Printer();
 	public static final Logger LOG = LogManager.getLogger();
-	public static File currentPath; 
-	private boolean lecternArmed = false;
 	public static final FileHandler FILE_HANDLER = new FileHandler(GLOBAL_CLIPBOARD);
+	private static final Minecraft MC = Minecraft.getInstance();
+	public static File currentPath;
+	private boolean lecternArmed = false;
 	
 	
 	public Ghostwriter() {
@@ -40,13 +40,14 @@ public class Ghostwriter{
 	}
 	
 	
-	private void setup(final FMLClientSetupEvent event){
+	private void setup(final FMLClientSetupEvent event) {
 		LOG.info("Setting up...");
 	}
-
-
+	
+	
 	// TODO: Add check for 'air' stack instead of book (I think there's a race condition where this might get called too early)
 	// TODO: Refactor this to remove the duplicated code with guiOpen() below
+	
 	/**
 	 * This swaps the book on a lectern for the Ghostwriter equivalent
 	 */
@@ -55,28 +56,28 @@ public class Ghostwriter{
 		if (MC.currentScreen instanceof LecternScreen && lecternArmed) {
 			lecternArmed = false;
 			LOG.debug("Lectern screen detected!");
-
-			if (MC.player == null){
+			
+			if (MC.player == null) {
 				LOG.error("Aborting GUI replacement because the player is null");
 				return;
 			}
-
+			
 			// Abort if the player is crouching
 			if (MC.player.isCrouching()) {
 				LOG.debug("Aborting GUI replacement because the player is crouching");
 				return;
 			}
 			
-			LecternScreen ls = (LecternScreen)MC.currentScreen;
+			LecternScreen ls = (LecternScreen) MC.currentScreen;
 			ItemStack bookStack = ls.getContainer().getBook();
 			LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
 			
 			Item bookItem = bookStack.getItem();
-			if (!(bookItem instanceof WritableBookItem) && ! (bookItem instanceof WrittenBookItem)){
+			if (!(bookItem instanceof WritableBookItem) && !(bookItem instanceof WrittenBookItem)) {
 				LOG.error("Unknown book type on lectern!");
 				return;
 			}
-
+			
 			LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
 			GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
 					ls.getContainer(), MC.player.inventory);
@@ -91,17 +92,19 @@ public class Ghostwriter{
 	 * This swaps the default book GUI for the Ghostwriter screen before it loads
 	 */
 	@SubscribeEvent
-	public void guiOpen(GuiOpenEvent event){
+	public void guiOpen(GuiOpenEvent event) {
 		Screen eventGui = event.getGui();
-		if (eventGui == null){return;}
+		if (eventGui == null) {
+			return;
+		}
 		LOG.debug("GUIOpenEvent: " + eventGui.toString());
 		
 		if (!eventGui.getClass().equals(EditBookScreen.class) && !eventGui.getClass().equals(ReadBookScreen.class) &&
-				!eventGui.getClass().equals(LecternScreen.class)){
+				!eventGui.getClass().equals(LecternScreen.class)) {
 			return;
 		}
-			
-		if (MC.player == null){
+		
+		if (MC.player == null) {
 			LOG.error("Minecraft.player is null. Cannot continue with GUI swap");
 			return;
 		}
@@ -111,8 +114,8 @@ public class Ghostwriter{
 			LOG.debug("Aborting GUI replacement because the player is crouching");
 			return;
 		}
-
-		if (eventGui instanceof LecternScreen){
+		
+		if (eventGui instanceof LecternScreen) {
 			LOG.info("Aborting early GUI replacement (target is a lectern). Setting lectern swap flag");
 			lecternArmed = true;
 			return;
@@ -122,11 +125,10 @@ public class Ghostwriter{
 		ItemStack bookStack = MC.player.getHeldItem(Hand.MAIN_HAND);
 		
 		// Finally, do the GUI replacement
-		if (eventGui instanceof EditBookScreen){
+		if (eventGui instanceof EditBookScreen) {
 			LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
 			eventGui = new GhostwriterEditBookScreen(MC.player, bookStack, Hand.MAIN_HAND);
-		}
-		else {
+		} else {
 			LOG.debug("Replacing the current screen with a GhostwriterReadBookScreen");
 			ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
 			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack);

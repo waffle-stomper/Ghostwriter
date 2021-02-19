@@ -20,11 +20,11 @@ import java.util.List;
 
 
 @OnlyIn(Dist.CLIENT)
-public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostBook{
+public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostBook {
 	
+	protected final GhostLayer ghostLayer;
 	private int currPageLineCount = 0;
 	private long lastPageLineCountUpdate = 0;
-	protected final GhostLayer ghostLayer;
 	
 	
 	public GhostwriterEditBookScreen(PlayerEntity editingPlayer, ItemStack book, Hand hand) {
@@ -49,7 +49,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * Override from vanilla EditBookScreen
 	 */
 	@Override
-	public void init(){
+	public void init() {
 		super.init();
 		this.ghostLayer.init();
 		
@@ -61,7 +61,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.buttonSign.x = SharedConstants.BUTTON_SIDE_OFFSET;
 		this.buttonFinalize.x = SharedConstants.BUTTON_SIDE_OFFSET;
 		this.buttonDone.x = SharedConstants.BUTTON_SIDE_OFFSET;
-		this.buttonCancel.x =  SharedConstants.BUTTON_SIDE_OFFSET;
+		this.buttonCancel.x = SharedConstants.BUTTON_SIDE_OFFSET;
 		this.buttonSign.y = 120;
 		this.buttonFinalize.y = 120;
 		this.buttonDone.y = 145;
@@ -90,16 +90,15 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	
 	/**
 	 * Counts the lines on the current page, returning a cached version most of the time
-	 *
+	 * <p>
 	 * Unfortunately the vanilla code makes it borderline impossible to extract the word-wrapped lines that
 	 * EditBookScreen uses in render(), so we have to split it ourselves
-	 *
+	 * <p>
 	 * Note that this will need to be updated periodically so that it matches the code in EditBookScreen
 	 */
-	private int getCurrPageLineCount(){
+	private int getCurrPageLineCount() {
 		if (System.currentTimeMillis() - lastPageLineCountUpdate >= 250) {
 			this.currPageLineCount = BookUtilities.splitIntoPages(this.getCurrPageText(), 0).get(0).lines.length;
 			this.lastPageLineCountUpdate = System.currentTimeMillis();
@@ -110,18 +109,18 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	/**
 	 * Visual patches:
-	 *  - Warn when the title is over the vanilla 15 character limit
-	 *  - Warn when the page is over the vanilla 14 line limit
-	 *  - Warn when the page is over the multiplayer 256 character limit
-	 *  - Add a high contrast background behind extended length titles
+	 * - Warn when the title is over the vanilla 15 character limit
+	 * - Warn when the page is over the vanilla 14 line limit
+	 * - Warn when the page is over the multiplayer 256 character limit
+	 * - Add a high contrast background behind extended length titles
 	 */
 	@Override
 	@ParametersAreNonnullByDefault
-	public void render(MatrixStack matrixStack , int mouseX, int mouseY, float partialTicks) {
+	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
 		super.render(matrixStack, mouseX, mouseY, partialTicks);
 		
 		// Render long title and warning (if necessary)
-		if (this.bookGettingSigned && this.bookTitle.length() > 15){
+		if (this.bookGettingSigned && this.bookTitle.length() > 15) {
 			// Show the title length
 			String textLen = "Title length: " + this.bookTitle.length();
 			// params are matrixStack, x, y, color
@@ -136,11 +135,11 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 			int titleMaxX = titleMinX + titleWidth;
 			// color for the fill() method is MSB->LSB: alpha, r, g, b, (each 8 bits)
 			AbstractGui.fill(matrixStack, titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
-			this.font.drawString(matrixStack, textTitle, (float)(titleMinX), 50.0F, 0);
+			this.font.drawString(matrixStack, textTitle, (float) (titleMinX), 50.0F, 0);
 			
 			// Show the long title warning
 			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
-					   "Set longer titles at your own risk";
+					"Set longer titles at your own risk";
 			StringTextComponent lengthWarning = new StringTextComponent(s);
 			// params are text, x, y, width, color
 			this.font.func_238418_a_(lengthWarning, 153, 116, 114, 0xFF3333);
@@ -150,10 +149,9 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		// Things get weird over 256 characters, so we don't bother showing the line warning in that case
 		if (!this.bookGettingSigned) {
 			String warning = "";
-			if (this.getCurrPageText().length() > 256){
+			if (this.getCurrPageText().length() > 256) {
 				warning = "Over 256 char limit!";
-			}
-			else if (this.getCurrPageLineCount() > SharedConstants.BOOK_MAX_LINES){
+			} else if (this.getCurrPageLineCount() > SharedConstants.BOOK_MAX_LINES) {
 				warning = "Over " + SharedConstants.BOOK_MAX_LINES + " line limit!";
 			}
 			
@@ -180,7 +178,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	/**
 	 * Called by GhostLayer
 	 */
-	public List<String> pagesAsList(){
+	public List<String> pagesAsList() {
 		// As of 1.16.1, unsigned books just use plain strings for book pages so we don't need to remove
 		// any JSON weirdness
 		return this.bookPages;
@@ -192,7 +190,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 */
 	@Override
 	public void insertText(String text) {
-		if (this.bookGettingSigned){
+		if (this.bookGettingSigned) {
 			// Put the text into the title
 			this.field_238749_v_.putText(text);
 			return;
@@ -208,7 +206,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * e.g. removing a page
 	 */
 	@Override
-	public void bookChanged(boolean setModifiedFlag){
+	public void bookChanged(boolean setModifiedFlag) {
 		if (setModifiedFlag) this.bookIsModified = true;
 		this.cachedPage = -1;
 		
@@ -225,58 +223,44 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * Called by GhostLayer
 	 */
 	@Override
-	public boolean isBookBeingSigned(){
+	public boolean isBookBeingSigned() {
 		return this.bookGettingSigned;
-	}
-	
-	
-	/**
-	 * Called by GhostLayer to set the current page
-	 */
-	@Override
-	public void setCurrPage(int pageNum){
-		// TODO: idiot proofing
-		this.currPage = pageNum;
-		this.bookChanged(false);
 	}
 	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void insertNewPage(int atPageNum, String pageText){
+	public void insertNewPage(int atPageNum, String pageText) {
 		// TODO: idiot proofing
 		this.bookPages.add(atPageNum, pageText);
 		this.bookChanged(true);
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void setPageText(int pageNum, String pageText){
+	public void setPageText(int pageNum, String pageText) {
 		// TODO: idiot proofing
 		this.bookPages.set(pageNum, pageText);
 		this.bookChanged(true);
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public String getPageText(int pageNum){
+	public String getPageText(int pageNum) {
 		// TODO: idiot proofing
 		return this.bookPages.get(pageNum);
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void removePage(int pageNum){
+	public void removePage(int pageNum) {
 		// TODO: idiot proofing
 		this.bookPages.remove(pageNum);
 		// Add a blank page if the book is empty
@@ -284,12 +268,11 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookChanged(true);
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void replaceBookPages(List<String> newPages){
+	public void replaceBookPages(List<String> newPages) {
 		// TODO: idiot proofing
 		this.bookPages.clear();
 		this.bookPages.addAll(newPages);
@@ -297,25 +280,22 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookChanged(true);
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public String getBookTitle(){
+	public String getBookTitle() {
 		return this.bookTitle;
 	}
 	
-	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void setBookTitle(String title){
+	public void setBookTitle(String title) {
 		this.bookTitle = title;
 		this.field_238749_v_.moveCursorToEnd();  // field_238749_v_ is titleInput
 	}
-	
 	
 	/**
 	 * Called by GhostLayer
@@ -325,8 +305,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		return this.addButton(button);
 	}
 	
-	
-	
 	/**
 	 * Called by GhostLayer
 	 */
@@ -335,12 +313,21 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		return this.currPage;
 	}
 	
+	/**
+	 * Called by GhostLayer to set the current page
+	 */
+	@Override
+	public void setCurrPage(int pageNum) {
+		// TODO: idiot proofing
+		this.currPage = pageNum;
+		this.bookChanged(false);
+	}
 	
 	/**
 	 * Called by GhostLayer
 	 */
 	@Override
-	public int getBookPageCount(){
+	public int getBookPageCount() {
 		return this.getPageCount();
 	}
 	
@@ -349,7 +336,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * Called by GhostLayer
 	 */
 	@Override
-	public void updateVanillaButtons(){
+	public void updateVanillaButtons() {
 		super.updateButtons();
 	}
 }

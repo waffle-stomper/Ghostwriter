@@ -7,12 +7,12 @@ import net.minecraft.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostBook{
+public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostBook {
 	
 	private final GhostLayer ghostLayer;
 	
-
-	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, ItemStack currStack){
+	
+	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, ItemStack currStack) {
 		super(bookInfoIn);
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.ghostLayer.extractTitleAuthor(currStack);
@@ -20,7 +20,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	
 	
 	@Override  // From ReadBookScreen
-	public void init(){
+	public void init() {
 		super.init();
 		this.ghostLayer.init();
 		this.updateButtons();
@@ -28,15 +28,15 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	
 	
 	@Override  // From ReadBookScreen
-	public void updateButtons(){
+	public void updateButtons() {
 		this.ghostLayer.updateButtons();
 	}
 	
 	
 	@Override  // From IGhostBook
-	public List<String> pagesAsList(){
+	public List<String> pagesAsList() {
 		List<String> pages = new ArrayList<>();
-		for (int i=0; i<this.getPageCount(); i++){
+		for (int i = 0; i < this.getPageCount(); i++) {
 			pages.add(BookUtilities.deJSONify(this.bookInfo.func_238806_b_(i).getString()));
 		}
 		return pages;
@@ -44,13 +44,13 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	
 	
 	@Override  // From IGhostBook
-	public int getBookPageCount(){
+	public int getBookPageCount() {
 		return this.getPageCount();
 	}
 	
 	
 	@Override  // From IGhostBook
-	public void updateVanillaButtons(){
+	public void updateVanillaButtons() {
 		super.updateButtons();
 	}
 	
@@ -73,12 +73,15 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 		return this.currPage;
 	}
 	
+	// Unused methods that only apply to unsigned books
+	@Override  // From IGhostBook
+	public void setCurrPage(int pageNum) {
+	}
 	
 	@Override  // From IGhostBook
 	public boolean isBookBeingSigned() {
 		return false;
 	}
-	
 	
 	@Override  // From IGhostBook
 	public void bookChanged(boolean setModifiedFlag) {
@@ -86,26 +89,32 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 		// TODO: Do we need to do anything else?
 	}
 	
-	
 	@Override  // From IGhostBook
 	public String getBookTitle() {
 		return this.ghostLayer.bookTitle;
 	}
 	
+	@Override  // From IGhostBook
+	public void setBookTitle(String title) {
+	}
 	
-	// Unused methods that only apply to unsigned books
 	@Override  // From IGhostBook
-	public void setCurrPage(int pageNum){}
+	public void setPageText(int pageNum, String pageText) {
+	}
+	
 	@Override  // From IGhostBook
-	public void setBookTitle(String title){}
+	public void insertText(String insertChars) {
+	}
+	
 	@Override  // From IGhostBook
-	public void setPageText(int pageNum, String pageText){}
+	public void insertNewPage(int atPageNum, String pageText) {
+	}
+	
 	@Override  // From IGhostBook
-	public void insertText(String insertChars){}
+	public void removePage(int pageNum) {
+	}
+	
 	@Override  // From IGhostBook
-	public void insertNewPage(int atPageNum, String pageText){}
-	@Override  // From IGhostBook
-	public void removePage(int pageNum){}
-	@Override  // From IGhostBook
-	public void replaceBookPages(List<String> newPages){}
+	public void replaceBookPages(List<String> newPages) {
+	}
 }

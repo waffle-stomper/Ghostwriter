@@ -9,14 +9,14 @@ import net.minecraft.util.text.StringTextComponent;
 public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 	private final GhostwriterEditBookScreen parent;
 	
-	public GhostwriterSignedPreviewScreen(GhostwriterEditBookScreen parent){
+	public GhostwriterSignedPreviewScreen(GhostwriterEditBookScreen parent) {
 		this.parent = parent;
 		this.bookInfo = new PreviewBookInfo(this.parent);
 		this.currPage = this.parent.currPage;
 	}
 	
 	@Override
-	public void addDoneButton(){
+	public void addDoneButton() {
 		this.addButton(new Button(this.width / 2 - 100, 196, 200, 20,
 				new StringTextComponent("Back to editor"), (p_214161_1_) -> {
 			if (this.minecraft == null) return;
@@ -28,7 +28,7 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 	public void tick() {
 		long lastFileMod = this.parent.ghostLayer.autoReloadLastModified;
 		this.parent.tick(); // Is something going to break if we do this?
-		if (lastFileMod != this.parent.ghostLayer.autoReloadLastModified){
+		if (lastFileMod != this.parent.ghostLayer.autoReloadLastModified) {
 			// File has been reloaded
 			this.cachedPage = -1;
 		}

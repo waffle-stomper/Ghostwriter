@@ -22,7 +22,7 @@ public class BookUtilities {
 	 * I'm using 'style' here to refer to all of the non-color codes (e.g. bold)
 	 * Note that a sequence like Red Bold Red will be preserved because the second red is needed to cancel the bold
 	 */
-	public static String removeRedundantFormatChars(String in, String pageBreakString){
+	public static String removeRedundantFormatChars(String in, String pageBreakString) {
 		// TODO: Find out where the extra format characters are coming from and try to suppress them upstream
 		//       rather than just removing them later. I suspect the issue is books that have been saved on servers
 		//       running old Minecraft versions, but I'm not totally sure
@@ -32,42 +32,39 @@ public class BookUtilities {
 		StringBuilder cleanedOut = new StringBuilder();
 		char currentColor = '0';  // Black
 		List<String> currentStyles = new ArrayList<>();  // No style
-		for(int pageNum=0; pageNum < splitByPage.length; pageNum++){
+		for (int pageNum = 0; pageNum < splitByPage.length; pageNum++) {
 			String page = splitByPage[pageNum];
 			// Loop through each character of the page, adding all characters except redundant formatting
 			boolean formatPrefixFlag = false;
-			for(int i=0; i<page.length(); i++){
+			for (int i = 0; i < page.length(); i++) {
 				char c = page.charAt(i);
-				if (formatPrefixFlag){
+				if (formatPrefixFlag) {
 					formatPrefixFlag = false;
 					String lowerChar = String.valueOf(c).toLowerCase();
 					// Previous character was a format prefix.
-					if ("0123456789abcdef".contains(lowerChar)){
+					if ("0123456789abcdef".contains(lowerChar)) {
 						// Color code (which also cancels any existing style codes)
-						if (currentColor == c && currentStyles.size() == 0){
+						if (currentColor == c && currentStyles.size() == 0) {
 							// Color code isn't needed
 							continue;
 						}
 						currentColor = c;
 						currentStyles.clear();
-					}
-					else if ("klmnor".contains(lowerChar)){
+					} else if ("klmnor".contains(lowerChar)) {
 						// Style code
-						if (lowerChar.equals("r")){
+						if (lowerChar.equals("r")) {
 							// Reset char
 							if (currentColor == '0' && currentStyles.size() == 0) {
 								// Reset char isn't required
 								continue;
-							}
-							else{
+							} else {
 								// Reset format
 								currentColor = '0';
 								currentStyles.clear();
 							}
-						}
-						else{
+						} else {
 							// Some other format char
-							if (currentStyles.contains(lowerChar)){
+							if (currentStyles.contains(lowerChar)) {
 								// Style character is already active
 								continue;
 							}
@@ -77,8 +74,7 @@ public class BookUtilities {
 					// Format character is necessary. Add it to the cleaned string
 					cleanedPage.append('\u00a7').append(c);
 					continue;
-				}
-				else if (c == '\u00a7'){
+				} else if (c == '\u00a7') {
 					formatPrefixFlag = true;
 					continue;
 				}
@@ -87,7 +83,7 @@ public class BookUtilities {
 			// Add the page text (and a page break if it's not the last page) to the output
 			// and reset the formatting
 			cleanedOut.append(cleanedPage.toString());
-			if (pageNum < splitByPage.length - 1){
+			if (pageNum < splitByPage.length - 1) {
 				cleanedOut.append(pageBreakString);
 			}
 			cleanedPage = new StringBuilder();
@@ -104,11 +100,11 @@ public class BookUtilities {
 	 * Inspired by code in EditBookScreen that splits the current page for rendering
 	 * Note that this function preserves newline characters at the end of lines, where the vanilla code removes them
 	 *
-	 * @param inStr String to split
+	 * @param inStr           String to split
 	 * @param maxLinesPerPage Maximum number of lines on a single page (<= 0 if you want all lines on a single page)
 	 * @return List of pages
 	 */
-	public static Pages splitIntoPages(String inStr, int maxLinesPerPage){
+	public static Pages splitIntoPages(String inStr, int maxLinesPerPage) {
 		Pages pages = new Pages();
 		IntList lineStartIndices = new IntArrayList();
 		List<String> lines = new ArrayList<>();
@@ -117,21 +113,21 @@ public class BookUtilities {
 		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.func_238420_b_();
 		charactermanager.func_238353_a_(inStr, SharedConstants.BOOK_TEXT_WIDTH, Style.EMPTY, true,
 				(style, start, end) -> {
-			lineStartIndices.add(start - pageStartPos.getValue());
-			String line = inStr.substring(start, end);
-			lines.add(line);
-			stylizedLines.add(new StringTextComponent(line).setStyle(style));
-			
-			if (lines.size() == maxLinesPerPage){
-				// The current page is full. Store it and start a new one
-				String currPageText = inStr.substring(pageStartPos.getValue(), end);
-				pages.add(new PageDetails(currPageText, lineStartIndices, lines, stylizedLines));
-				pageStartPos.setValue(end);
-				lineStartIndices.clear();
-				lines.clear();
-				stylizedLines.clear();
-			}
-		});
+					lineStartIndices.add(start - pageStartPos.getValue());
+					String line = inStr.substring(start, end);
+					lines.add(line);
+					stylizedLines.add(new StringTextComponent(line).setStyle(style));
+					
+					if (lines.size() == maxLinesPerPage) {
+						// The current page is full. Store it and start a new one
+						String currPageText = inStr.substring(pageStartPos.getValue(), end);
+						pages.add(new PageDetails(currPageText, lineStartIndices, lines, stylizedLines));
+						pageStartPos.setValue(end);
+						lineStartIndices.clear();
+						lines.clear();
+						stylizedLines.clear();
+					}
+				});
 		
 		// Add anything remaining to last page
 		if (lines.size() > 0) {
@@ -145,13 +141,14 @@ public class BookUtilities {
 	
 	/**
 	 * Helper function that first splits by page break, then into book sized pages and lines
-	 * @param strIn String to split
+	 *
+	 * @param strIn           String to split
 	 * @param maxLinesPerPage Maximum number of lines to allow on a single page. 0 is infinite
-	 * @param pageBreak Page break symbol
+	 * @param pageBreak       Page break symbol
 	 */
-	public static Pages splitIntoPages(String strIn, int maxLinesPerPage, String pageBreak){
+	public static Pages splitIntoPages(String strIn, int maxLinesPerPage, String pageBreak) {
 		Pages pages = new Pages();
-		for (String pageBroken: strIn.split(pageBreak)){
+		for (String pageBroken : strIn.split(pageBreak)) {
 			pages.addAll(splitIntoPages(pageBroken, maxLinesPerPage));
 		}
 		return pages;
@@ -163,28 +160,27 @@ public class BookUtilities {
 	 * Hopefully this is just temporary.
 	 * EditBookScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
 	 */
-	public static String deJSONify(String jsonIn){
-		try{
+	public static String deJSONify(String jsonIn) {
+		try {
 			// func_240643_a_() is fromJson()
 			ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
-			if (i != null){
-				return(i.getString());
+			if (i != null) {
+				return (i.getString());
 			}
-		}
-		catch (JsonParseException jsonparseexception){
+		} catch (JsonParseException jsonparseexception) {
 			// jsonIn was probably just a normal string, so there's no need to freak out the end user
 		}
-		return(jsonIn);
+		return (jsonIn);
 	}
 	
 	
-	static class PageDetails{
+	static class PageDetails {
 		public final String fullPageText;
 		public final int[] lineStartIndices;
 		public final String[] lines;
 		public final ITextComponent[] stylizedLines;
 		
-		PageDetails(String fullPageText, IntList lineStartIndices, List<String> lines, List<ITextComponent> stylizedLines){
+		PageDetails(String fullPageText, IntList lineStartIndices, List<String> lines, List<ITextComponent> stylizedLines) {
 			this.fullPageText = fullPageText;
 			this.lineStartIndices = lineStartIndices.toIntArray();
 			this.lines = lines.toArray(new String[0]);
@@ -193,14 +189,14 @@ public class BookUtilities {
 	}
 	
 	
-	static class Pages{
+	static class Pages {
 		private final List<BookUtilities.PageDetails> pages = new ArrayList<>();
 		
 		/**
 		 * @return The requested page, or a blank page if index is invalid
 		 */
-		public BookUtilities.PageDetails get(int index){
-			if (index >= 0 && index < this.pages.size()){
+		public BookUtilities.PageDetails get(int index) {
+			if (index >= 0 && index < this.pages.size()) {
 				return this.pages.get(index);
 			}
 			// Return an empty page
@@ -219,20 +215,20 @@ public class BookUtilities {
 		 */
 		public List<String> asStrings() {
 			List<String> pageStrings = new ArrayList<>();
-			for (BookUtilities.PageDetails page: this.pages){
+			for (BookUtilities.PageDetails page : this.pages) {
 				pageStrings.add(page.fullPageText);
 			}
 			return pageStrings;
 		}
 		
 		
-		public void add(BookUtilities.PageDetails page){
+		public void add(BookUtilities.PageDetails page) {
 			this.pages.add(page);
 		}
 		
 		
-		public void addAll(Pages pagesToAdd){
-			for (int i=0; i < pagesToAdd.pages.size(); i++){
+		public void addAll(Pages pagesToAdd) {
+			for (int i = 0; i < pagesToAdd.pages.size(); i++) {
 				this.add(pagesToAdd.get(i));
 			}
 		}
