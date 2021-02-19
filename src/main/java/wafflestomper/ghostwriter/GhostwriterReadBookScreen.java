@@ -47,15 +47,6 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Called by file browser
-	 */
-	public void saveBookToDisk(File savePath){
-		// TODO: Refactor this away
-		this.ghostLayer.saveBookToDisk(savePath);
-	}
-	
-	
 	@Override  // From ReadBookScreen
 	public void init(){
 		super.init();

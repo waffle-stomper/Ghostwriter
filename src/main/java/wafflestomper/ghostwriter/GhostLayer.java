@@ -37,8 +37,8 @@ public class GhostLayer {
 	
 	private static final Minecraft MINECRAFT = Minecraft.getInstance();
 	private final IGhostBook parent;
-	private final Screen screen;
-	private final boolean editButtonsEnabled;
+	public final Screen screen;
+	public final boolean bookIsEditable;
 	
 	// These are mostly used for loaded books
 	// Note that EditBookScreen has its own bookTitle field that we need to keep track of
@@ -48,10 +48,10 @@ public class GhostLayer {
 	private boolean buttonsInitialized = false;
 	
 	
-	public GhostLayer(IGhostBook parent, Screen screenParent, boolean enableEditButtons){
+	public GhostLayer(IGhostBook parent, Screen screenParent, boolean bookIsEditable){
 		this.parent = parent;
 		this.screen = screenParent;  // TODO: Is there a cleaner way to do this?
-		this.editButtonsEnabled = enableEditButtons;
+		this.bookIsEditable = bookIsEditable;
 	}
 	
 	
@@ -320,7 +320,7 @@ public class GhostLayer {
 		// Set visibility for buttons that aren't visible in read-only modes
 		// Note that if the button has been hidden by the loop above, it won't be shown by this loop
 		for (Button b: this.buttonsEditOnly){
-			b.visible = this.editButtonsEnabled  && b.visible;
+			b.visible = this.bookIsEditable && b.visible;
 		}
 		
 		// Reset invalid selection
@@ -406,7 +406,7 @@ public class GhostLayer {
 		this.addPageButton(new Button(5, 5, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
 				new StringTextComponent("File Browser"), (pressed_button) -> {
 						// TODO: Pass the IGhostBook this file browser rather than the parent screen
-						MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this.screen));
+						MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 					}
 				), false);
 		

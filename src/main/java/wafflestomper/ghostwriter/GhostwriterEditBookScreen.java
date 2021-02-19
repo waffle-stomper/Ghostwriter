@@ -72,12 +72,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
-	// TODO: Work this into the ghost layer?
-	public void saveBookToDisk(File filepath) {
-		Ghostwriter.FILE_HANDLER.saveBookToGHBFile("", "", this.bookPages, filepath);
-	}
-	
-	
 	/**
 	 * Override from vanilla EditBookScreen
 	 */

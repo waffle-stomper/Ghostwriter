@@ -4,10 +4,6 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.ConfirmScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
@@ -26,7 +22,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private File cachedPath;
 	private File selectedFile = null;
 	
-	private final Screen PARENT_GUI; // TODO: add a generic interface so we don't have to check cast before saving
+	private final GhostLayer parent;
 	private final Clipboard TEMP_CLIPBOARD = new Clipboard();
 	private static final Printer PRINTER = new Printer();
 	
@@ -48,16 +44,15 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private String hoveringText;
 	
 	
-
-	public GhostwriterFileBrowserScreen(Screen _parentGui){
+	public GhostwriterFileBrowserScreen(GhostLayer parent){
 		super(new StringTextComponent("Ghostwriter File Browser"));
-		this.PARENT_GUI = _parentGui;
+		this.parent = parent;
 		this.FILE_HANDLER = new FileHandler(this.TEMP_CLIPBOARD);
 		if (Ghostwriter.currentPath == null) {
 			Ghostwriter.currentPath = this.FILE_HANDLER.getSavePath();
 		}
 		this.FILE_HANDLER.currentPath = Ghostwriter.currentPath;
-		if (_parentGui instanceof GhostwriterEditBookScreen) {
+		if (parent.bookIsEditable) {
 			this.enableLoading = true;
 		}
 	}
@@ -75,33 +70,32 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	public void saveCallback(boolean confirmed){
 		if (confirmed) {
 			// Do the save, then kick back to the book
-			saveBook();
+			this.saveBook();
 		}
 		else {
 			this.goBackToParentGui();
 		}
 	}
 	
-	// TODO: I'm sure we can refactor this to get rid of the casts now that we have IGhostBook
+	
 	private void loadClicked(boolean autoReload) {
 		// The book should already be in the temp clipboard at this point, right?
 		if (!this.TEMP_CLIPBOARD.bookInClipboard) {
 			PRINTER.gamePrint(Printer.RED + "Error loading book - no book in temp clipboard!");
 		}
-		else if (this.PARENT_GUI instanceof GhostwriterEditBookScreen) {
-			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.PARENT_GUI;
-			if (autoReload) {
-				parent.ghostLayer.enableAutoReload(this.FILE_HANDLER.lastLoadedBook, this.TEMP_CLIPBOARD);
-				parent.ghostLayer.clipboardToBook(this.TEMP_CLIPBOARD);
-			}
-			else {
-				Ghostwriter.GLOBAL_CLIPBOARD.clone(this.TEMP_CLIPBOARD);
-				new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
-			}
-		}
-		else {
+		else if (!this.parent.bookIsEditable){
 			PRINTER.gamePrint(Printer.RED + "Error loading book - you can't load to a non-writable book!");
 		}
+		
+		if (autoReload) {
+			parent.enableAutoReload(this.FILE_HANDLER.lastLoadedBook, this.TEMP_CLIPBOARD);
+			parent.clipboardToBook(this.TEMP_CLIPBOARD);
+		}
+		else {
+			Ghostwriter.GLOBAL_CLIPBOARD.clone(this.TEMP_CLIPBOARD);
+			new Printer().gamePrint(Printer.GRAY + "Book loaded into clipboard");
+		}
+		
 		this.goBackToParentGui();
 	}
 	
@@ -136,22 +130,8 @@ public class GhostwriterFileBrowserScreen extends Screen{
 					new StringTextComponent("filename"));
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
-			String file_title = "";
-			String file_author = "";
-			if (this.PARENT_GUI instanceof GhostwriterEditBookScreen) {
-				GhostwriterEditBookScreen parentBook = (GhostwriterEditBookScreen)this.PARENT_GUI;
-				file_title = parentBook.getBookTitle();
-			}
-			if (this.PARENT_GUI instanceof GhostwriterReadBookScreen && this.minecraft.player != null) {
-				ItemStack itemstack = this.minecraft.player.getHeldItem(Hand.MAIN_HAND); // TODO: Off hand?
-				if (itemstack.getItem() == Items.WRITTEN_BOOK){
-					CompoundNBT compoundnbt = itemstack.getTag();
-					if (compoundnbt != null) {
-						file_author = compoundnbt.getString("author");
-						file_title = compoundnbt.getString("title");
-					}
-				}
-			}
+			String file_title = this.parent.bookTitle;
+			String file_author = this.parent.bookAuthor;
 			
 			file_title = file_title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 			file_author = file_author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
@@ -316,9 +296,8 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	private void goBackToParentGui(){
 		if (this.minecraft == null) return;
 		Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
-		this.minecraft.displayGuiScreen(this.PARENT_GUI);
+		this.minecraft.displayGuiScreen(this.parent.screen);
 	}
-	
 	
 	
 	public void updateButtons() {
@@ -340,6 +319,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 			this.btnEditExtension.setMessage(new StringTextComponent("\u00a7mEXT"));
 		}
 	}
+	
 	
 	/**
 	 * Handles everything, which eventually filters down to charTyped if the key is printable
@@ -366,10 +346,10 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
 		if (super.charTyped(p_charTyped_1_, p_charTyped_2_)) {
 			return true;
-		} 
+		}
 		else {
 			return this.filenameField.charTyped(p_charTyped_1_, p_charTyped_2_);
-		} 	
+		}
 	}
 	
 	
@@ -382,21 +362,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 	 * This actually calls the save function and kicks back to the book screen
 	 */
 	private void saveBook(){
-		if (this.PARENT_GUI instanceof GhostwriterEditBookScreen) {
-			GhostwriterEditBookScreen parent = (GhostwriterEditBookScreen)this.PARENT_GUI;
-			parent.saveBookToDisk(this.getSavePath());
-		}
-		else if (this.PARENT_GUI instanceof GhostwriterLecternScreen){
-			GhostwriterLecternScreen parent = (GhostwriterLecternScreen)this.PARENT_GUI;
-			parent.saveBookToDisk(this.getSavePath());
-		}
-		else if (this.PARENT_GUI instanceof GhostwriterReadBookScreen) {
-			GhostwriterReadBookScreen parent = (GhostwriterReadBookScreen)this.PARENT_GUI;
-			parent.saveBookToDisk(this.getSavePath());
-		}
-		else {
-			PRINTER.gamePrint(Printer.RED + "Saving not implemented for the parent screen!");
-		}
+		this.parent.saveBookToDisk(this.getSavePath());
 		this.goBackToParentGui();
 	}
 	
@@ -418,7 +384,7 @@ public class GhostwriterFileBrowserScreen extends Screen{
 		else {
 			this.FILE_HANDLER.currentPath = path;
 		}
-	}	
+	}
 	
 	
 	public void setHoveringText(String text) {

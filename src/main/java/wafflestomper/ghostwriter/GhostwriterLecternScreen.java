@@ -91,21 +91,6 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	}
 	
 	
-	/**
-	 * Called by file browser
-	 */
-	// TODO: consolidate all of these to ghostlayer
-	public void saveBookToDisk(File filepath) {
-		List<String> pages = new ArrayList<>();
-		for (int i=0; i<this.getPageCount(); i++) {
-			// func_230456_a_ is the old getPageText and getString() converts it to a string with formatting codes
-			String s = this.bookInfo.func_230456_a_(i).getString();  // TODO: Should we use extractBookPages instead? I'm so confused
-			pages.add(s);
-		}
-		Ghostwriter.FILE_HANDLER.saveBookToGHBFile(this.ghostLayer.bookTitle, this.ghostLayer.bookAuthor, pages, filepath);
-	}
-	
-	
 	@Override  // From IGhostBook
 	public int getBookPageCount(){
 		return this.getPageCount();
