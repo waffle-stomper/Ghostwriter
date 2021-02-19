@@ -35,6 +35,17 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 	}
 	
 	
+	@Override
+	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		// Patch Esc function so it kicks back to parent screen rather than exiting completely
+		if (keyCode == SharedConstants.KEY_ESC && this.minecraft != null) {
+			this.minecraft.displayGuiScreen(this.parent);
+			return true;
+		}
+		return super.keyPressed(keyCode, scanCode, modifiers);
+	}
+	
+	
 	@MethodsReturnNonnullByDefault
 	public static class PreviewBookInfo implements ReadBookScreen.IBookInfo {
 		private final GhostwriterEditBookScreen PARENT;

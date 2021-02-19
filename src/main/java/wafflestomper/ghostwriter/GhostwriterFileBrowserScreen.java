@@ -320,6 +320,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	 */
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+		// Patch Esc function to kicking back to parent screen rather than exiting completely
 		if (keyCode == SharedConstants.KEY_ESC) {
 			goBackToParentGui();
 			return true;
