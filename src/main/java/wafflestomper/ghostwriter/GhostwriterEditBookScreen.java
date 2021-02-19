@@ -16,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -167,11 +168,14 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	}
 	
 	
+	/**
+	 * @return A deep copy of the book's pages
+	 */
 	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
 		// As of 1.16.1, unsigned books just use plain strings for book pages so we don't need to remove
 		// any JSON weirdness
-		return this.bookPages;
+		return new ArrayList<>(this.bookPages);
 	}
 	
 	
