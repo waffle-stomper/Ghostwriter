@@ -17,7 +17,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,29 +32,17 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		super(editingPlayer, book, hand);
 		this.ghostLayer = new GhostLayer(this, this, true);
 		
-		// Swap out the title input util for one that allows longer titles
+		// Swap out the title input util for one that allows longer titles and updates the title in GhostLayer
 		// WrittenBookItem.validBookTagContents declares the book invalid if the title is over 32 characters
 		field_238749_v_ = new TextInputUtil(
 				() -> this.bookTitle,
-				(p_238772_1_) -> this.bookTitle = p_238772_1_,
+				(p_238772_1_) -> {
+					this.bookTitle = p_238772_1_;
+					this.ghostLayer.bookTitle = this.bookTitle;
+				},
 				this::func_238773_g_,  // getClipboardText
 				this::func_238760_a_,  // setClipboardText
 				(p_238771_0_) -> p_238771_0_.length() <= SharedConstants.BOOK_TITLE_MAX_LEN);
-	}
-	
-	
-	// TODO: Why do we use this for cut/copy/paste but not for saving?
-	@Deprecated  // I don't think this is needed for unsigned books. As far as I can tell, JSON is only used for signed
-	public List<String> pagesAsList(){
-		List<String> pages = new ArrayList<>();
-		for (int i=0; i<this.getPageCount(); i++){
-			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
-			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
-			String pageText = BookUtilities.deJSONify(this.bookPages.get(i));
-			pages.add(pageText);
-		}
-		return pages;
 	}
 	
 	
@@ -197,12 +184,21 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		return super.keyPressedInTitle(keyCode, scanCode, modifiers);
 	}
 	
+	/**
+	 * Called by GhostLayer
+	 */
+	public List<String> pagesAsList(){
+		// As of 1.16.1, unsigned books just use plain strings for book pages so we don't need to remove
+		// any JSON weirdness
+		return this.bookPages;
+	}
+	
 	
 	/**
 	 * Called by GhostLayer to insert text
 	 */
 	@Override
-	public void insertTextIntoPage(String text) {
+	public void insertText(String text) {
 		if (this.bookGettingSigned){
 			// Put the text into the title
 			this.field_238749_v_.putText(text);
@@ -219,8 +215,8 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	 * e.g. removing a page
 	 */
 	@Override
-	public void bookChanged(){
-		this.bookIsModified = true;
+	public void bookChanged(boolean setModifiedFlag){
+		if (setModifiedFlag) this.bookIsModified = true;
 		this.cachedPage = -1;
 		
 		// field_238748_u_ is the new TextInputUtil. If we don't move the cursor, the game can crash because
@@ -240,6 +236,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		return this.bookGettingSigned;
 	}
 	
+	
 	/**
 	 * Called by GhostLayer to set the current page
 	 */
@@ -247,7 +244,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	public void setCurrPage(int pageNum){
 		// TODO: idiot proofing
 		this.currPage = pageNum;
-		this.bookChanged();
+		this.bookChanged(false);
 	}
 	
 	/**
@@ -257,7 +254,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	public void insertNewPage(int atPageNum, String pageText){
 		// TODO: idiot proofing
 		this.bookPages.add(atPageNum, pageText);
-		this.bookChanged();
+		this.bookChanged(true);
 	}
 	
 	
@@ -268,7 +265,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	public void setPageText(int pageNum, String pageText){
 		// TODO: idiot proofing
 		this.bookPages.set(pageNum, pageText);
-		this.bookChanged();
+		this.bookChanged(true);
 	}
 	
 	
@@ -291,7 +288,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookPages.remove(pageNum);
 		// Add a blank page if the book is empty
 		if (this.bookPages.size() == 0) this.bookPages.add("");
-		this.bookChanged();
+		this.bookChanged(true);
 	}
 	
 	
@@ -304,7 +301,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 		this.bookPages.clear();
 		this.bookPages.addAll(newPages);
 		if (this.bookPages.isEmpty()) this.bookPages.add("");
-		this.bookChanged();
+		this.bookChanged(true);
 	}
 	
 	

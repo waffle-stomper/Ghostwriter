@@ -52,19 +52,19 @@ public class GhostLayer {
 		this.editButtonsEnabled = enableEditButtons;
 	}
 	
-	public void setTitleAuthor(String title, String author){
+	
+	public void setTitleAuthor(String title, String author) {
 		this.bookTitle = title;
 		this.bookAuthor = author;
 	}
 	
 	
-	// TODO: make sure this is called instead of the parent.bookChanged
-	private void bookChanged(boolean resetPageSelection){
-		if (resetPageSelection){
+	private void bookChanged(boolean resetPageSelection) {
+		if (resetPageSelection) {
 			this.selectedPageA = -1;
 			this.selectedPageB = -1;
 		}
-		this.parent.bookChanged();
+		this.parent.bookChanged(true);
 		this.updateButtons();
 	}
 	
@@ -306,7 +306,6 @@ public class GhostLayer {
 	}
 	
 	
-	
 	public void updateButtons() {
 		this.parent.updateVanillaButtons();
 		if (!this.buttonsInitialized) return;
@@ -389,7 +388,7 @@ public class GhostLayer {
 	private Button addColorFormatButton(int y, String label, String insertChars){
 		Button b = this.addPageButton(new Button(this.colorFormatButtonX, y,  SharedConstants.COLOR_FORMAT_BUTTON_WIDTH,
 				SharedConstants.BUTTON_HEIGHT, new StringTextComponent(label),
-				(pressed_button) -> this.parent.insertTextIntoPage(insertChars)), true);
+				(pressed_button) -> this.parent.insertText(insertChars)), true);
 		this.colorFormatButtonX += SharedConstants.COLOR_FORMAT_BUTTON_WIDTH;
 		return b;
 	}

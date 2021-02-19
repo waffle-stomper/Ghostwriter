@@ -11,7 +11,7 @@ public interface IGhostBook {
 	int getBookPageCount();
 	List<String> pagesAsList();
 	void updateVanillaButtons();
-	void insertTextIntoPage(String insertChars);
+	void insertText(String insertChars);
 	void insertNewPage(int atPageNum, String pageText);
 	void removePage(int pageNum);
 	void replaceBookPages(List<String> newPages);
@@ -25,5 +25,5 @@ public interface IGhostBook {
 	 * Used to update the vanilla book after a change is made without using the vanilla TextInputUtil
 	 * e.g. removing a page
 	 */
-	void bookChanged();
+	void bookChanged(boolean setModifiedFlag);
 }

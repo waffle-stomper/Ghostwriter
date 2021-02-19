@@ -54,29 +54,22 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 		this.ghostLayer.saveBookToDisk(savePath);
 	}
 	
-	/**
-	 * Override from ReadBookScreen
-	 */
-	@Override
+	
+	@Override  // From ReadBookScreen
 	public void init(){
 		super.init();
 		this.ghostLayer.init();
 		this.updateButtons();
 	}
 	
-	/**
-	 * Override from ReadBookScreen
-	 */
-	@Override
+	
+	@Override  // From ReadBookScreen
 	public void updateButtons(){
 		this.ghostLayer.updateButtons();
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
@@ -90,90 +83,69 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public int getBookPageCount(){
 		return this.getPageCount();
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public void updateVanillaButtons(){
 		super.updateButtons();
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public Button addGhostButton(Button button) {
 		return this.addButton(button);
 	}
 	
 	
-	@Override
+	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
 		// func_238806_b_() either returns the page text or a blank ITextComponent
 		return this.bookInfo.func_238806_b_(pageNum).toString();
 	}
 	
 	
-	/**
-	 * Called by GhostLayer
-	 */
-	@Override
+	@Override  // From IGhostBook
 	public int getCurrPage() {
 		return this.currPage;
 	}
 	
-	@Override
-	public void setCurrPage(int pageNum) {
 	
-	}
-	
-	/**
-	 * Called by GhostLayer
-	 * Unused because signed books are read-only
-	 */
-	@Override
-	public void insertTextIntoPage(String insertChars) {}
-	
-	@Override
-	public void insertNewPage(int atPageNum, String pageText) {}
-	
-	@Override
-	public void removePage(int pageNum) {}
-	
-	@Override
-	public void replaceBookPages(List<String> newPages) {}
-	
-
-	@Override
-	public void setPageText(int pageNum, String pageText) {
-	
-	}
-	
-	@Override
+	@Override  // From IGhostBook
 	public boolean isBookBeingSigned() {
 		return false;
 	}
 	
 	
-	@Override
-	public void setBookTitle(String title) {}
+	@Override  // From IGhostBook
+	public void bookChanged(boolean setModifiedFlag) {
+		this.cachedPage = -1;
+		// TODO: Do we need to do anything else?
+	}
 	
-	@Override
-	public void bookChanged() {}
 	
-	
-	@Override
+	@Override  // From IGhostBook
 	public String getBookTitle() {
 		return this.ghostLayer.bookTitle;
 	}
+	
+	
+	// Unused methods that only apply to unsigned books
+	@Override  // From IGhostBook
+	public void setCurrPage(int pageNum){}
+	@Override  // From IGhostBook
+	public void setBookTitle(String title){}
+	@Override  // From IGhostBook
+	public void setPageText(int pageNum, String pageText){}
+	@Override  // From IGhostBook
+	public void insertText(String insertChars){}
+	@Override  // From IGhostBook
+	public void insertNewPage(int atPageNum, String pageText){}
+	@Override  // From IGhostBook
+	public void removePage(int pageNum){}
+	@Override  // From IGhostBook
+	public void replaceBookPages(List<String> newPages){}
 }
