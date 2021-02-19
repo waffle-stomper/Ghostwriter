@@ -14,16 +14,8 @@ public class Printer {
 	public static final TextFormatting AQUA = TextFormatting.AQUA;
 	public static final TextFormatting RED = TextFormatting.RED;
 	private static final Minecraft MC = Minecraft.getInstance();
-	private static final Logger LOG = LogManager.getLogger();
-	
-	public Printer() {
-	}
 	
 	public void gamePrint(String inStr) {
 		MC.ingameGUI.getChatGUI().printChatMessage(new StringTextComponent(inStr));
-	}
-	
-	public void print(String toPrint) {
-		LOG.info(toPrint);
 	}
 }
