@@ -1,12 +1,10 @@
 package wafflestomper.ghostwriter;
 
 import net.minecraft.client.gui.screen.LecternScreen;
-import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.LecternContainer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -24,38 +22,10 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 		
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.lecternContainer = lecternContainer;
-		if (currStack != null){
-			CompoundNBT compoundnbt = currStack.getTag();
-			if (compoundnbt != null) {
-				this.ghostLayer.setTitleAuthor(compoundnbt.getString("title"), compoundnbt.getString("author"));
-			}
-		}
-	}
-
-
-	/**
-	 * Helper function that extracts the pages from the read book until I find a cleaner way to do this
-	 * @return Pages as a list of Strings
-	 */
-	// TODO: We can probably drop this in favor of pagesAsList, which should use the IBookInfo methods to get the page text
-	public List<String> extractBookPages(){
-		if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
-			ReadBookScreen.WrittenBookInfo b = (ReadBookScreen.WrittenBookInfo)this.bookInfo;
-			return b.pages;
-		}
-		else if (this.bookInfo instanceof ReadBookScreen.UnwrittenBookInfo) {
-			ReadBookScreen.UnwrittenBookInfo b = (ReadBookScreen.UnwrittenBookInfo)this.bookInfo;
-			return b.pages;
-		}
-		else {
-			return new ArrayList<>();
-		}
+		this.ghostLayer.extractTitleAuthor(currStack);
 	}
 	
 	
-	/**
-	 * Override from ReadBookScreen
-	 */
 	@Override  // From ReadBookScreen
 	public void updateButtons() {
 		this.ghostLayer.updateButtons();
@@ -64,15 +34,9 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	@Override  // From IGhostBook
 	public List<String> pagesAsList(){
-		// TODO: Perhaps we should use the getPage() method provided by IBookInfo instead? I think that would negate the
-		//       JSON weirdness we get from some read books
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
-			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
-			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
-			String pageText = BookUtilities.deJSONify(this.extractBookPages().get(i)); // TODO: Should this use the getPage function from IBookInfo instead?
-			pages.add(pageText);
+			pages.add(BookUtilities.deJSONify(this.bookInfo.func_238806_b_(i).getString()));
 		}
 		return pages;
 	}

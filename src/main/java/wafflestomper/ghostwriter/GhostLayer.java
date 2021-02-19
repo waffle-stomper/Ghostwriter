@@ -3,6 +3,8 @@ package wafflestomper.ghostwriter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.io.File;
@@ -55,9 +57,16 @@ public class GhostLayer {
 	}
 	
 	
-	public void setTitleAuthor(String title, String author) {
-		this.bookTitle = title;
-		this.bookAuthor = author;
+	/**
+	 * Called by GhostwriterLecternScreen and GhostwriterReadBookScreen
+	 * Extracts title and author
+	 */
+	public void extractTitleAuthor(ItemStack bookStack) {
+		if (bookStack == null) return;
+		CompoundNBT compoundnbt = bookStack.getTag();
+		if (compoundnbt == null) return;
+		this.bookTitle = compoundnbt.getString("title");
+		this.bookAuthor = compoundnbt.getString("author");
 	}
 	
 	
@@ -69,6 +78,7 @@ public class GhostLayer {
 		this.parent.bookChanged(true);
 		this.updateButtons();
 	}
+	
 	
 	private void copyBook(){
 		Ghostwriter.GLOBAL_CLIPBOARD.author = "";
@@ -405,7 +415,6 @@ public class GhostLayer {
 		////////////////////////////////////  Left side buttons  ///////////////////////////////////////////////
 		this.addPageButton(new Button(5, 5, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
 				new StringTextComponent("File Browser"), (pressed_button) -> {
-						// TODO: Pass the IGhostBook this file browser rather than the parent screen
 						MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this));
 					}
 				), false);

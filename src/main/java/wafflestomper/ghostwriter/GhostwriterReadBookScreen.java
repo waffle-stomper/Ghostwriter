@@ -3,7 +3,6 @@ package wafflestomper.ghostwriter;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,33 +15,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, ItemStack currStack){
 		super(bookInfoIn);
 		this.ghostLayer = new GhostLayer(this, this, false);
-		if (currStack != null){
-			CompoundNBT compoundnbt = currStack.getTag();
-			if (compoundnbt != null) {
-				this.ghostLayer.setTitleAuthor(compoundnbt.getString("title"), compoundnbt.getString("author"));
-			}
-		}
-	}
-	
-	
-	/**
-	 * Helper function that extracts the pages from the book until I find a cleaner way to do this
-	 */
-	// TODO: We can probably drop this in favor of pagesAsList, which should use the IBookInfo methods to get the page text
-	private List<String> extractBookPages(){
-		// TODO: Perhaps we should use the getPage() method provided by IBookInfo instead? I think that would negate the
-		//       JSON weirdness we get from some read books
-		if (this.bookInfo instanceof ReadBookScreen.WrittenBookInfo) {
-			ReadBookScreen.WrittenBookInfo b = (ReadBookScreen.WrittenBookInfo)this.bookInfo;
-			return b.pages;
-		}
-		else if (this.bookInfo instanceof ReadBookScreen.UnwrittenBookInfo) {
-			ReadBookScreen.UnwrittenBookInfo b = (ReadBookScreen.UnwrittenBookInfo)this.bookInfo;
-			return b.pages;
-		}
-		else {
-			return new ArrayList<>();
-		}
+		this.ghostLayer.extractTitleAuthor(currStack);
 	}
 	
 	
@@ -64,11 +37,7 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	public List<String> pagesAsList(){
 		List<String> pages = new ArrayList<>();
 		for (int i=0; i<this.getPageCount(); i++){
-			// Ugly hack to convert the new JSON "Yo dawg I heard you like strings, so I put a string in your string" strings
-			//  back to the old-style literal strings that everyone knows and loves. I'll update this to do the opposite once
-			//  we're finally allowed to send JSON strings to the server. It also converts to old-school formatting codes
-			String pageText = BookUtilities.deJSONify(this.extractBookPages().get(i));
-			pages.add(pageText);
+			pages.add(BookUtilities.deJSONify(this.bookInfo.func_238806_b_(i).getString()));
 		}
 		return pages;
 	}
