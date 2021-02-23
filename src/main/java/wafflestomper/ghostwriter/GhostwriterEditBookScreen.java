@@ -38,7 +38,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 				() -> this.bookTitle,
 				(p_238772_1_) -> {
 					this.bookTitle = p_238772_1_;
-					this.ghostLayer.bookTitle = this.bookTitle;
+					this.ghostLayer.setBookTitle(this.bookTitle);
 				},
 				this::func_238773_g_,  // getClipboardText
 				this::func_238760_a_,  // setClipboardText
@@ -214,7 +214,15 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public void insertNewPage(int atPageNum, String pageText) {
-		// TODO: idiot proofing
+		// Idiot proofing
+		if (atPageNum >= SharedConstants.MAX_BOOK_PAGES){
+			Ghostwriter.LOG.error("Cannot insert a page at index " + atPageNum + ". It would make the book too long");
+			return;
+		}
+		
+		// Add blank pages if necessary to prevent IndexOutOfBoundsException
+		while(this.bookPages.size() < atPageNum) this.bookPages.add("");
+		
 		this.bookPages.add(atPageNum, pageText);
 		this.bookChanged(true);
 	}
@@ -222,7 +230,12 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public void setPageText(int pageNum, String pageText) {
-		// TODO: idiot proofing
+		// Idiot proofing
+		if (pageNum < 0 || pageNum > this.bookPages.size() - 1){
+			Ghostwriter.LOG.error("Couldn't set text on page " + pageNum + " because it doesn't exist");
+			return;
+		}
+		
 		this.bookPages.set(pageNum, pageText);
 		this.bookChanged(true);
 	}
@@ -230,14 +243,21 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
-		// TODO: idiot proofing
+		// Idiot proofing
+		if (pageNum < 0 || pageNum > this.bookPages.size() - 1) return "";
+		
 		return this.bookPages.get(pageNum);
 	}
 	
 	
 	@Override  // From IGhostBook
 	public void removePage(int pageNum) {
-		// TODO: idiot proofing
+		// Prevent IndexOutOfBoundsException
+		if (pageNum > this.bookPages.size() - 1){
+			Ghostwriter.LOG.error("Can't remove page " + pageNum + ". It doesn't exist");
+			return;
+		}
+		
 		this.bookPages.remove(pageNum);
 		// Add a blank page if the book is empty
 		if (this.bookPages.size() == 0) this.bookPages.add("");
@@ -247,7 +267,6 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public void replaceBookPages(List<String> newPages) {
-		// TODO: idiot proofing
 		this.bookPages.clear();
 		this.bookPages.addAll(newPages);
 		if (this.bookPages.isEmpty()) this.bookPages.add("");
@@ -276,7 +295,12 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public void setCurrPage(int pageNum) {
-		// TODO: idiot proofing
+		// Idiot proofing
+		if (pageNum < 0 || pageNum > this.bookPages.size() - 1){
+			Ghostwriter.LOG.error("Couldn't move to page " + pageNum + ". It doesn't exist");
+			pageNum = 0;
+		}
+		
 		this.currPage = pageNum;
 		this.bookChanged(false);
 	}

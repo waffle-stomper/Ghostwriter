@@ -44,16 +44,38 @@ public class GhostLayer {
 	
 	// These are mostly used for loaded books
 	// Note that EditBookScreen has its own bookTitle field that we need to keep track of
-	public String bookTitle = "";
-	public String bookAuthor = "";
+	private String bookTitle = "";
+	private String bookAuthor = "";
 	
 	private boolean buttonsInitialized = false;
 	
 	
 	public GhostLayer(IGhostBook parent, Screen screenParent, boolean bookIsEditable) {
 		this.parent = parent;
-		this.screen = screenParent;  // TODO: Is there a cleaner way to do this?
+		this.screen = screenParent;
 		this.bookIsEditable = bookIsEditable;
+	}
+	
+	
+	public String getBookAuthor(){
+		return this.bookAuthor;
+	}
+	
+	
+	public String getBookTitle(){
+		return this.bookTitle;
+	}
+	
+	
+	/**
+	 * Set the internal bookTitle field, enforcing the maximum length from SharedConstants
+	 */
+	public void setBookTitle(String title){
+		if (title.length() < SharedConstants.BOOK_TITLE_MAX_LEN) {
+			this.bookTitle = title;
+		} else {
+			this.bookTitle = title.substring(0, SharedConstants.BOOK_TITLE_MAX_LEN);
+		}
 	}
 	
 	
@@ -65,7 +87,7 @@ public class GhostLayer {
 		if (bookStack == null) return;
 		CompoundNBT compoundnbt = bookStack.getTag();
 		if (compoundnbt == null) return;
-		this.bookTitle = compoundnbt.getString("title");
+		this.setBookTitle(compoundnbt.getString("title"));
 		this.bookAuthor = compoundnbt.getString("author");
 	}
 	
@@ -192,7 +214,7 @@ public class GhostLayer {
 		FileHandler fh = new FileHandler(clip);
 		File sigFile = new File(Ghostwriter.FILE_HANDLER.getSignaturePath(), "default.ghb");
 		if (fh.loadBook(sigFile) && clip.bookInClipboard) {
-			this.parent.insertNewPage(this.parent.getBookPageCount(), "");  // TODO: Is this necessary?
+			this.parent.insertNewPage(this.parent.getBookPageCount(), "");
 			Ghostwriter.GLOBAL_CLIPBOARD.miscPages.addAll(clip.pages);
 			pasteMultiplePages(this.parent.getBookPageCount() - 1);
 			Ghostwriter.PRINTER.gamePrint(Printer.GRAY + "Signature pages added");
@@ -260,7 +282,7 @@ public class GhostLayer {
 	 * Copies a book from the clipboard into the 'real' book
 	 */
 	public void clipboardToBook(Clipboard fromBook) {
-		this.bookTitle = fromBook.title;
+		this.setBookTitle(fromBook.title);
 		this.parent.setBookTitle(this.bookTitle);
 		this.parent.replaceBookPages(fromBook.pages);
 		if (this.parent.getBookPageCount() == 0) this.parent.insertNewPage(0, "");
@@ -364,14 +386,6 @@ public class GhostLayer {
 		}
 		
 		this.buttonDisableAutoReload.active = this.autoReloadFile != null;
-		
-		// TODO: Is there a better place to do this?
-		// Trim book title to a max of 32 characters. Anything longer an the book will be marked invalid by
-		// the client when you try to read it
-		// updateButtons() is called when the 'sign' button is clicked, so it's a convenient time to check this
-		if (this.bookTitle.length() > 32) {
-			this.bookTitle = this.bookTitle.substring(0, 32);
-		}
 	}
 	
 	

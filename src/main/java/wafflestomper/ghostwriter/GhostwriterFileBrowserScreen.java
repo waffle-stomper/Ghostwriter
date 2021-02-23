@@ -127,8 +127,8 @@ public class GhostwriterFileBrowserScreen extends Screen {
 					new StringTextComponent("filename"));
 			this.filenameField.setMaxStringLength(100);
 			// Add default filename to filenameField
-			String file_title = this.parent.bookTitle;
-			String file_author = this.parent.bookAuthor;
+			String file_title = this.parent.getBookTitle();
+			String file_author = this.parent.getBookAuthor();
 			
 			file_title = file_title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 			file_author = file_author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
@@ -203,7 +203,6 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	}
 	
 	
-	// TODO: This could probably use some more checks
 	private boolean isFilenameValid() {
 		String fn = this.filenameField.getText();
 		return !fn.equals("");
