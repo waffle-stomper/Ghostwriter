@@ -45,9 +45,6 @@ public class Ghostwriter {
 	}
 	
 	
-	// TODO: Add check for 'air' stack instead of book (I think there's a race condition where this might get called too early)
-	// TODO: Refactor this to remove the duplicated code with guiOpen() below
-	
 	/**
 	 * This swaps the book on a lectern for the Ghostwriter equivalent
 	 */

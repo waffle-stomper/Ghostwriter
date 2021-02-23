@@ -3,8 +3,6 @@ package wafflestomper.ghostwriter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Printer {
 	// I think we've already established that I'm a terrible person

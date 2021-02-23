@@ -23,9 +23,6 @@ public class BookUtilities {
 	 * Note that a sequence like Red Bold Red will be preserved because the second red is needed to cancel the bold
 	 */
 	public static String removeRedundantFormatChars(String in, String pageBreakString) {
-		// TODO: Find out where the extra format characters are coming from and try to suppress them upstream
-		//       rather than just removing them later. I suspect the issue is books that have been saved on servers
-		//       running old Minecraft versions, but I'm not totally sure
 		// Split the string into pages
 		String[] splitByPage = in.split(pageBreakString);
 		StringBuilder cleanedPage = new StringBuilder();
