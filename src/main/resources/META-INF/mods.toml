@@ -1,28 +1,25 @@
-# This is an example mods.toml file. It contains the data relating to the loading mods.
-# There are several mandatory fields (#mandatory), and many more that are optional (#optional).
-# The overall format is standard TOML format, v0.5.0.
-# Note that there are a couple of TOML lists in this file.
-# Find more information on toml format here:  https://github.com/toml-lang/toml
-
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
-modLoader="javafml" #mandatory
+modLoader="javafml"
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[28,)"
+loaderVersion="[32,)"  # 32 = 1.16.1
+
+# The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
+license="GNU GPL v3"
 
 # A URL to refer people to when problems occur with this mod
-issueTrackerURL="http://my.issue.tracker/" #optional
+issueTrackerURL="https://github.com/waffle-stomper/Ghostwriter/issues"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
-[[mods]] #mandatory
-    modId="ghostwriter" #mandatory
+[[mods]]
+    modId="ghostwriter"
     version="${file.jarVersion}"
     displayName="Ghostwriter" 
     updateJSONURL="https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json"
     displayURL="https://github.com/waffle-stomper/Ghostwriter" 
     logoFile="icon.png"
-    credits="maester_flaminius, SortByNode, and all of the other wonderful people I've met through Minecraft"
-    authors="waffle_stomper and maester_flaminius" #optional
+    credits="maester_flaminius, SortByNode, Lodish, and all of the other wonderful people I've met through Minecraft"
+    authors="waffle_stomper and maester_flaminius"
     description='''
     Utility for dealing with books (backup, restore, copy, paste, etc.).
     '''
@@ -30,12 +27,12 @@ issueTrackerURL="http://my.issue.tracker/" #optional
 [[dependencies.ghostwriter]]
     modId="forge"
     mandatory=true
-    versionRange="[32.0.108,)"
+    versionRange="[32,)"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.ghostwriter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1]"
+    versionRange="[1.16.1,1.17]"
     ordering="NONE"
     side="CLIENT"
