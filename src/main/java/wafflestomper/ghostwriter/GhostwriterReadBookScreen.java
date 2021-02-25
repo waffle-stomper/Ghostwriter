@@ -86,7 +86,6 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	@Override  // From IGhostBook
 	public void bookChanged(boolean setModifiedFlag) {
 		this.cachedPage = -1;
-		// TODO: Do we need to do anything else?
 	}
 	
 	@Override  // From IGhostBook

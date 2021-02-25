@@ -387,13 +387,17 @@ public class GhostLayer {
 		
 		this.buttonDisableAutoReload.active = this.autoReloadFile != null;
 	}
-	
+
 	
 	/**
 	 * Helper method for buttons that need to be selectively hidden
+	 * By default it creates the widest ghostwriter buttons, but you can use Button.setWidth() to make them thinner
 	 */
-	protected Button addPageButton(Button button, boolean hideInReadOnlyMode) {
-		Button b = this.parent.addGhostButton(button);
+	private Button addPageButton(int x, int y, String label, Button.IPressable action, boolean hideInReadOnlyMode){
+		int width = SharedConstants.LARGE_BUTTON_WIDTH;
+		int height = SharedConstants.BUTTON_HEIGHT;
+		StringTextComponent buttonText = new StringTextComponent(label);
+		Button b = this.parent.addGhostButton(new Button(x, y, width, height, buttonText, action));
 		this.buttonsHideWhileSigning.add(b);
 		if (hideInReadOnlyMode) this.buttonsEditOnly.add(b);
 		return b;
@@ -401,78 +405,66 @@ public class GhostLayer {
 	
 	
 	private Button addColorFormatButton(int y, String label, String insertChars) {
-		Button b = this.addPageButton(new Button(this.colorFormatButtonX, y, SharedConstants.COLOR_FORMAT_BUTTON_WIDTH,
-				SharedConstants.BUTTON_HEIGHT, new StringTextComponent(label),
-				(pressed_button) -> this.parent.insertText(insertChars)), true);
-		this.colorFormatButtonX += SharedConstants.COLOR_FORMAT_BUTTON_WIDTH;
+		Button b = this.addPageButton(this.colorFormatButtonX, y, label,
+				(pressed_button) -> this.parent.insertText(insertChars), true);
+		b.setWidth(SharedConstants.COLOR_FORMAT_BUTTON_WIDTH);
 		return b;
 	}
 	
 	
-	// TODO: Add a method with default button params so we don't have to specify them for every button (especially height)
 	public void init() {
 		this.buttonsEditOnly.clear();
 		this.buttonsHideWhileSigning.clear();
 		int rightXPos = this.screen.width - (SharedConstants.LARGE_BUTTON_WIDTH + SharedConstants.BUTTON_SIDE_OFFSET);
 		
 		////////////////////////////////////  Left side buttons  ///////////////////////////////////////////////
-		this.addPageButton(new Button(5, 5, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("File Browser"), (pressed_button) -> MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this))
-		), false);
+		this.addPageButton(5, 5, "File Browser",
+				(pressed_button) -> MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this)),false);
 		
-		this.buttonDisableAutoReload = this.addPageButton(new Button(5, 45, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-						new StringTextComponent("Disable AutoReload"), (pressed_button) -> this.disableAutoReload()),
-				true);
+		this.buttonDisableAutoReload = this.addPageButton(5, 45, "Disable AutoReload",
+				(pressed_button) -> this.disableAutoReload(),true);
 		
-		this.addPageButton(new Button(5, 70, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Add Signature Pages"), (pressed_button) -> this.addSignaturePages()), true);
+		this.addPageButton(5, 70, "Add Signature Pages", (pressed_button) -> this.addSignaturePages(), true);
 		
-		this.addPageButton(new Button(5, 95, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Preview Signed Book"), (pressed_button) ->
-				MINECRAFT.displayGuiScreen(new GhostwriterSignedPreviewScreen((GhostwriterEditBookScreen) this.screen))), true);
-		
+		this.addPageButton(5, 95, "Preview Signed Book", (pressed_button) -> MINECRAFT.displayGuiScreen(
+				new GhostwriterSignedPreviewScreen((GhostwriterEditBookScreen) this.screen)), true);
 		
 		////////////////////////////////////  Right side buttons  ////////////////////////////////////////////
-		this.addPageButton(new Button(rightXPos, 5, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Copy Book"), (pressed_button) -> this.copyBook()), false);
+		this.addPageButton(rightXPos, 5, "Copy Book", (pressed_button) -> this.copyBook(), false);
 		
-		this.buttonPasteBook = this.addPageButton(new Button(rightXPos, 25, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Paste Book"), (pressed_button) -> this.pasteBook()), true);
+		this.buttonPasteBook = this.addPageButton(rightXPos, 25, "Paste Book",
+				(pressed_button) -> this.pasteBook(), true);
 		
-		this.buttonSelectPageA = this.addPageButton(new Button(rightXPos, 50, SharedConstants.LARGE_BUTTON_WIDTH / 2, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("A"), (pressed_button) -> {
+		this.buttonSelectPageA = this.addPageButton(rightXPos, 50, "A", (pressed_button) -> {
 			this.selectedPageA = this.parent.getCurrPage();
 			this.updateButtons();
-		}), false);
+		}, false);
+		this.buttonSelectPageA.setWidth(SharedConstants.LARGE_BUTTON_WIDTH / 2);
 		
-		this.buttonSelectPageB = this.addPageButton(new Button(rightXPos + SharedConstants.LARGE_BUTTON_WIDTH / 2, 50, SharedConstants.LARGE_BUTTON_WIDTH / 2,
-				SharedConstants.BUTTON_HEIGHT, new StringTextComponent("B"), (pressed_button) -> {
+		int buttonBX = rightXPos + SharedConstants.LARGE_BUTTON_WIDTH / 2;
+		this.buttonSelectPageB = this.addPageButton(buttonBX, 50, "B", (pressed_button) -> {
 			this.selectedPageB = this.parent.getCurrPage();
 			this.updateButtons();
-		}), false);
+		}, false);
+		this.buttonSelectPageB.setWidth(SharedConstants.LARGE_BUTTON_WIDTH / 2);
 		
-		this.buttonCopySelectedPages = this.addPageButton(new Button(rightXPos, 70, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Copy This Page"), (pressed_button) -> this.copySelectedPagesToClipboard()), false);
+		this.buttonCopySelectedPages = this.addPageButton(rightXPos, 70, "Copy This Page",
+				(pressed_button) -> this.copySelectedPagesToClipboard(), false);
 		
-		this.buttonCutMultiplePages = this.addPageButton(new Button(rightXPos, 90, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Cut This Page"), (pressed_button) -> this.cutMultiplePages()), true);
+		this.buttonCutMultiplePages = this.addPageButton(rightXPos, 90, "Cut This Page",
+				(pressed_button) -> this.cutMultiplePages(), true);
 		
-		this.buttonRemoveSelectedPages = this.addPageButton(new Button(rightXPos, 110, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Remove This Page"),
-				(pressed_button) -> this.removePages(this.selectedPageA, this.selectedPageB)), true);
+		this.buttonRemoveSelectedPages = this.addPageButton(rightXPos, 110, "Remove This Page",
+				(pressed_button) -> this.removePages(this.selectedPageA, this.selectedPageB), true);
 		
-		this.buttonPasteMultiplePages = this.addPageButton(new Button(rightXPos, 130, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Paste This Page"),
-				(pressed_button) -> this.pasteMultiplePages(this.parent.getCurrPage())), true);
+		this.buttonPasteMultiplePages = this.addPageButton(rightXPos, 130, "Paste This Page",
+				(pressed_button) -> this.pasteMultiplePages(this.parent.getCurrPage()), true);
 		
-		this.addPageButton(new Button(rightXPos, 155, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Insert Blank Page"), (pressed_button) -> this.insertPage()), true);
+		this.addPageButton(rightXPos, 155,"Insert Blank Page", (pressed_button) -> this.insertPage(), true);
 		
-		this.addPageButton(new Button(rightXPos, 175, SharedConstants.LARGE_BUTTON_WIDTH, SharedConstants.BUTTON_HEIGHT,
-				new StringTextComponent("Remove Top Space"), (pressed_button) -> this.collapseTop()), true);
+		this.addPageButton(rightXPos, 175, "Remove Top Space", (pressed_button) -> this.collapseTop(), true);
 		
 		///////////////////////////////////////  Underside buttons  ///////////////////////////////////////////
-		
 		this.colorFormatButtonX = this.screen.width / 2 - (SharedConstants.COLOR_FORMAT_BUTTON_WIDTH * 8);
 		int colorButY = this.screen.height - 40;
 		this.addColorFormatButton(colorButY, "\u00a70A", "\u00a70");  // BLACK
@@ -499,7 +491,7 @@ public class GhostLayer {
 		this.addColorFormatButton(formatButY, "\u00a7mA", "\u00a7m");  // STRIKETHROUGH
 		this.addColorFormatButton(formatButY, "\u00a7nA", "\u00a7n");  // UNDERLINE
 		this.addColorFormatButton(formatButY, "\u00a7oA", "\u00a7o");  // ITALIC
-		this.addColorFormatButton(formatButY, "Reset Formatting", "\u00a7r").setWidth(100);  // Reset
+		this.addColorFormatButton(formatButY, "Reset Formatting", "\u00a7r").setWidth(100);
 		
 		this.buttonsInitialized = true;
 		this.updateButtons();
