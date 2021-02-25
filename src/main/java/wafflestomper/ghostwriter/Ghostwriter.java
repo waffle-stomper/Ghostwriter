@@ -51,7 +51,7 @@ public class Ghostwriter {
 	@SubscribeEvent
 	public void tick(TickEvent event) {
 		if (MC.currentScreen == null) return;
-		if (!lecternArmed || MC.currentScreen.getClass().equals(LecternScreen.class)) return;
+		if (!lecternArmed || !MC.currentScreen.getClass().equals(LecternScreen.class)) return;
 		
 		lecternArmed = false;
 		LOG.debug("Lectern screen detected!");
