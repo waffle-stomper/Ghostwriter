@@ -15,7 +15,15 @@ public class SelectableFilenameField extends TextFieldWidget {
 	
 	public SelectableFilenameField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent text) {
 		super(fontRenderer, x, y, width, height, text);
-		this.CHARACTER_MANAGER = fontRenderer.func_238420_b_();
+		this.CHARACTER_MANAGER = fontRenderer.getCharacterManager();
+	}
+	
+	
+	/**
+	 * 1.16.5 patch because Widget.getHeight() was removed
+	 */
+	public int getHeight(){
+		return this.height;
 	}
 	
 	

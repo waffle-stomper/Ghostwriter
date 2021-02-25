@@ -107,7 +107,7 @@ public class BookUtilities {
 		List<String> lines = new ArrayList<>();
 		List<ITextComponent> stylizedLines = new ArrayList<>();
 		MutableInt pageStartPos = new MutableInt(0);
-		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.func_238420_b_();
+		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.getCharacterManager();
 		charactermanager.func_238353_a_(inStr, SharedConstants.BOOK_TEXT_WIDTH, Style.EMPTY, true,
 				(style, start, end) -> {
 					lineStartIndices.add(start - pageStartPos.getValue());
@@ -159,8 +159,7 @@ public class BookUtilities {
 	 */
 	public static String deJSONify(String jsonIn) {
 		try {
-			// func_240643_a_() is fromJson()
-			ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
+			ITextComponent i = ITextComponent.Serializer.getComponentFromJson(jsonIn);
 			if (i != null) {
 				return (i.getString());
 			}

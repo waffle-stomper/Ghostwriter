@@ -224,10 +224,10 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			int allowedSize = DISPLAY_PATH_WIDTH - this.font.getStringWidth("...");
 			String reversed = new StringBuilder(displayPath).reverse().toString();
 			// func_238361_b_() is trimStringToWidth()
-			reversed = this.font.func_238420_b_().func_238361_b_(reversed, allowedSize, Style.EMPTY);
+			reversed = this.font.getCharacterManager().func_238361_b_(reversed, allowedSize, Style.EMPTY);
 			displayPath = "..." + new StringBuilder(reversed).reverse().toString();
 		}
-		this.drawCenteredString(matrixStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
+		drawCenteredString(matrixStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
 		
 		this.filenameField.render(matrixStack, mouseX, mouseY, partialTicks);
 		

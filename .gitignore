@@ -1,5 +1,5 @@
 # local nonsense
-Run Server.*
+*.log
 *.ods
 *.xcf
 Issues
@@ -36,6 +36,5 @@ run
 forge*changelog.txt
 changelog.txt
 CREDITS.txt
-LICENSE.txt
 README.txt
 
