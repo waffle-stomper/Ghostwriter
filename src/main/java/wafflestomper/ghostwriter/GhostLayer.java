@@ -415,6 +415,7 @@ public class GhostLayer {
 		Button b = this.addPageButton(this.colorFormatButtonX, y, label,
 				(pressed_button) -> this.parent.insertText(insertChars), true);
 		b.setWidth(SharedConstants.COLOR_FORMAT_BUTTON_WIDTH);
+		this.colorFormatButtonX += SharedConstants.COLOR_FORMAT_BUTTON_WIDTH;
 		return b;
 	}
 	
