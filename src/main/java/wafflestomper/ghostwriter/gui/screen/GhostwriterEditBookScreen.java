@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui.screen;
 
 
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -14,6 +14,9 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import wafflestomper.ghostwriter.*;
+import wafflestomper.ghostwriter.utilities.BookUtilities;
+import wafflestomper.ghostwriter.utilities.SharedConstants;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;

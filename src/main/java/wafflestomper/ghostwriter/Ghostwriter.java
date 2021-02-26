@@ -19,6 +19,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import wafflestomper.ghostwriter.gui.screen.GhostwriterEditBookScreen;
+import wafflestomper.ghostwriter.gui.screen.GhostwriterLecternScreen;
+import wafflestomper.ghostwriter.gui.screen.GhostwriterReadBookScreen;
+import wafflestomper.ghostwriter.utilities.Clipboard;
+import wafflestomper.ghostwriter.utilities.FileHandler;
+import wafflestomper.ghostwriter.utilities.Printer;
 
 import java.io.File;
 

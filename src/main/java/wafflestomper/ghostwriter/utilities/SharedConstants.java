@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.utilities;
 
 public class SharedConstants {
 	
@@ -33,5 +33,5 @@ public class SharedConstants {
 	public static final int LARGE_BUTTON_WIDTH = 120;
 	public static final int BUTTON_HEIGHT = 20;
 	public static final int BUTTON_SIDE_OFFSET = 5;
-	static final int COLOR_FORMAT_BUTTON_WIDTH = 20;
+	public static final int COLOR_FORMAT_BUTTON_WIDTH = 20;
 }

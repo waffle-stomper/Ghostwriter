@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui.screen;
 
 import net.minecraft.client.gui.screen.LecternScreen;
 import net.minecraft.client.gui.widget.button.Button;
@@ -6,6 +6,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.LecternContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.StringTextComponent;
+import wafflestomper.ghostwriter.utilities.BookUtilities;
+import wafflestomper.ghostwriter.GhostLayer;
+import wafflestomper.ghostwriter.IGhostBook;
 
 import java.util.ArrayList;
 import java.util.List;

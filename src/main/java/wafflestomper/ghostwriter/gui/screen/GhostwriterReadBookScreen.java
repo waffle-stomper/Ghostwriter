@@ -1,8 +1,11 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui.screen;
 
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
+import wafflestomper.ghostwriter.utilities.BookUtilities;
+import wafflestomper.ghostwriter.GhostLayer;
+import wafflestomper.ghostwriter.IGhostBook;
 
 import java.util.ArrayList;
 import java.util.List;

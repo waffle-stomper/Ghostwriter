@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.utilities;
 
 import java.util.ArrayList;
 import java.util.List;

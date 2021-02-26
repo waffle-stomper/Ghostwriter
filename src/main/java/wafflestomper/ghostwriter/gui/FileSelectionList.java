@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -7,6 +7,7 @@ import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.util.Util;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import wafflestomper.ghostwriter.gui.screen.GhostwriterFileBrowserScreen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;

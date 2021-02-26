@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.utilities;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.StringTextComponent;

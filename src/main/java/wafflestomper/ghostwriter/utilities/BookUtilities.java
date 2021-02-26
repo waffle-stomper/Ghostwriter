@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.utilities;
 
 import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -9,6 +9,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import org.apache.commons.lang3.mutable.MutableInt;
+import wafflestomper.ghostwriter.datastructures.PageDetails;
+import wafflestomper.ghostwriter.datastructures.Pages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,66 +170,5 @@ public class BookUtilities {
 			// jsonIn was probably just a normal string, so there's no need to freak out the end user
 		}
 		return (jsonIn);
-	}
-	
-	
-	static class PageDetails {
-		public final String fullPageText;
-		public final int[] lineStartIndices;
-		public final String[] lines;
-		public final ITextComponent[] stylizedLines;
-		
-		PageDetails(String fullPageText, IntList lineStartIndices, List<String> lines, List<ITextComponent> stylizedLines) {
-			this.fullPageText = fullPageText;
-			this.lineStartIndices = lineStartIndices.toIntArray();
-			this.lines = lines.toArray(new String[0]);
-			this.stylizedLines = stylizedLines.toArray(new ITextComponent[0]);
-		}
-	}
-	
-	
-	static class Pages {
-		private final List<BookUtilities.PageDetails> pages = new ArrayList<>();
-		
-		/**
-		 * @return The requested page, or a blank page if index is invalid
-		 */
-		public BookUtilities.PageDetails get(int index) {
-			if (index >= 0 && index < this.pages.size()) {
-				return this.pages.get(index);
-			}
-			// Return an empty page
-			IntList lineStartIndices = new IntArrayList();
-			lineStartIndices.add(0);
-			List<String> lines = new ArrayList<>();
-			lines.add("");
-			List<ITextComponent> stylizedLines = new ArrayList<>();
-			stylizedLines.add(new StringTextComponent(""));
-			return new PageDetails("", lineStartIndices, lines, stylizedLines);
-		}
-		
-		
-		/**
-		 * Returns the pages as a list of strings
-		 */
-		public List<String> asStrings() {
-			List<String> pageStrings = new ArrayList<>();
-			for (BookUtilities.PageDetails page : this.pages) {
-				pageStrings.add(page.fullPageText);
-			}
-			return pageStrings;
-		}
-		
-		
-		public void add(BookUtilities.PageDetails page) {
-			this.pages.add(page);
-		}
-		
-		
-		public void addAll(Pages pagesToAdd) {
-			for (int i = 0; i < pagesToAdd.pages.size(); i++) {
-				this.add(pagesToAdd.get(i));
-			}
-		}
 	}
 }

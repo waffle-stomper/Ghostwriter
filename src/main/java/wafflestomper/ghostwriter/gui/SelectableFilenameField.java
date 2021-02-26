@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -7,6 +7,7 @@ import net.minecraft.util.Util;
 import net.minecraft.util.text.CharacterManager;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
+import wafflestomper.ghostwriter.utilities.SharedConstants;
 
 public class SelectableFilenameField extends TextFieldWidget {
 	private final CharacterManager CHARACTER_MANAGER;

@@ -1,9 +1,11 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.utilities;
 
 import net.minecraft.client.Minecraft;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import wafflestomper.ghostwriter.datastructures.PageDetails;
+import wafflestomper.ghostwriter.datastructures.Pages;
 
 import java.io.*;
 import java.nio.charset.*;
@@ -186,7 +188,7 @@ public class FileHandler {
 			String[] largePages = bookText.split("(\\s::){2,}");
 			for (String largePage : largePages) {
 				largePage = largePage.replaceAll("\\s*::\\s*", "\n  ");
-				BookUtilities.Pages pages = BookUtilities.splitIntoPages(largePage, SharedConstants.BOOK_MAX_LINES);
+				Pages pages = BookUtilities.splitIntoPages(largePage, SharedConstants.BOOK_MAX_LINES);
 				this.clipboard.pages.addAll(pages.asStrings());
 			}
 			
@@ -263,7 +265,7 @@ public class FileHandler {
 		}
 		// Split into pages
 		String pageBreak = ">>>><<<<>>>><<<<";
-		BookUtilities.Pages splitPages;
+		Pages splitPages;
 		splitPages = BookUtilities.splitIntoPages(concatFile.toString(), SharedConstants.BOOK_MAX_LINES, pageBreak);
 		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
@@ -310,7 +312,7 @@ public class FileHandler {
 		
 		//convert all the linebreak characters (##) to newline characters (\n) and split into pages
 		concatFileStr = concatFileStr.replaceAll("##", "\\\n");
-		BookUtilities.Pages splitPages;
+		Pages splitPages;
 		splitPages = BookUtilities.splitIntoPages(concatFileStr, SharedConstants.BOOK_MAX_LINES, GHB_PAGE_BREAK);
 		book.pages.addAll(splitPages.asStrings());
 		book.bookInClipboard = true;
@@ -342,7 +344,7 @@ public class FileHandler {
 			
 			// Split the string into book width lines. Since the text should be coming from a valid
 			// book page, we shouldn't have to split it into pages
-			BookUtilities.PageDetails currPage = BookUtilities.splitIntoPages(pageAsString, 0).get(0);
+			PageDetails currPage = BookUtilities.splitIntoPages(pageAsString, 0).get(0);
 			
 			// Replace newline characters with double hashes
 			for (String line : currPage.lines) {

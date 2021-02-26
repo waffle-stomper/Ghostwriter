@@ -1,10 +1,11 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui.screen;
 
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screen.ReadBookScreen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
+import wafflestomper.ghostwriter.utilities.SharedConstants;
 
 public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 	private final GhostwriterEditBookScreen parent;
