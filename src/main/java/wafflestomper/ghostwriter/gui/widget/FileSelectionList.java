@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter.gui;
+package wafflestomper.ghostwriter.gui.widget;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;

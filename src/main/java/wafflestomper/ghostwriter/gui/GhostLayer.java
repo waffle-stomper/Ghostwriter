@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -6,6 +6,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.text.StringTextComponent;
+import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterEditBookScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterFileBrowserScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterSignedPreviewScreen;

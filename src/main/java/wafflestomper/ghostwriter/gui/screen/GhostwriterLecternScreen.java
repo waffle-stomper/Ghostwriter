@@ -7,8 +7,8 @@ import net.minecraft.inventory.container.LecternContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.StringTextComponent;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
-import wafflestomper.ghostwriter.GhostLayer;
-import wafflestomper.ghostwriter.IGhostBook;
+import wafflestomper.ghostwriter.gui.GhostLayer;
+import wafflestomper.ghostwriter.gui.IGhostBook;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter;
+package wafflestomper.ghostwriter.gui;
 
 import net.minecraft.client.gui.widget.button.Button;
 

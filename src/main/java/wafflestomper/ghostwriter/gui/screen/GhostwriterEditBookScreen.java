@@ -15,6 +15,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import wafflestomper.ghostwriter.*;
+import wafflestomper.ghostwriter.gui.GhostLayer;
+import wafflestomper.ghostwriter.gui.IGhostBook;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.utilities.SharedConstants;
 

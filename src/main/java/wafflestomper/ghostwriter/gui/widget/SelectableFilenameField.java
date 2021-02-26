@@ -1,4 +1,4 @@
-package wafflestomper.ghostwriter.gui;
+package wafflestomper.ghostwriter.gui.widget;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
