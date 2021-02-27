@@ -180,14 +180,6 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			rootNum++;
 		}
 		
-		// Add button for enabling file extension editing
-		this.btnEditExtension = this.addButton(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
-				this.filenameField.y, 25, this.filenameField.getHeight(), new StringTextComponent("EXT"),
-				(pressedButton) -> {
-					this.filenameField.toggleExtensionModifications();
-					this.updateButtons();
-				}));
-		
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
 		
@@ -195,6 +187,14 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		this.fileSelectionList.updateSize(this.width, this.height, 32, this.height - 64);
 		this.filenameField.x = this.width / 2 - 125;
 		this.filenameField.y = this.height - BORDER_HEIGHT * 2 - BUTTON_HEIGHT * 2;
+		
+		// Add button for enabling file extension editing
+		this.btnEditExtension = this.addButton(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
+				this.filenameField.y, 25, this.filenameField.getHeight(), new StringTextComponent("EXT"),
+				(pressedButton) -> {
+					this.filenameField.toggleExtensionModifications();
+					this.updateButtons();
+				}));
 		
 		this.updateButtons();
 	}
