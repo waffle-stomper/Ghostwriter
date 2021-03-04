@@ -2,7 +2,7 @@
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
     "1.16.5-recommended": "2.2.6",
-    "1.16.1-recommended": "2.2.7",
+    "1.16.1-recommended": "2.2.8",
     "1.15.2-recommended": "2.0.6",
     "1.15.1-recommended": "2.0.5",
     "1.14.4-recommended": "2.0.4",
@@ -17,6 +17,7 @@
     "2.2.6": "Beta 1.16.5 release, fix lectern crash"
   },
   "1.16.1":{
+    "2.2.8": "Fix file browser EXT button appearing at the wrong height\nInternal cleanup",
     "2.2.7": "Fix lectern crash",
     "2.2.5": "Fix index out of range error when removing book pages\nEsc in signed preview now returns to edit screen\nMore internal changes to improve maintainability",
     "2.2.4": "Add optional protection to filename extension in file browser\nRemove 16 character title limit when loading bookworm books\nRefactor constants\nRemove some single use functions\nPressing escape in file browser now reverts back to the book, rather than exiting completely\nMassive internal code shuffle to make the project easier to maintain",
