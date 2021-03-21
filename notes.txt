@@ -16,6 +16,32 @@ N::::::N        N::::::N   OO:::::::::OO         T:::::::::T      E:::::::::::::
 NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEEEEEEEEEE SSSSSSSSSSSSSSS
 
 
+#########################################################################
+#																		#
+#          Changing Forge/MC Version (IntelliJ IDEA)                    #
+#																		#
+#########################################################################
+
+1) build.gradle
+ + Update version
+ + Update archivesBaseName
+ + Update mappings channel
+ + Update minecraft
+
+2) mods.toml
+ + Update loaderVersion
+ + Update dependency version ranges
+
+3) update.json
+ + Add new version info
+
+4) In IDEA
+ + Gradle > build > clean?
+ + Refresh Gradle project
+ + Gradle > fg_runs > genIntellijRuns
+
+
+
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
 Mappings can be found in External Libraries > net.minecraft:mappings_snapshot... > mcp_snapshot...
