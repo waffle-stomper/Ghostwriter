@@ -127,7 +127,7 @@ public class GhostwriterEditBookScreen extends EditBookScreen implements IGhostB
 			String textTitle = this.bookTitle;
 			textTitle += (this.updateCount / 6 % 2 == 0 ? TextFormatting.BLACK : TextFormatting.GRAY) + "_";
 			int bookLeftSide = (this.width - 192) / 2;
-			int titleWidth = this.getTextWidth(textTitle);
+			int titleWidth = this.font.getStringWidth(textTitle);
 			int titleMinX = bookLeftSide + 36 + (114 - titleWidth) / 2;
 			int titleMaxX = titleMinX + titleWidth;
 			// color for the fill() method is MSB->LSB: alpha, r, g, b, (each 8 bits)

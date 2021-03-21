@@ -16,7 +16,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 	
 	public SelectableFilenameField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent text) {
 		super(fontRenderer, x, y, width, height, text);
-		this.CHARACTER_MANAGER = fontRenderer.func_238420_b_();
+		this.CHARACTER_MANAGER = fontRenderer.getCharacterManager();
 	}
 	
 	
@@ -63,7 +63,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * to type upper case text would erroneously select text
 	 */
 	public void updateShiftKeyStatus() {
-		this.field_212956_h = Screen.hasShiftDown();
+		this.isShiftDown = Screen.hasShiftDown();
 	}
 	
 	
