@@ -121,7 +121,8 @@ public class FileSelectionList extends ExtendedList<FileSelectionList.Entry> {
 			}
 			
 			// Draw the trimmed filename in the slot
-			String s = this.mc.fontRenderer.trimStringToWidth(this.path.getName(), slotWidth);
+			// func_238412_a_ is trimStringToWidth
+			String s = this.mc.fontRenderer.func_238412_a_(this.path.getName(), slotWidth);
 			this.mc.fontRenderer.drawString(matrixStack, s, (float) (slotX), (float) (p_render_2_ + 1), color);
 			
 			// Set up the hover text if the mouse is hovering over this slot

@@ -20,6 +20,14 @@ public class SelectableFilenameField extends TextFieldWidget {
 	}
 	
 	
+	/**
+	 * 1.16.2 patch because Widget.getHeight() was removed
+	 */
+	public int getHeight(){
+		return this.height;
+	}
+	
+	
 	public void toggleExtensionModifications() {
 		this.allowExtensionModifications = !this.allowExtensionModifications;
 		// Ensure cursor is in a valid position
@@ -63,7 +71,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * to type upper case text would erroneously select text
 	 */
 	public void updateShiftKeyStatus() {
-		this.isShiftDown = Screen.hasShiftDown();
+		this.field_212956_h = Screen.hasShiftDown();
 	}
 	
 	
