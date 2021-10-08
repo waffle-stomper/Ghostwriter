@@ -23,10 +23,10 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 #########################################################################
 
 1) build.gradle
- + Update version
+ + Update version (check all releases to make sure you don't re-use a version number from another branch)
  + Update archivesBaseName
- + Update mappings channel
- + Update minecraft
+ + Update minecraft > mappings channel
+ + Update dependencies > minecraft
 
 2) mods.toml
  + Update loaderVersion
@@ -43,9 +43,6 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
-Mappings can be found in External Libraries > net.minecraft:mappings_snapshot... > mcp_snapshot...
-
-Signatures can be found in <project dir>/build/createSrgToMcp/output.srg
 
 
 #########################################################################

@@ -1,7 +1,7 @@
 package wafflestomper.ghostwriter.utilities;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 
 public class Printer {
@@ -14,6 +14,6 @@ public class Printer {
 	private static final Minecraft MC = Minecraft.getInstance();
 	
 	public void gamePrint(String inStr) {
-		MC.ingameGUI.getChatGUI().printChatMessage(new StringTextComponent(inStr));
+		MC.ingameGUI.getChatGUI().printChatMessage(new TextComponent(inStr));
 	}
 }
