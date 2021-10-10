@@ -1,12 +1,12 @@
 package wafflestomper.ghostwriter.gui.screen;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.screen.ConfirmScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
 import wafflestomper.ghostwriter.*;
 import wafflestomper.ghostwriter.gui.widget.FileSelectionList;
 import wafflestomper.ghostwriter.gui.GhostLayer;
@@ -53,7 +53,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	
 	public GhostwriterFileBrowserScreen(GhostLayer parent) {
-		super(new StringTextComponent("Ghostwriter File Browser"));
+		super(new TextComponent("Ghostwriter File Browser"));
 		this.parent = parent;
 		this.FILE_HANDLER = new FileHandler(this.TEMP_CLIPBOARD);
 		if (Ghostwriter.currentPath == null) {
@@ -108,15 +108,15 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	private void saveClicked() {
 		// Template for this found in the delete button on MultiplayerScreen
-		File save_path = new File(this.FILE_HANDLER.currentPath, this.filenameField.getText());
+		File save_path = new File(this.FILE_HANDLER.currentPath, this.filenameField.getValue());
 		if (save_path.exists()) {
-			ITextComponent overwriteText = new StringTextComponent("Are you sure you wish to overwrite this file?");
-			ITextComponent filenameText = new StringTextComponent(this.filenameField.getText());
-			ITextComponent s1 = new StringTextComponent("Yes");
-			ITextComponent s2 = new StringTextComponent("Cancel");
+			Component overwriteText = new TextComponent("Are you sure you wish to overwrite this file?");
+			Component filenameText = new TextComponent(this.filenameField.getValue());
+			Component s1 = new TextComponent("Yes");
+			Component s2 = new TextComponent("Cancel");
 			Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
 			assert this.minecraft != null;
-			this.minecraft.displayGuiScreen(new ConfirmScreen(this::saveCallback, overwriteText, filenameText, s1, s2));
+			this.minecraft.setScreen(new ConfirmScreen(this::saveCallback, overwriteText, filenameText, s1, s2));
 		} else {
 			this.saveBook();
 		}
@@ -125,15 +125,15 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	public void init() {
 		super.init();
-		if (this.minecraft != null) this.minecraft.keyboardListener.enableRepeatEvents(true);
+		if (this.minecraft != null) this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		
 		if (!this.initialized) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
 			
-			this.filenameField = new SelectableFilenameField(this.minecraft.fontRenderer, this.width / 2 - 125,
+			this.filenameField = new SelectableFilenameField(this.minecraft.font, this.width / 2 - 125,
 					this.height - BORDER_HEIGHT - BUTTON_HEIGHT, 250, BUTTON_HEIGHT,
-					new StringTextComponent("filename"));
-			this.filenameField.setMaxStringLength(100);
+					new TextComponent("filename"));
+			this.filenameField.setMaxLength(100);
 			// Add default filename to filenameField
 			String file_title = this.parent.getBookTitle();
 			String file_author = this.parent.getBookAuthor();
@@ -141,10 +141,10 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			file_title = file_title.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 			file_author = file_author.trim().replaceAll(" ", ".").replaceAll("[^a-zA-Z0-9.]", "");
 			String defaultFilename = file_title + "_" + file_author + "_" + this.FILE_HANDLER.getUTC() + ".ghb";
-			this.filenameField.setText(defaultFilename);
+			this.filenameField.setValue(defaultFilename);
 			
 			// Focus on the filename field and highlight the filename (without the extension)
-			this.filenameField.setFocused2(true);
+			this.filenameField.setFocus(true);
 			this.filenameField.highlightFilename();
 			
 			// Prevent re-initializing element on resize
@@ -154,27 +154,27 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		// For some reason the button list is cleared when the window is resized
 		int mainButtonsY = this.height - BORDER_HEIGHT - BUTTON_HEIGHT;
 		int loadX = this.width / 2 - 127;
-		this.btnLoad = this.addButton(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new StringTextComponent("Load"), (pressedButton) -> this.loadClicked(false)));
+		this.btnLoad = this.addRenderableWidget(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
+				new TextComponent("Load"), (pressedButton) -> this.loadClicked(false)));
 		
 		int autoReloadX = loadX + BUTTON_WIDTH;
-		this.btnAutoReload = this.addButton(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new StringTextComponent("AutoReload"), (pressedButton) -> this.loadClicked(true)));
+		this.btnAutoReload = this.addRenderableWidget(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
+				new TextComponent("AutoReload"), (pressedButton) -> this.loadClicked(true)));
 		
 		int saveX = autoReloadX + BUTTON_WIDTH + 7;
-		this.btnSave = this.addButton(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new StringTextComponent("Save"), (pressedButton) -> this.saveClicked()));
+		this.btnSave = this.addRenderableWidget(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
+				new TextComponent("Save"), (pressedButton) -> this.saveClicked()));
 		
 		int cancelX = this.width / 2 + 127 - BUTTON_WIDTH;
-		this.addButton(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new StringTextComponent("Cancel"), (pressedButton) -> goBackToParentGui()));
+		this.addRenderableWidget(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
+				new TextComponent("Cancel"), (pressedButton) -> goBackToParentGui()));
 		
 		//Add buttons for each non-empty drive letter
 		int rootNum = 100;
 		List<File> roots = this.FILE_HANDLER.getValidRoots();
 		for (File root : roots) {
-			this.addButton(new Button(5, 35 + 21 * (rootNum - 100), 50, 20,
-					new StringTextComponent(root.getAbsolutePath()), (pressedButton) ->
+			this.addRenderableWidget(new Button(5, 35 + 21 * (rootNum - 100), 50, 20,
+					new TextComponent(root.getAbsolutePath()), (pressedButton) ->
 					this.driveButtonClicked(root)
 			));
 			rootNum++;
@@ -189,8 +189,8 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		this.filenameField.y = this.height - BORDER_HEIGHT * 2 - BUTTON_HEIGHT * 2;
 		
 		// Add button for enabling file extension editing
-		this.btnEditExtension = this.addButton(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
-				this.filenameField.y, 25, this.filenameField.getHeight(), new StringTextComponent("EXT"),
+		this.btnEditExtension = this.addRenderableWidget(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
+				this.filenameField.y, 25, this.filenameField.getHeight(), new TextComponent("EXT"),
 				(pressedButton) -> {
 					this.filenameField.toggleExtensionModifications();
 					this.updateButtons();
@@ -212,40 +212,40 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	
 	private boolean isFilenameValid() {
-		String fn = this.filenameField.getText();
+		String fn = this.filenameField.getValue();
 		return !fn.equals("");
 	}
 	
 	
 	@Override
 	@ParametersAreNonnullByDefault
-	public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
 		this.btnSave.active = this.isFilenameValid();
 		this.hoveringText = null;
-		this.fileSelectionList.render(matrixStack, mouseX, mouseY, partialTicks);
-		super.render(matrixStack, mouseX, mouseY, partialTicks);
+		this.fileSelectionList.render(PoseStack, mouseX, mouseY, partialTicks);
+		super.render(PoseStack, mouseX, mouseY, partialTicks);
 		
 		// Render the current directory, truncating the left side if it becomes too long
 		String displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
-		int displayPathSize = this.font.getStringWidth(displayPath);
+		int displayPathSize = this.font.width(displayPath);
 		if (displayPathSize > DISPLAY_PATH_WIDTH) {
-			int allowedSize = DISPLAY_PATH_WIDTH - this.font.getStringWidth("...");
+			int allowedSize = DISPLAY_PATH_WIDTH - this.font.width("...");
 			String reversed = new StringBuilder(displayPath).reverse().toString();
 			// func_238361_b_() is trimStringToWidth()
-			reversed = this.font.func_238420_b_().func_238361_b_(reversed, allowedSize, Style.EMPTY);
+			reversed = this.font.getSplitter().plainHeadByWidth(reversed, allowedSize, Style.EMPTY);
 			displayPath = "..." + new StringBuilder(reversed).reverse().toString();
 		}
-		this.drawCenteredString(matrixStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
+		this.drawCenteredString(PoseStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
 		
-		this.filenameField.render(matrixStack, mouseX, mouseY, partialTicks);
+		this.filenameField.render(PoseStack, mouseX, mouseY, partialTicks);
 		
 		// Draw tooltip if the path is hovered
 		if (mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= 20 && mouseY <= 27) {
-			this.renderTooltip(matrixStack, new StringTextComponent(displayPath), 0, 0);
+			this.renderTooltip(PoseStack, new TextComponent(displayPath), 0, 0);
 		}
 		// Draw any other hover text
 		else if (this.hoveringText != null) {
-			this.renderTooltip(matrixStack, new StringTextComponent(this.hoveringText), mouseX, mouseY);
+			this.renderTooltip(PoseStack, new TextComponent(this.hoveringText), mouseX, mouseY);
 		}
 	}
 	
@@ -259,7 +259,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			} else if (p.path.isFile()) {
 				this.FILE_HANDLER.loadBook(p.path);
 				this.selectedFile = p.path;
-				this.filenameField.setText(p.path.getName());
+				this.filenameField.setValue(p.path.getName());
 				this.updateButtons();
 				return;
 			}
@@ -299,7 +299,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	private void goBackToParentGui() {
 		if (this.minecraft == null) return;
 		Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
-		this.minecraft.displayGuiScreen(this.parent.screen);
+		this.minecraft.setScreen(this.parent.screen);
 	}
 	
 	
@@ -315,9 +315,9 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		}
 		
 		if (this.filenameField.allowExtensionModifications) {
-			this.btnEditExtension.setMessage(new StringTextComponent("EXT"));
+			this.btnEditExtension.setMessage(new TextComponent("EXT"));
 		} else {
-			this.btnEditExtension.setMessage(new StringTextComponent("\u00a7mEXT"));
+			this.btnEditExtension.setMessage(new TextComponent("\u00a7mEXT"));
 		}
 	}
 	
@@ -355,7 +355,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	
 	private File getSavePath() {
-		return (new File(this.FILE_HANDLER.currentPath, this.filenameField.getText()));
+		return (new File(this.FILE_HANDLER.currentPath, this.filenameField.getValue()));
 	}
 	
 	

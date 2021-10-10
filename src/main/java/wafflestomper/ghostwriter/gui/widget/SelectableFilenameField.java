@@ -1,22 +1,22 @@
 package wafflestomper.ghostwriter.gui.widget;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.CharacterManager;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.Util;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import wafflestomper.ghostwriter.utilities.SharedConstants;
 
-public class SelectableFilenameField extends TextFieldWidget {
-	private final CharacterManager CHARACTER_MANAGER;
+public class SelectableFilenameField extends EditBox {
+	private final StringSplitter CHARACTER_MANAGER;
 	public boolean allowExtensionModifications = false;
 	private long lastClickTime = 0;
 	
-	public SelectableFilenameField(FontRenderer fontRenderer, int x, int y, int width, int height, ITextComponent text) {
+	public SelectableFilenameField(Font fontRenderer, int x, int y, int width, int height, Component text) {
 		super(fontRenderer, x, y, width, height, text);
-		this.CHARACTER_MANAGER = fontRenderer.func_238420_b_();
+		this.CHARACTER_MANAGER = fontRenderer.getSplitter();
 	}
 	
 	
@@ -25,7 +25,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 		// Ensure cursor is in a valid position
 		this.setCursorPosition(Math.min(this.getCursorPosition(), this.getEditableLength()));
 		// Cancel any text selection
-		this.setSelectionPos(this.getCursorPosition());
+		this.setHighlightPos(this.getCursorPosition());
 	}
 	
 	
@@ -33,9 +33,9 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * @return Extension for the current filename (or a blank string if it doesn't have an extension)
 	 */
 	public String getExtension() {
-		int dotPos = this.getText().lastIndexOf('.');
+		int dotPos = this.getValue().lastIndexOf('.');
 		if (dotPos == -1) return "";
-		return this.getText().substring(dotPos);
+		return this.getValue().substring(dotPos);
 	}
 	
 	/**
@@ -43,9 +43,9 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 */
 	public int getEditableLength() {
 		if (this.allowExtensionModifications) {
-			return this.getText().length();
+			return this.getValue().length();
 		}
-		return this.getText().length() - this.getExtension().length();
+		return this.getValue().length() - this.getExtension().length();
 	}
 	
 	
@@ -53,17 +53,17 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * Selects the filename
 	 */
 	public void highlightFilename() {
-		this.setCursorPositionZero();
-		this.setSelectionPos(this.getEditableLength());
+		this.moveCursorToStart();
+		this.setHighlightPos(this.getEditableLength());
 	}
 	
 	
 	/**
-	 * This field in TextFieldWidget was causing the bug where single clicking after using the shift key
+	 * This field in EditBox was causing the bug where single clicking after using the shift key
 	 * to type upper case text would erroneously select text
 	 */
 	public void updateShiftKeyStatus() {
-		this.field_212956_h = Screen.hasShiftDown();
+		this.shiftPressed = Screen.hasShiftDown();
 	}
 	
 	
@@ -72,7 +72,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 	 * and adds Up and Down keys as Home and End aliases
 	 */
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (!this.canWrite()) return false;
+		if (!this.canConsumeInput()) return false;
 		
 		this.updateShiftKeyStatus();
 		
@@ -95,7 +95,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 				return true;
 			
 			case SharedConstants.KEY_UP:
-				this.setCursorPositionZero();
+				this.moveCursorToStart();
 				return true;
 		}
 		
@@ -119,12 +119,12 @@ public class SelectableFilenameField extends TextFieldWidget {
 		
 		if (super.mouseClicked(mouseX, mouseY, button)) {
 			// Mouse was clicked within this component
-			if (Util.milliTime() - this.lastClickTime < 250L) {
+			if (Util.getMillis() - this.lastClickTime < 250L) {
 				// Double click - highlight the filename without the extension
 				this.highlightFilename();
 				this.lastClickTime = 0; // Prevent triple-click
 			} else {
-				this.lastClickTime = Util.milliTime();
+				this.lastClickTime = Util.getMillis();
 				// Ensure the cursor is within the range they're allowed to edit
 				int editableLength = this.getEditableLength();
 				if (this.getCursorPosition() > editableLength) {
@@ -133,7 +133,7 @@ public class SelectableFilenameField extends TextFieldWidget {
 				// Collapse the selection onto the cursor position (no selection)
 				// This shouldn't be necessary now that we're updating the shift key status field, but
 				// it's relatively harmless performance-wise
-				this.setSelectionPos(this.getCursorPosition());
+				this.setHighlightPos(this.getCursorPosition());
 			}
 			return true;
 		}
@@ -164,13 +164,13 @@ public class SelectableFilenameField extends TextFieldWidget {
 		// If the mouse is somewhere to the right of the start of this component, we calculate how many characters
 		// from the filename could fit to the left of the cursor
 		if (relativeX > 0) {
-			//func_238361_b_ is trimStringToWidth;
-			dragCharPos = this.CHARACTER_MANAGER.func_238361_b_(this.getText(), relativeX, Style.EMPTY).length();
+			// was trimStringToWidth in Forge
+			dragCharPos = this.CHARACTER_MANAGER.plainHeadByWidth(this.getValue(), relativeX, Style.EMPTY).length();
 		}
 		
 		// Ensure that only editable content is selected
 		dragCharPos = Math.min(dragCharPos, this.getEditableLength());
 		
-		this.setSelectionPos(dragCharPos);
+		this.setHighlightPos(dragCharPos);
 	}
 }

@@ -1,11 +1,11 @@
 package wafflestomper.ghostwriter.gui.screen;
 
-import net.minecraft.client.gui.screen.LecternScreen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.LecternContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.inventory.LecternScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.LecternMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.TextComponent;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.IGhostBook;
@@ -16,12 +16,12 @@ import java.util.List;
 public class GhostwriterLecternScreen extends LecternScreen implements IGhostBook {
 	
 	private final GhostLayer ghostLayer;
-	private final LecternContainer lecternContainer;
+	private final LecternMenu lecternContainer;
 	
 	
-	public GhostwriterLecternScreen(ItemStack currStack, LecternContainer lecternContainer, PlayerInventory playerInventory) {
+	public GhostwriterLecternScreen(ItemStack currStack, LecternMenu lecternContainer, Inventory playerInventory) {
 		// Not sure why it needs the inventory and text. Both params are ignored by the constructor
-		super(lecternContainer, playerInventory, new StringTextComponent(""));
+		super(lecternContainer, playerInventory, new TextComponent(""));
 		
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.lecternContainer = lecternContainer;
@@ -30,7 +30,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	
 	@Override  // From ReadBookScreen
-	public void updateButtons() {
+	public void updateButtonVisibility() {
 		this.ghostLayer.updateButtons();
 	}
 	
@@ -38,8 +38,8 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
 		List<String> pages = new ArrayList<>();
-		for (int i = 0; i < this.getPageCount(); i++) {
-			pages.add(BookUtilities.deJSONify(this.bookInfo.func_238806_b_(i).getString()));
+		for (int i = 0; i < this.getNumPages(); i++) {
+			pages.add(BookUtilities.deJSONify(this.bookAccess.getPage(i).getString()));
 		}
 		return pages;
 	}
@@ -49,29 +49,29 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	public void init() {
 		super.init();
 		this.ghostLayer.init();
-		this.updateButtons();
+		this.updateButtonVisibility();
 		// This is a hack based on LecternScreen.func_214176_h()
 		// Books can be left open to a specific page on a lectern. This displays that page.
 		// Otherwise we'd just be showing the first page every time
-		this.showPage(this.lecternContainer.getPage());
+		this.setPage(this.lecternContainer.getPage());
 	}
 	
 	
 	@Override  // From IGhostBook
 	public int getBookPageCount() {
-		return this.getPageCount();
+		return this.getNumPages();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public void updateVanillaButtons() {
-		super.updateButtons();
+		super.updateButtonVisibility();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
-		return this.bookInfo.func_238806_b_(pageNum).getString();
+		return this.bookAccess.getPage(pageNum).getString();
 	}
 	
 	
@@ -89,13 +89,13 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	@Override  // From IGhostBook
 	public Button addGhostButton(Button button) {
-		return this.addButton(button);
+		return this.addRenderableWidget(button);
 	}
 	
 	
 	@Override  // From IGhostBook
 	public int getCurrPage() {
-		return this.currPage;
+		return this.currentPage;
 	}
 	
 	// Unused methods that only apply to unsigned books

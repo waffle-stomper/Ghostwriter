@@ -4,10 +4,10 @@ import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.CharacterManager;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.mutable.MutableInt;
 import wafflestomper.ghostwriter.datastructures.PageDetails;
 import wafflestomper.ghostwriter.datastructures.Pages;
@@ -96,7 +96,7 @@ public class BookUtilities {
 	
 	/**
 	 * Splits a string into pages of word-wrapped lines
-	 * Inspired by code in EditBookScreen that splits the current page for rendering
+	 * Inspired by code in BookEditScreen that splits the current page for rendering
 	 * Note that this function preserves newline characters at the end of lines, where the vanilla code removes them
 	 *
 	 * @param inStr           String to split
@@ -107,15 +107,15 @@ public class BookUtilities {
 		Pages pages = new Pages();
 		IntList lineStartIndices = new IntArrayList();
 		List<String> lines = new ArrayList<>();
-		List<ITextComponent> stylizedLines = new ArrayList<>();
+		List<Component> stylizedLines = new ArrayList<>();
 		MutableInt pageStartPos = new MutableInt(0);
-		CharacterManager charactermanager = Minecraft.getInstance().fontRenderer.func_238420_b_();
-		charactermanager.func_238353_a_(inStr, SharedConstants.BOOK_TEXT_WIDTH, Style.EMPTY, true,
+		StringSplitter charactermanager = Minecraft.getInstance().font.getSplitter();
+		charactermanager.splitLines(inStr, SharedConstants.BOOK_TEXT_WIDTH, Style.EMPTY, true,
 				(style, start, end) -> {
 					lineStartIndices.add(start - pageStartPos.getValue());
 					String line = inStr.substring(start, end);
 					lines.add(line);
-					stylizedLines.add(new StringTextComponent(line).setStyle(style));
+					stylizedLines.add(new TextComponent(line).setStyle(style));
 					
 					if (lines.size() == maxLinesPerPage) {
 						// The current page is full. Store it and start a new one
@@ -157,12 +157,12 @@ public class BookUtilities {
 	/**
 	 * Converts the new JSON strings with their escaped quotation marks back into regular old strings
 	 * Hopefully this is just temporary.
-	 * EditBookScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
+	 * BookEditScreen seems to work with normal strings, but ReadBookScreen is converting the pages to JSON
 	 */
 	public static String deJSONify(String jsonIn) {
 		try {
 			// func_240643_a_() is fromJson()
-			ITextComponent i = ITextComponent.Serializer.func_240643_a_(jsonIn);
+			Component i = Component.Serializer.fromJson(jsonIn);
 			if (i != null) {
 				return (i.getString());
 			}

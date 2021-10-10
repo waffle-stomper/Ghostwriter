@@ -1,8 +1,8 @@
 package wafflestomper.ghostwriter.gui.screen;
 
-import net.minecraft.client.gui.screen.ReadBookScreen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.item.ItemStack;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.IGhostBook;
@@ -10,12 +10,12 @@ import wafflestomper.ghostwriter.gui.IGhostBook;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostBook {
+public class GhostwriterReadBookScreen extends BookViewScreen implements IGhostBook {
 	
 	private final GhostLayer ghostLayer;
 	
 	
-	public GhostwriterReadBookScreen(ReadBookScreen.IBookInfo bookInfoIn, ItemStack currStack) {
+	public GhostwriterReadBookScreen(BookViewScreen.BookAccess bookInfoIn, ItemStack currStack) {
 		super(bookInfoIn);
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.ghostLayer.extractTitleAuthor(currStack);
@@ -26,12 +26,12 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	public void init() {
 		super.init();
 		this.ghostLayer.init();
-		this.updateButtons();
+		this.updateButtonVisibility();
 	}
 	
 	
 	@Override  // From ReadBookScreen
-	public void updateButtons() {
+	public void updateButtonVisibility() {
 		this.ghostLayer.updateButtons();
 	}
 	
@@ -39,8 +39,8 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
 		List<String> pages = new ArrayList<>();
-		for (int i = 0; i < this.getPageCount(); i++) {
-			pages.add(BookUtilities.deJSONify(this.bookInfo.func_238806_b_(i).getString()));
+		for (int i = 0; i < this.getNumPages(); i++) {
+			pages.add(BookUtilities.deJSONify(this.bookAccess.getPage(i).getString()));
 		}
 		return pages;
 	}
@@ -48,32 +48,32 @@ public class GhostwriterReadBookScreen extends ReadBookScreen implements IGhostB
 	
 	@Override  // From IGhostBook
 	public int getBookPageCount() {
-		return this.getPageCount();
+		return this.getNumPages();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public void updateVanillaButtons() {
-		super.updateButtons();
+		super.updateButtonVisibility();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public Button addGhostButton(Button button) {
-		return this.addButton(button);
+		return this.addRenderableWidget(button);
 	}
 	
 	
 	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
-		// func_238806_b_() either returns the page text or a blank ITextComponent
-		return this.bookInfo.func_238806_b_(pageNum).toString();
+		// getPage() either returns the page text or a blank Component
+		return this.bookAccess.getPage(pageNum).toString();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public int getCurrPage() {
-		return this.currPage;
+		return this.currentPage;
 	}
 	
 	// Unused methods that only apply to unsigned books

@@ -1,15 +1,15 @@
 package wafflestomper.ghostwriter;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.EditBookScreen;
-import net.minecraft.client.gui.screen.LecternScreen;
-import net.minecraft.client.gui.screen.ReadBookScreen;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.WritableBookItem;
-import net.minecraft.item.WrittenBookItem;
-import net.minecraft.util.Hand;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.client.gui.screens.inventory.LecternScreen;
+import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.WritableBookItem;
+import net.minecraft.world.item.WrittenBookItem;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -56,8 +56,8 @@ public class Ghostwriter {
 	 */
 	@SubscribeEvent
 	public void tick(TickEvent event) {
-		if (MC.currentScreen == null) return;
-		if (!lecternArmed || !MC.currentScreen.getClass().equals(LecternScreen.class)) return;
+		if (MC.screen == null) return;
+		if (!lecternArmed || !MC.screen.getClass().equals(LecternScreen.class)) return;
 		
 		lecternArmed = false;
 		LOG.debug("Lectern screen detected!");
@@ -70,8 +70,8 @@ public class Ghostwriter {
 			return;
 		}
 		
-		LecternScreen ls = (LecternScreen) MC.currentScreen;
-		ItemStack bookStack = ls.getContainer().getBook();
+		LecternScreen ls = (LecternScreen) MC.screen;
+		ItemStack bookStack = ls.getMenu().getBook();
 		LOG.info("Swapping LecternScreen for GhostwriterLecternScreen...");
 		
 		Item bookItem = bookStack.getItem();
@@ -82,8 +82,8 @@ public class Ghostwriter {
 		
 		LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
 		GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
-				ls.getContainer(), MC.player.inventory);
-		MC.displayGuiScreen(g);
+				ls.getMenu(), MC.player.getInventory());
+		MC.setScreen(g);
 		
 		LOG.debug("Lectern GUI swap done!");
 	}
@@ -100,7 +100,7 @@ public class Ghostwriter {
 		}
 		LOG.debug("GUIOpenEvent: " + eventGui.toString());
 		
-		if (!eventGui.getClass().equals(EditBookScreen.class) && !eventGui.getClass().equals(ReadBookScreen.class) &&
+		if (!eventGui.getClass().equals(BookEditScreen.class) && !eventGui.getClass().equals(BookViewScreen.class) &&
 				!eventGui.getClass().equals(LecternScreen.class)) {
 			return;
 		}
@@ -117,15 +117,15 @@ public class Ghostwriter {
 			return;
 		}
 		
-		ItemStack bookStack = MC.player.getHeldItem(Hand.MAIN_HAND);
+		ItemStack bookStack = MC.player.getItemInHand(InteractionHand.MAIN_HAND);
 		
 		// Finally, do the GUI replacement
-		if (eventGui instanceof EditBookScreen) {
+		if (eventGui instanceof BookEditScreen) {
 			LOG.debug("Replacing the current screen with a GhostwriterEditBookScreen");
-			eventGui = new GhostwriterEditBookScreen(MC.player, bookStack, Hand.MAIN_HAND);
+			eventGui = new GhostwriterEditBookScreen(MC.player, bookStack, InteractionHand.MAIN_HAND);
 		} else {
 			LOG.debug("Replacing the current screen with a GhostwriterReadBookScreen");
-			ReadBookScreen.WrittenBookInfo bookInfo = new ReadBookScreen.WrittenBookInfo(bookStack);
+			BookViewScreen.WrittenBookAccess bookInfo = new BookViewScreen.WrittenBookAccess(bookStack);
 			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack);
 		}
 		event.setGui(eventGui);

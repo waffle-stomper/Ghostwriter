@@ -40,6 +40,7 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
  + Refresh Gradle project
  + Gradle > fg_runs > genIntellijRuns
 
+5) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
 
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 

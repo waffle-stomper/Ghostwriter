@@ -1,27 +1,26 @@
 package wafflestomper.ghostwriter.gui.screen;
 
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.screen.ReadBookScreen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.inventory.BookViewScreen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
 import wafflestomper.ghostwriter.utilities.SharedConstants;
 
-public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
+public class GhostwriterSignedPreviewScreen extends BookViewScreen {
 	private final GhostwriterEditBookScreen parent;
 	
 	public GhostwriterSignedPreviewScreen(GhostwriterEditBookScreen parent) {
 		this.parent = parent;
-		this.bookInfo = new PreviewBookInfo(this.parent);
-		this.currPage = this.parent.currPage;
+		this.bookAccess = new PreviewBookInfo(this.parent);
+		this.currentPage = this.parent.currentPage;
 	}
 	
 	@Override
-	public void addDoneButton() {
-		this.addButton(new Button(this.width / 2 - 100, 196, 200, 20,
-				new StringTextComponent("Back to editor"), (p_214161_1_) -> {
+	public void createMenuControls() {
+		this.addRenderableWidget(new Button(this.width / 2 - 100, 196, 200, 20,
+				new TextComponent("Back to editor"), (p_214161_1_) -> {
 			if (this.minecraft == null) return;
-			this.minecraft.displayGuiScreen(this.parent);
+			this.minecraft.setScreen(this.parent);
 		}));
 	}
 	
@@ -40,15 +39,14 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		// Patch Esc function so it kicks back to parent screen rather than exiting completely
 		if (keyCode == SharedConstants.KEY_ESC && this.minecraft != null) {
-			this.minecraft.displayGuiScreen(this.parent);
+			this.minecraft.setScreen(this.parent);
 			return true;
 		}
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
 	
 	
-	@MethodsReturnNonnullByDefault
-	public static class PreviewBookInfo implements ReadBookScreen.IBookInfo {
+	public static class PreviewBookInfo implements BookViewScreen.BookAccess {
 		private final GhostwriterEditBookScreen PARENT;
 		
 		public PreviewBookInfo(GhostwriterEditBookScreen parent) {
@@ -59,12 +57,12 @@ public class GhostwriterSignedPreviewScreen extends ReadBookScreen {
 		 * Returns the size of the book
 		 */
 		public int getPageCount() {
-			return this.PARENT.bookPages.size();
+			return this.PARENT.pages.size();
 		}
 		
-		// getPageContent
-		public ITextProperties func_230456_a_(int pageNum) {
-			return ITextProperties.func_240652_a_(this.PARENT.bookPages.get(pageNum));
+		// TODO: I have no idea if this is right
+		public FormattedText getPageRaw(int pageNum) {
+			return FormattedText.of(this.PARENT.pages.get(pageNum));
 		}
 	}
 }

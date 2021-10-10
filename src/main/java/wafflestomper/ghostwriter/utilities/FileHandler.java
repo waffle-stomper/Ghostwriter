@@ -30,7 +30,7 @@ public class FileHandler {
 	
 	public FileHandler(Clipboard _clipboard) {
 		this.clipboard = _clipboard;
-		String path = Minecraft.getInstance().gameDir.getAbsolutePath();
+		String path = Minecraft.getInstance().gameDirectory.getAbsolutePath();
 		if (path.endsWith(".")) {
 			path = path.substring(0, path.length() - 2);
 		}

@@ -2,18 +2,24 @@ package wafflestomper.ghostwriter.utilities;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import wafflestomper.ghostwriter.Ghostwriter;
 
 public class Printer {
 	// I think we've already established that I'm a terrible person
-	public static final TextFormatting GRAY = TextFormatting.GRAY;
-	public static final TextFormatting DARK_GRAY = TextFormatting.DARK_GRAY;
-	public static final TextFormatting GREEN = TextFormatting.GREEN;
-	public static final TextFormatting AQUA = TextFormatting.AQUA;
-	public static final TextFormatting RED = TextFormatting.RED;
+	public static final ChatFormatting GRAY = ChatFormatting.GRAY;
+	public static final ChatFormatting DARK_GRAY = ChatFormatting.DARK_GRAY;
+	public static final ChatFormatting GREEN = ChatFormatting.GREEN;
+	public static final ChatFormatting AQUA = ChatFormatting.AQUA;
+	public static final ChatFormatting RED = ChatFormatting.RED;
 	private static final Minecraft MC = Minecraft.getInstance();
 	
 	public void gamePrint(String inStr) {
-		MC.ingameGUI.getChatGUI().printChatMessage(new TextComponent(inStr));
+		try {
+			MC.gui.getChat().addMessage(new TextComponent(inStr));
+		}
+		catch (NullPointerException e){
+			Ghostwriter.LOG.error("NPE while trying to print this message to game: " + inStr);
+		}
 	}
 }

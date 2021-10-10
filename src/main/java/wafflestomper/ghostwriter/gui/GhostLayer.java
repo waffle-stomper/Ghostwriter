@@ -1,11 +1,11 @@
 package wafflestomper.ghostwriter.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TextComponent;
 import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterEditBookScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterFileBrowserScreen;
@@ -51,7 +51,7 @@ public class GhostLayer {
 	public final boolean bookIsEditable;
 	
 	// These are mostly used for loaded books
-	// Note that EditBookScreen has its own bookTitle field that we need to keep track of
+	// Note that BookEditScreen has its own bookTitle field that we need to keep track of
 	private String bookTitle = "";
 	private String bookAuthor = "";
 	
@@ -93,7 +93,7 @@ public class GhostLayer {
 	 */
 	public void extractTitleAuthor(ItemStack bookStack) {
 		if (bookStack == null) return;
-		CompoundNBT compoundnbt = bookStack.getTag();
+		CompoundTag compoundnbt = bookStack.getTag();
 		if (compoundnbt == null) return;
 		this.setBookTitle(compoundnbt.getString("title"));
 		this.bookAuthor = compoundnbt.getString("author");
@@ -365,22 +365,22 @@ public class GhostLayer {
 			// Multi page selection
 			this.buttonCopySelectedPages.active = true;
 			String xPages = (Math.abs(this.selectedPageB - this.selectedPageA) + 1) + " Pages";
-			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy " + xPages));
-			this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut " + xPages));
-			this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove " + xPages));
-			this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA + 1)));
-			this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB + 1)));
+			this.buttonCopySelectedPages.setMessage(new TextComponent("Copy " + xPages));
+			this.buttonCutMultiplePages.setMessage(new TextComponent("Cut " + xPages));
+			this.buttonRemoveSelectedPages.setMessage(new TextComponent("Remove " + xPages));
+			this.buttonSelectPageA.setMessage(new TextComponent("A: " + (this.selectedPageA + 1)));
+			this.buttonSelectPageB.setMessage(new TextComponent("B: " + (this.selectedPageB + 1)));
 		} else {
-			this.buttonCopySelectedPages.setMessage(new StringTextComponent("Copy This Page"));
-			this.buttonCutMultiplePages.setMessage(new StringTextComponent("Cut This Page"));
-			this.buttonRemoveSelectedPages.setMessage(new StringTextComponent("Remove This Page"));
-			this.buttonSelectPageA.setMessage(new StringTextComponent("A"));
-			this.buttonSelectPageB.setMessage(new StringTextComponent("B"));
+			this.buttonCopySelectedPages.setMessage(new TextComponent("Copy This Page"));
+			this.buttonCutMultiplePages.setMessage(new TextComponent("Cut This Page"));
+			this.buttonRemoveSelectedPages.setMessage(new TextComponent("Remove This Page"));
+			this.buttonSelectPageA.setMessage(new TextComponent("A"));
+			this.buttonSelectPageB.setMessage(new TextComponent("B"));
 			if (this.selectedPageA >= 0) {
-				this.buttonSelectPageA.setMessage(new StringTextComponent("A: " + (this.selectedPageA + 1)));
+				this.buttonSelectPageA.setMessage(new TextComponent("A: " + (this.selectedPageA + 1)));
 			}
 			if (this.selectedPageB >= 0) {
-				this.buttonSelectPageB.setMessage(new StringTextComponent("B: " + (this.selectedPageB + 1)));
+				this.buttonSelectPageB.setMessage(new TextComponent("B: " + (this.selectedPageB + 1)));
 			}
 		}
 		
@@ -388,9 +388,9 @@ public class GhostLayer {
 		
 		this.buttonPasteMultiplePages.active = (Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() > 0);
 		if (this.buttonPasteMultiplePages.active) {
-			this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste " + Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() + " Page" + ((Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() == 1) ? "" : "s")));
+			this.buttonPasteMultiplePages.setMessage(new TextComponent("Paste " + Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() + " Page" + ((Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() == 1) ? "" : "s")));
 		} else {
-			this.buttonPasteMultiplePages.setMessage(new StringTextComponent("Paste Multiple"));
+			this.buttonPasteMultiplePages.setMessage(new TextComponent("Paste Multiple"));
 		}
 		
 		this.buttonDisableAutoReload.active = this.autoReloadFile != null;
@@ -401,10 +401,10 @@ public class GhostLayer {
 	 * Helper method for buttons that need to be selectively hidden
 	 * By default it creates the widest ghostwriter buttons, but you can use Button.setWidth() to make them thinner
 	 */
-	private Button addPageButton(int x, int y, String label, Button.IPressable action, boolean hideInReadOnlyMode){
+	private Button addPageButton(int x, int y, String label, Button.OnPress action, boolean hideInReadOnlyMode){
 		int width = SharedConstants.LARGE_BUTTON_WIDTH;
 		int height = SharedConstants.BUTTON_HEIGHT;
-		StringTextComponent buttonText = new StringTextComponent(label);
+		TextComponent buttonText = new TextComponent(label);
 		Button b = this.parent.addGhostButton(new Button(x, y, width, height, buttonText, action));
 		this.buttonsHideWhileSigning.add(b);
 		if (hideInReadOnlyMode) this.buttonsEditOnly.add(b);
@@ -428,14 +428,14 @@ public class GhostLayer {
 		
 		////////////////////////////////////  Left side buttons  ///////////////////////////////////////////////
 		this.addPageButton(5, 5, "File Browser",
-				(pressed_button) -> MINECRAFT.displayGuiScreen(new GhostwriterFileBrowserScreen(this)),false);
+				(pressed_button) -> MINECRAFT.setScreen(new GhostwriterFileBrowserScreen(this)),false);
 		
 		this.buttonDisableAutoReload = this.addPageButton(5, 45, "Disable AutoReload",
 				(pressed_button) -> this.disableAutoReload(),true);
 		
 		this.addPageButton(5, 70, "Add Signature Pages", (pressed_button) -> this.addSignaturePages(), true);
 		
-		this.addPageButton(5, 95, "Preview Signed Book", (pressed_button) -> MINECRAFT.displayGuiScreen(
+		this.addPageButton(5, 95, "Preview Signed Book", (pressed_button) -> MINECRAFT.setScreen(
 				new GhostwriterSignedPreviewScreen((GhostwriterEditBookScreen) this.screen)), true);
 		
 		////////////////////////////////////  Right side buttons  ////////////////////////////////////////////

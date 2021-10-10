@@ -1,6 +1,6 @@
 package wafflestomper.ghostwriter.gui;
 
-import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.components.Button;
 
 import java.util.List;
 
@@ -85,7 +85,7 @@ public interface IGhostBook {
 	void setBookTitle(String title);
 	
 	/**
-	 * Updates a vanilla book after a change is made that didn't involve the vanilla TextInputUtil
+	 * Updates a vanilla book after a change is made that didn't involve the vanilla TextFieldHelper
 	 * e.g. removing a page
 	 * If this isn't called after GhostLayer makes a change, the game will probably crash (or at least misbehave)
 	 */
