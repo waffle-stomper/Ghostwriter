@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.TextComponent;
+import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.IGhostBook;
@@ -50,10 +51,13 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 		super.init();
 		this.ghostLayer.init();
 		this.updateButtonVisibility();
+		// I'm not sure why, but this is now necessary before the lectern will show text
+		this.bookChanged(true);
 		// This is a hack based on LecternScreen.func_214176_h()
 		// Books can be left open to a specific page on a lectern. This displays that page.
 		// Otherwise we'd just be showing the first page every time
-		this.setPage(this.lecternContainer.getPage());
+		this.setPage(Math.max(this.lecternContainer.getPage(), 0));
+		Ghostwriter.LOG.info("Page set to: " + this.currentPage);
 	}
 	
 	
@@ -83,7 +87,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	@Override  // From IGhostBook
 	public void bookChanged(boolean setModifiedFlag) {
-		this.cachedPage = -1;
+		super.bookChanged();
 	}
 	
 	

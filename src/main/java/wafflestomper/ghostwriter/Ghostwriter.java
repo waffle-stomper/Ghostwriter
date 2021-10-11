@@ -85,8 +85,11 @@ public class Ghostwriter {
 		}
 		
 		LOG.debug("Replacing the current screen with a GhostwriterLecternScreen");
-		GhostwriterLecternScreen g = new GhostwriterLecternScreen(bookStack,
-				ls.getMenu(), MC.player.getInventory());
+		GhostwriterLecternScreen g = new GhostwriterLecternScreen(
+				bookStack,
+				ls.getMenu(),
+				MC.player.getInventory()
+		);
 		MC.setScreen(g);
 		
 		LOG.debug("Lectern GUI swap done!");
