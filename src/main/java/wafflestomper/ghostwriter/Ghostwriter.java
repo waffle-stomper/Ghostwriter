@@ -19,6 +19,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterEditBookScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterLecternScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterReadBookScreen;
@@ -27,6 +28,9 @@ import wafflestomper.ghostwriter.utilities.FileHandler;
 import wafflestomper.ghostwriter.utilities.Printer;
 
 import java.io.File;
+
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
 
 
 @Mod("ghostwriter")
@@ -130,5 +134,16 @@ public class Ghostwriter {
 		}
 		event.setGui(eventGui);
 		LOG.debug("GUI swap done!");
+	}
+	
+	
+	// Fix by The Matt Crawford to reveal the hidden cursor when you hit a breakpoint
+	// https://intellij-support.jetbrains.com/hc/en-us/community/posts/360007479999-If-application-window-is-in-focus-
+	// when-breakpoint-is-hit-keyboard-and-mouse-focus-will-not-shift-to-any-other-window
+	// To use it, you just need to call it from your breakpoint's condition field.
+	// Note that you can import this class into the condition if your breakpoint isn't in the ghostwriter namespace
+	public static boolean debuggerReleaseControl() {
+		GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		return true;
 	}
 }
