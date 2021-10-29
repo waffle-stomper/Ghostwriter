@@ -484,7 +484,7 @@ public class GhostLayer {
 		this.addColorFormatButton(colorButY, "\u00a75A", "\u00a75");  // DARK_PURPLE
 		this.addColorFormatButton(colorButY, "\u00a76A", "\u00a76");  // GOLD
 		this.addColorFormatButton(colorButY, "\u00a77A", "\u00a77");  // GRAY
-		this.addColorFormatButton(colorButY, "\u00a78A", "\u007a8");  // DARK_GRAY
+		this.addColorFormatButton(colorButY, "\u00a78A", "\u00a78");  // DARK_GRAY
 		this.addColorFormatButton(colorButY, "\u00a79A", "\u00a79");  // BLUE
 		this.addColorFormatButton(colorButY, "\u00a7aA", "\u00a7a");  // GREEN
 		this.addColorFormatButton(colorButY, "\u00a7bA", "\u00a7b");  // AQUA
