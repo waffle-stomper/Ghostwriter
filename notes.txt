@@ -45,6 +45,13 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
 
+Simulate server latency on linux:
+sudo tc qdisc add dev <nic> root netem delay 100ms
+Show current rule(s):
+tc -s qdisc
+Remove the latency:
+sudo tc qdisc del dev <nic> root netem
+
 
 #########################################################################
 #																		#
