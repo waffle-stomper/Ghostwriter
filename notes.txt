@@ -39,6 +39,7 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
  + Gradle > build > clean?
  + Refresh Gradle project
  + Gradle > fg_runs > genIntellijRuns
+If any of these steps fail, try restarting IDEA.
 
 5) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
 
