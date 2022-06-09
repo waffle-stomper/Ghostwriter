@@ -2,7 +2,7 @@
 modLoader="javafml"
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[40,)"  # 40 = 1.18.2
+loaderVersion="[41,)"  # 41 = 1.19
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
 license="GNU GPL v3"
@@ -33,6 +33,6 @@ issueTrackerURL="https://github.com/waffle-stomper/Ghostwriter/issues"
 [[dependencies.ghostwriter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2,1.19)"
+    versionRange="[1.19,1.20)"
     ordering="NONE"
     side="CLIENT"

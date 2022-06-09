@@ -10,7 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -138,7 +138,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			// Show the long title warning
 			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
 					"Set longer titles at your own risk";
-			TextComponent lengthWarning = new TextComponent(s);
+			Component lengthWarning = Component.translatable(s);
 			// params are text, x, y, width, color
 			this.font.drawWordWrap(lengthWarning, 153, 116, 114, 0xFF3333);
 		}

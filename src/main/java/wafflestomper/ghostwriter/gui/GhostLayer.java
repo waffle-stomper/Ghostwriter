@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterEditBookScreen;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterFileBrowserScreen;
@@ -365,22 +365,22 @@ public class GhostLayer {
 			// Multi page selection
 			this.buttonCopySelectedPages.active = true;
 			String xPages = (Math.abs(this.selectedPageB - this.selectedPageA) + 1) + " Pages";
-			this.buttonCopySelectedPages.setMessage(new TextComponent("Copy " + xPages));
-			this.buttonCutMultiplePages.setMessage(new TextComponent("Cut " + xPages));
-			this.buttonRemoveSelectedPages.setMessage(new TextComponent("Remove " + xPages));
-			this.buttonSelectPageA.setMessage(new TextComponent("A: " + (this.selectedPageA + 1)));
-			this.buttonSelectPageB.setMessage(new TextComponent("B: " + (this.selectedPageB + 1)));
+			this.buttonCopySelectedPages.setMessage(Component.translatable("Copy " + xPages));
+			this.buttonCutMultiplePages.setMessage(Component.translatable("Cut " + xPages));
+			this.buttonRemoveSelectedPages.setMessage(Component.translatable("Remove " + xPages));
+			this.buttonSelectPageA.setMessage(Component.translatable("A: " + (this.selectedPageA + 1)));
+			this.buttonSelectPageB.setMessage(Component.translatable("B: " + (this.selectedPageB + 1)));
 		} else {
-			this.buttonCopySelectedPages.setMessage(new TextComponent("Copy This Page"));
-			this.buttonCutMultiplePages.setMessage(new TextComponent("Cut This Page"));
-			this.buttonRemoveSelectedPages.setMessage(new TextComponent("Remove This Page"));
-			this.buttonSelectPageA.setMessage(new TextComponent("A"));
-			this.buttonSelectPageB.setMessage(new TextComponent("B"));
+			this.buttonCopySelectedPages.setMessage(Component.translatable("Copy This Page"));
+			this.buttonCutMultiplePages.setMessage(Component.translatable("Cut This Page"));
+			this.buttonRemoveSelectedPages.setMessage(Component.translatable("Remove This Page"));
+			this.buttonSelectPageA.setMessage(Component.translatable("A"));
+			this.buttonSelectPageB.setMessage(Component.translatable("B"));
 			if (this.selectedPageA >= 0) {
-				this.buttonSelectPageA.setMessage(new TextComponent("A: " + (this.selectedPageA + 1)));
+				this.buttonSelectPageA.setMessage(Component.translatable("A: " + (this.selectedPageA + 1)));
 			}
 			if (this.selectedPageB >= 0) {
-				this.buttonSelectPageB.setMessage(new TextComponent("B: " + (this.selectedPageB + 1)));
+				this.buttonSelectPageB.setMessage(Component.translatable("B: " + (this.selectedPageB + 1)));
 			}
 		}
 		
@@ -388,9 +388,9 @@ public class GhostLayer {
 		
 		this.buttonPasteMultiplePages.active = (Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() > 0);
 		if (this.buttonPasteMultiplePages.active) {
-			this.buttonPasteMultiplePages.setMessage(new TextComponent("Paste " + Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() + " Page" + ((Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() == 1) ? "" : "s")));
+			this.buttonPasteMultiplePages.setMessage(Component.translatable("Paste " + Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() + " Page" + ((Ghostwriter.GLOBAL_CLIPBOARD.miscPages.size() == 1) ? "" : "s")));
 		} else {
-			this.buttonPasteMultiplePages.setMessage(new TextComponent("Paste Multiple"));
+			this.buttonPasteMultiplePages.setMessage(Component.translatable("Paste Multiple"));
 		}
 		
 		this.buttonDisableAutoReload.active = this.autoReloadFile != null;
@@ -404,7 +404,7 @@ public class GhostLayer {
 	private Button addPageButton(int x, int y, String label, Button.OnPress action, boolean hideInReadOnlyMode){
 		int width = SharedConstants.LARGE_BUTTON_WIDTH;
 		int height = SharedConstants.BUTTON_HEIGHT;
-		TextComponent buttonText = new TextComponent(label);
+		Component buttonText = Component.translatable(label);
 		Button b = this.parent.addGhostButton(new Button(x, y, width, height, buttonText, action));
 		this.buttonsHideWhileSigning.add(b);
 		if (hideInReadOnlyMode) this.buttonsEditOnly.add(b);

@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import wafflestomper.ghostwriter.gui.screen.GhostwriterFileBrowserScreen;
@@ -84,7 +83,7 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 		}
 		
 		public Component getNarration(){
-			return new TextComponent("NOT_SET - please file an issue in the Ghostwriter Github repo");
+			return Component.translatable("NOT_SET - please file an issue in the Ghostwriter Github repo");
 		}
 	}
 	
@@ -157,7 +156,7 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 		}
 		
 		public Component getNarration(){
-			return new TextComponent("NOT_SET - please file an issue in the Ghostwriter Github repo");
+			return Component.translatable("NOT_SET - please file an issue in the Ghostwriter Github repo");
 		}
 	}
 }

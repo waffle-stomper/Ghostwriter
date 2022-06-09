@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
 import wafflestomper.ghostwriter.*;
 import wafflestomper.ghostwriter.gui.widget.FileSelectionList;
@@ -53,7 +52,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	
 	public GhostwriterFileBrowserScreen(GhostLayer parent) {
-		super(new TextComponent("Ghostwriter File Browser"));
+		super(Component.translatable("Ghostwriter File Browser"));
 		this.parent = parent;
 		this.FILE_HANDLER = new FileHandler(this.TEMP_CLIPBOARD);
 		if (Ghostwriter.currentPath == null) {
@@ -110,10 +109,10 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		// Template for this found in the delete button on MultiplayerScreen
 		File save_path = new File(this.FILE_HANDLER.currentPath, this.filenameField.getValue());
 		if (save_path.exists()) {
-			Component overwriteText = new TextComponent("Are you sure you wish to overwrite this file?");
-			Component filenameText = new TextComponent(this.filenameField.getValue());
-			Component s1 = new TextComponent("Yes");
-			Component s2 = new TextComponent("Cancel");
+			Component overwriteText = Component.translatable("Are you sure you wish to overwrite this file?");
+			Component filenameText = Component.translatable(this.filenameField.getValue());
+			Component s1 = Component.translatable("Yes");
+			Component s2 = Component.translatable("Cancel");
 			Ghostwriter.currentPath = this.FILE_HANDLER.currentPath;
 			assert this.minecraft != null;
 			this.minecraft.setScreen(new ConfirmScreen(this::saveCallback, overwriteText, filenameText, s1, s2));
@@ -132,7 +131,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			
 			this.filenameField = new SelectableFilenameField(this.minecraft.font, this.width / 2 - 125,
 					this.height - BORDER_HEIGHT - BUTTON_HEIGHT, 250, BUTTON_HEIGHT,
-					new TextComponent("filename"));
+					Component.translatable("filename"));
 			this.filenameField.setMaxLength(100);
 			// Add default filename to filenameField
 			String file_title = this.parent.getBookTitle();
@@ -155,26 +154,26 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		int mainButtonsY = this.height - BORDER_HEIGHT - BUTTON_HEIGHT;
 		int loadX = this.width / 2 - 127;
 		this.btnLoad = this.addRenderableWidget(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new TextComponent("Load"), (pressedButton) -> this.loadClicked(false)));
+				Component.translatable("Load"), (pressedButton) -> this.loadClicked(false)));
 		
 		int autoReloadX = loadX + BUTTON_WIDTH;
 		this.btnAutoReload = this.addRenderableWidget(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new TextComponent("AutoReload"), (pressedButton) -> this.loadClicked(true)));
+				Component.translatable("AutoReload"), (pressedButton) -> this.loadClicked(true)));
 		
 		int saveX = autoReloadX + BUTTON_WIDTH + 7;
 		this.btnSave = this.addRenderableWidget(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new TextComponent("Save"), (pressedButton) -> this.saveClicked()));
+				Component.translatable("Save"), (pressedButton) -> this.saveClicked()));
 		
 		int cancelX = this.width / 2 + 127 - BUTTON_WIDTH;
 		this.addRenderableWidget(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				new TextComponent("Cancel"), (pressedButton) -> goBackToParentGui()));
+				Component.translatable("Cancel"), (pressedButton) -> goBackToParentGui()));
 		
 		//Add buttons for each non-empty drive letter
 		int rootNum = 100;
 		List<File> roots = this.FILE_HANDLER.getValidRoots();
 		for (File root : roots) {
 			this.addRenderableWidget(new Button(5, 35 + 21 * (rootNum - 100), 50, 20,
-					new TextComponent(root.getAbsolutePath()), (pressedButton) ->
+					Component.translatable(root.getAbsolutePath()), (pressedButton) ->
 					this.driveButtonClicked(root)
 			));
 			rootNum++;
@@ -190,7 +189,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		
 		// Add button for enabling file extension editing
 		this.btnEditExtension = this.addRenderableWidget(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
-				this.filenameField.y, 25, this.filenameField.getHeight(), new TextComponent("EXT"),
+				this.filenameField.y, 25, this.filenameField.getHeight(), Component.translatable("EXT"),
 				(pressedButton) -> {
 					this.filenameField.toggleExtensionModifications();
 					this.updateButtons();
@@ -241,11 +240,11 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		
 		// Draw tooltip if the path is hovered
 		if (mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= 20 && mouseY <= 27) {
-			this.renderTooltip(PoseStack, new TextComponent(displayPath), 0, 0);
+			this.renderTooltip(PoseStack, Component.translatable(displayPath), 0, 0);
 		}
 		// Draw any other hover text
 		else if (this.hoveringText != null) {
-			this.renderTooltip(PoseStack, new TextComponent(this.hoveringText), mouseX, mouseY);
+			this.renderTooltip(PoseStack, Component.translatable(this.hoveringText), mouseX, mouseY);
 		}
 	}
 	
@@ -315,9 +314,9 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		}
 		
 		if (this.filenameField.allowExtensionModifications) {
-			this.btnEditExtension.setMessage(new TextComponent("EXT"));
+			this.btnEditExtension.setMessage(Component.translatable("EXT"));
 		} else {
-			this.btnEditExtension.setMessage(new TextComponent("\u00a7mEXT"));
+			this.btnEditExtension.setMessage(Component.translatable("\u00a7mEXT"));
 		}
 	}
 	

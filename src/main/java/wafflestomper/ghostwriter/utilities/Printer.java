@@ -1,7 +1,7 @@
 package wafflestomper.ghostwriter.utilities;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
 import wafflestomper.ghostwriter.Ghostwriter;
 
@@ -16,7 +16,7 @@ public class Printer {
 	
 	public void gamePrint(String inStr) {
 		try {
-			MC.gui.getChat().addMessage(new TextComponent(inStr));
+			MC.gui.getChat().addMessage(Component.translatable(inStr));
 		}
 		catch (NullPointerException e){
 			Ghostwriter.LOG.error("NPE while trying to print this message to game: " + inStr);

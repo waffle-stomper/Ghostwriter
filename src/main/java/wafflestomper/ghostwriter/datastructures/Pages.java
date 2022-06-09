@@ -3,7 +3,6 @@ package wafflestomper.ghostwriter.datastructures;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ public class Pages {
 		List<String> lines = new ArrayList<>();
 		lines.add("");
 		List<Component> stylizedLines = new ArrayList<>();
-		stylizedLines.add(new TextComponent(""));
+		stylizedLines.add(Component.translatable(""));
 		return new PageDetails("", lineStartIndices, lines, stylizedLines);
 	}
 	

@@ -5,7 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.LecternMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.gui.GhostLayer;
@@ -22,7 +22,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	public GhostwriterLecternScreen(ItemStack currStack, LecternMenu lecternContainer, Inventory playerInventory) {
 		// Not sure why it needs the inventory and text. Both params are ignored by the constructor
-		super(lecternContainer, playerInventory, new TextComponent(""));
+		super(lecternContainer, playerInventory, Component.translatable(""));
 		
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.lecternContainer = lecternContainer;

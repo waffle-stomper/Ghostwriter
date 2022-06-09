@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
 import org.apache.commons.lang3.mutable.MutableInt;
 import wafflestomper.ghostwriter.datastructures.PageDetails;
@@ -115,7 +114,7 @@ public class BookUtilities {
 					lineStartIndices.add(start - pageStartPos.getValue());
 					String line = inStr.substring(start, end);
 					lines.add(line);
-					stylizedLines.add(new TextComponent(line).setStyle(style));
+					stylizedLines.add(Component.translatable(line).setStyle(style));
 					
 					if (lines.size() == maxLinesPerPage) {
 						// The current page is full. Store it and start a new one
