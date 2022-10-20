@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.WritableBookItem;
 import net.minecraft.world.item.WrittenBookItem;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.client.event.ScreenOpenEvent;
+import net.minecraftforge.client.event.ScreenEvent.Opening;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -100,7 +100,7 @@ public class Ghostwriter {
 	 * This swaps the default book GUI for the Ghostwriter screen before it loads
 	 */
 	@SubscribeEvent
-	public void guiOpen(ScreenOpenEvent event) {
+	public void guiOpen(Opening event) {
 		Screen eventGui = event.getScreen();
 		if (eventGui == null) {
 			return;
@@ -135,7 +135,7 @@ public class Ghostwriter {
 			BookViewScreen.WrittenBookAccess bookInfo = new BookViewScreen.WrittenBookAccess(bookStack);
 			eventGui = new GhostwriterReadBookScreen(bookInfo, bookStack);
 		}
-		event.setScreen(eventGui);
+		event.setNewScreen(eventGui);
 		LOG.debug("GUI swap done!");
 	}
 	

@@ -17,9 +17,9 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 
 
 #########################################################################
-#																		#
+#                                                                       #
 #          Changing Forge/MC Version (IntelliJ IDEA)                    #
-#																		#
+#                                                                       #
 #########################################################################
 
 1) build.gradle
