@@ -36,7 +36,7 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
  + Add new version info
 
 4) In IDEA
- + Gradle > build > clean?
+ + Gradle > build > clean (if you get a 'ProjectScopeServices has been closed' error, run ./gradlew --stop)
  + Reload Gradle project
  + Gradle > forgegradle runs > genIntellijRuns
 If any of these steps fail, try restarting IDEA.
@@ -55,9 +55,9 @@ sudo tc qdisc del dev <nic> root netem
 
 
 #########################################################################
-#																		#
+#                                                                       #
 #                             BOOK FORMATS                              #
-#																		#
+#                                                                       #
 #########################################################################
 
   ~~~~~~~~~~~~~~~~~~~~
@@ -153,9 +153,9 @@ Mat Oxley
 ###################################
 
 #########################################################################
-#																		#
-#                          OTHER NOTES                                  #
-#																		#
+#	                                                                      #
+#                               OTHER NOTES                             #
+#	                                                                      #
 #########################################################################
 
 Note on these notes: Some of the following information may be out of date.
