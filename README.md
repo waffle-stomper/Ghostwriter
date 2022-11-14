@@ -21,8 +21,6 @@ https://github.com/waffle-stomper/Ghostwriter/wiki
 
 ## Fabric Users:
 
-There are no plans to port Ghostwriter to Fabric, but I've recently been made aware of Stendhal - a similar mod for 
-Fabric: https://modrinth.com/mod/stendhal
+There are no plans to port Ghostwriter to Fabric. Consider Stendhal instead: https://modrinth.com/mod/stendhal
 
-Please note that Ghostwriter and the Maester Alliance are not affiliated with Stendhal. Issues with it should 
-be directed to their [Gitlab issues page](https://gitlab.com/NebSpacefarer/stendhal/-/issues)
+Please note that Ghostwriter and the Maester Alliance are not affiliated with Stendhal.
