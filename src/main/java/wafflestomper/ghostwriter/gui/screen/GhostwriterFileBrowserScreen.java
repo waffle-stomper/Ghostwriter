@@ -1,12 +1,14 @@
 package wafflestomper.ghostwriter.gui.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import wafflestomper.ghostwriter.*;
+import wafflestomper.ghostwriter.gui.GuiUtils;
 import wafflestomper.ghostwriter.gui.widget.FileSelectionList;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.widget.SelectableFilenameField;
@@ -124,7 +126,10 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	public void init() {
 		super.init();
-		if (this.minecraft != null) this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
+		if (this.minecraft == null) return;
+
+		// I can't remember what this did but setSendRepeatsToGui() is no longer a valid function...
+		// this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		
 		if (!this.initialized) {
 			this.fileSelectionList = new FileSelectionList(this, this.minecraft, this.width, this.height, 32, this.height - 64, SLOT_HEIGHT);
@@ -153,29 +158,48 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		// For some reason the button list is cleared when the window is resized
 		int mainButtonsY = this.height - BORDER_HEIGHT - BUTTON_HEIGHT;
 		int loadX = this.width / 2 - 127;
-		this.btnLoad = this.addRenderableWidget(new Button(loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				Component.translatable("Load"), (pressedButton) -> this.loadClicked(false)));
+
+		this.btnLoad = this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						loadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Load",
+						(pressedButton) -> this.loadClicked(false)
+				)
+		);
 		
 		int autoReloadX = loadX + BUTTON_WIDTH;
-		this.btnAutoReload = this.addRenderableWidget(new Button(autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				Component.translatable("AutoReload"), (pressedButton) -> this.loadClicked(true)));
+		this.btnAutoReload = this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						autoReloadX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "AutoReload",
+						(pressedButton) -> this.loadClicked(true)
+				)
+		);
 		
 		int saveX = autoReloadX + BUTTON_WIDTH + 7;
-		this.btnSave = this.addRenderableWidget(new Button(saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				Component.translatable("Save"), (pressedButton) -> this.saveClicked()));
+		this.btnSave = this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						saveX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Save",
+						(pressedButton) -> this.saveClicked()
+				)
+		);
 		
 		int cancelX = this.width / 2 + 127 - BUTTON_WIDTH;
-		this.addRenderableWidget(new Button(cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT,
-				Component.translatable("Cancel"), (pressedButton) -> goBackToParentGui()));
+		this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						cancelX, mainButtonsY, BUTTON_WIDTH, BUTTON_HEIGHT, "Cancel",
+						(pressedButton) -> goBackToParentGui()
+				)
+		);
 		
 		//Add buttons for each non-empty drive letter
 		int rootNum = 100;
 		List<File> roots = this.FILE_HANDLER.getValidRoots();
 		for (File root : roots) {
-			this.addRenderableWidget(new Button(5, 35 + 21 * (rootNum - 100), 50, 20,
-					Component.translatable(root.getAbsolutePath()), (pressedButton) ->
-					this.driveButtonClicked(root)
-			));
+			this.addRenderableWidget(
+					GuiUtils.buttonFactory(
+							5, 35 + 21 * (rootNum - 100), 50, 20, root.getAbsolutePath(),
+							(pressedButton) -> this.driveButtonClicked(root)
+					)
+			);
 			rootNum++;
 		}
 		
@@ -188,12 +212,19 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		this.filenameField.y = this.height - BORDER_HEIGHT * 2 - BUTTON_HEIGHT * 2;
 		
 		// Add button for enabling file extension editing
-		this.btnEditExtension = this.addRenderableWidget(new Button(this.filenameField.x + this.filenameField.getWidth() + 3,
-				this.filenameField.y, 25, this.filenameField.getHeight(), Component.translatable("EXT"),
-				(pressedButton) -> {
-					this.filenameField.toggleExtensionModifications();
-					this.updateButtons();
-				}));
+		this.btnEditExtension = this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						this.filenameField.x + this.filenameField.getWidth() + 3,
+						this.filenameField.y,
+						25,
+						this.filenameField.getHeight(),
+						"EXT",
+						(pressedButton) -> {
+							this.filenameField.toggleExtensionModifications();
+							this.updateButtons();
+						}
+				)
+		);
 		
 		this.updateButtons();
 	}
@@ -232,9 +263,9 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			String reversed = new StringBuilder(displayPath).reverse().toString();
 			// func_238361_b_() is trimStringToWidth()
 			reversed = this.font.getSplitter().plainHeadByWidth(reversed, allowedSize, Style.EMPTY);
-			displayPath = "..." + new StringBuilder(reversed).reverse().toString();
+			displayPath = "..." + new StringBuilder(reversed).reverse();
 		}
-		this.drawCenteredString(PoseStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
+		GuiComponent.drawCenteredString(PoseStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
 		
 		this.filenameField.render(PoseStack, mouseX, mouseY, partialTicks);
 		
@@ -251,8 +282,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	public void setSelectedSlot(FileSelectionList.Entry entry) {
 		this.fileSelectionList.setSelected(entry);
-		if (this.enableLoading && entry instanceof FileSelectionList.PathItemEntry) {
-			FileSelectionList.PathItemEntry p = (FileSelectionList.PathItemEntry) entry;
+		if (this.enableLoading && entry instanceof FileSelectionList.PathItemEntry p) {
 			if (p.path == this.selectedFile) {
 				return;
 			} else if (p.path.isFile()) {
@@ -316,7 +346,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		if (this.filenameField.allowExtensionModifications) {
 			this.btnEditExtension.setMessage(Component.translatable("EXT"));
 		} else {
-			this.btnEditExtension.setMessage(Component.translatable("\u00a7mEXT"));
+			this.btnEditExtension.setMessage(Component.translatable("§mEXT"));
 		}
 	}
 	

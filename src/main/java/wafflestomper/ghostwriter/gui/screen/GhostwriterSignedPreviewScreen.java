@@ -1,9 +1,9 @@
 package wafflestomper.ghostwriter.gui.screen;
 
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+import wafflestomper.ghostwriter.gui.GuiUtils;
 import wafflestomper.ghostwriter.utilities.SharedConstants;
 
 public class GhostwriterSignedPreviewScreen extends BookViewScreen {
@@ -17,11 +17,15 @@ public class GhostwriterSignedPreviewScreen extends BookViewScreen {
 	
 	@Override
 	public void createMenuControls() {
-		this.addRenderableWidget(new Button(this.width / 2 - 100, 196, 200, 20,
-				Component.translatable("Back to editor"), (p_214161_1_) -> {
-			if (this.minecraft == null) return;
-			this.minecraft.setScreen(this.parent);
-		}));
+		this.addRenderableWidget(
+				GuiUtils.buttonFactory(
+						this.width / 2 - 100, 196, 200, 20, "Back to editor",
+						(p_214161_1_) -> {
+								if (this.minecraft == null) return;
+								this.minecraft.setScreen(this.parent);
+						}
+				)
+		);
 	}
 	
 	@Override
@@ -61,7 +65,7 @@ public class GhostwriterSignedPreviewScreen extends BookViewScreen {
 		}
 		
 		// TODO: I have no idea if this is right
-		public FormattedText getPageRaw(int pageNum) {
+		public @NotNull FormattedText getPageRaw(int pageNum) {
 			return FormattedText.of(this.PARENT.pages.get(pageNum));
 		}
 	}
