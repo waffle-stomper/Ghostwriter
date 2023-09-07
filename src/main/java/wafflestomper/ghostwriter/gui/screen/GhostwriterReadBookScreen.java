@@ -100,7 +100,7 @@ public class GhostwriterReadBookScreen extends BookViewScreen implements IGhostB
 	}
 	
 	@Override  // From IGhostBook
-	public void insertText(String insertChars) {
+	public void addFormattingCode(String formattingCode) {
 	}
 	
 	@Override  // From IGhostBook

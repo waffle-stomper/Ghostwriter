@@ -411,10 +411,15 @@ public class GhostLayer {
 		return b;
 	}
 	
-	
-	private Button addColorFormatButton(int y, String label, String insertChars) {
-		Button b = this.addPageButton(this.colorFormatButtonX, y, label,
-				(pressed_button) -> this.parent.insertText(insertChars), true);
+
+	private Button addColorFormatButton(int y, String label, String formattingCode) {
+		Button b = this.addPageButton(
+			this.colorFormatButtonX,
+			y,
+			label,
+			(pressed_button) -> this.parent.addFormattingCode(formattingCode),
+			true
+		);
 		b.setWidth(SharedConstants.COLOR_FORMAT_BUTTON_WIDTH);
 		this.colorFormatButtonX += SharedConstants.COLOR_FORMAT_BUTTON_WIDTH;
 		return b;

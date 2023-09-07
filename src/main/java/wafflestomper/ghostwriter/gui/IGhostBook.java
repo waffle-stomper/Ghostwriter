@@ -42,10 +42,10 @@ public interface IGhostBook {
 	String getPageText(int pageNum);
 	
 	/**
-	 * Adds text to the open page (or the title if the book is being signed)
+	 * Adds formatting code to the book (or the title if the book is being signed)
 	 * Only used with unsigned books
 	 */
-	void insertText(String insertChars);
+	void addFormattingCode(String formattingCode);
 	
 	/**
 	 * Adds a new page (if possible) into the book at the given page number, with the given text

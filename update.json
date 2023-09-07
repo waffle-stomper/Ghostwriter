@@ -1,11 +1,11 @@
 {
   "homepage": "https://github.com/waffle-stomper/Ghostwriter/releases",
   "promos":{
-    "1.19.3-recommended": "2.4.1",
+    "1.19.3-recommended": "2.4.3",
     "1.19.2-recommended": "2.4.0",
     "1.19.1-recommended": "2.3.9",
     "1.19-recommended": "2.3.8",
-    "1.18.2-recommended": "2.3.7",
+    "1.18.2-recommended": "2.4.2",
     "1.18.1-recommended": "2.3.5",
     "1.17.1-recommended": "2.3.4",
     "1.16.5-recommended": "2.2.6",
@@ -24,6 +24,7 @@
     "1.10-recommended": "1.8.5"
   },
   "1.19.3": {
+    "2.4.3": "Fix bug where formatting characters replace selected text. Thanks to ZeliotL for the bug report",
     "2.4.1": "Update to 1.19.3"
   },
   "1.19.2": {
@@ -36,6 +37,7 @@
     "2.3.8": "Update to 1.19"
   },
   "1.18.2": {
+    "2.4.2": "Fix bug where formatting characters replace selected text. Thanks to ZeliotL for the bug report",
     "2.3.7": "Update to 1.18.2"
   },
   "1.18.1": {
