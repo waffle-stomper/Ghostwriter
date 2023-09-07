@@ -411,10 +411,15 @@ public class GhostLayer {
 		return b;
 	}
 	
-	
-	private Button addColorFormatButton(int y, String label, String insertChars) {
-		Button b = this.addPageButton(this.colorFormatButtonX, y, label,
-				(pressed_button) -> this.parent.insertText(insertChars), true);
+
+	private Button addColorFormatButton(int y, String label, String formattingCode) {
+		Button b = this.addPageButton(
+			this.colorFormatButtonX,
+			y,
+			label,
+			(pressed_button) -> this.parent.addFormattingCode(formattingCode),
+			true
+		);
 		b.setWidth(SharedConstants.COLOR_FORMAT_BUTTON_WIDTH);
 		this.colorFormatButtonX += SharedConstants.COLOR_FORMAT_BUTTON_WIDTH;
 		return b;
@@ -476,31 +481,31 @@ public class GhostLayer {
 		///////////////////////////////////////  Underside buttons  ///////////////////////////////////////////
 		this.colorFormatButtonX = this.screen.width / 2 - (SharedConstants.COLOR_FORMAT_BUTTON_WIDTH * 8);
 		int colorButY = this.screen.height - 40;
-		this.addColorFormatButton(colorButY, "\u00a70A", "\u00a70");  // BLACK
-		this.addColorFormatButton(colorButY, "\u00a71A", "\u00a71");  // DARK_BLUE
-		this.addColorFormatButton(colorButY, "\u00a72A", "\u00a72");  // DARK_GREEN
-		this.addColorFormatButton(colorButY, "\u00a73A", "\u00a73");  // DARK_AQUA
-		this.addColorFormatButton(colorButY, "\u00a74A", "\u00a74");  // DARK_RED
-		this.addColorFormatButton(colorButY, "\u00a75A", "\u00a75");  // DARK_PURPLE
-		this.addColorFormatButton(colorButY, "\u00a76A", "\u00a76");  // GOLD
-		this.addColorFormatButton(colorButY, "\u00a77A", "\u00a77");  // GRAY
-		this.addColorFormatButton(colorButY, "\u00a78A", "\u00a78");  // DARK_GRAY
-		this.addColorFormatButton(colorButY, "\u00a79A", "\u00a79");  // BLUE
-		this.addColorFormatButton(colorButY, "\u00a7aA", "\u00a7a");  // GREEN
-		this.addColorFormatButton(colorButY, "\u00a7bA", "\u00a7b");  // AQUA
-		this.addColorFormatButton(colorButY, "\u00a7cA", "\u00a7c");  // RED
-		this.addColorFormatButton(colorButY, "\u00a7dA", "\u00a7d");  // LIGHT_PURPLE
-		this.addColorFormatButton(colorButY, "\u00a7eA", "\u00a7e");  // YELLOW
-		this.addColorFormatButton(colorButY, "\u00a7fA", "\u00a7f");  // WHITE
+		this.addColorFormatButton(colorButY, "§0A", "§0");  // BLACK
+		this.addColorFormatButton(colorButY, "§1A", "§1");  // DARK_BLUE
+		this.addColorFormatButton(colorButY, "§2A", "§2");  // DARK_GREEN
+		this.addColorFormatButton(colorButY, "§3A", "§3");  // DARK_AQUA
+		this.addColorFormatButton(colorButY, "§4A", "§4");  // DARK_RED
+		this.addColorFormatButton(colorButY, "§5A", "§5");  // DARK_PURPLE
+		this.addColorFormatButton(colorButY, "§6A", "§6");  // GOLD
+		this.addColorFormatButton(colorButY, "§7A", "§7");  // GRAY
+		this.addColorFormatButton(colorButY, "§8A", "§8");  // DARK_GRAY
+		this.addColorFormatButton(colorButY, "§9A", "§9");  // BLUE
+		this.addColorFormatButton(colorButY, "§aA", "§a");  // GREEN
+		this.addColorFormatButton(colorButY, "§bA", "§b");  // AQUA
+		this.addColorFormatButton(colorButY, "§cA", "§c");  // RED
+		this.addColorFormatButton(colorButY, "§dA", "§d");  // LIGHT_PURPLE
+		this.addColorFormatButton(colorButY, "§eA", "§e");  // YELLOW
+		this.addColorFormatButton(colorButY, "§fA", "§f");  // WHITE
 		
 		this.colorFormatButtonX = this.screen.width / 2 - (SharedConstants.COLOR_FORMAT_BUTTON_WIDTH * 5);
 		int formatButY = this.screen.height - 20;
-		this.addColorFormatButton(formatButY, "\u00a7kA", "\u00a7k");  // OBFUSCATED
-		this.addColorFormatButton(formatButY, "\u00a7lA", "\u00a7l");  // BOLD
-		this.addColorFormatButton(formatButY, "\u00a7mA", "\u00a7m");  // STRIKETHROUGH
-		this.addColorFormatButton(formatButY, "\u00a7nA", "\u00a7n");  // UNDERLINE
-		this.addColorFormatButton(formatButY, "\u00a7oA", "\u00a7o");  // ITALIC
-		this.addColorFormatButton(formatButY, "Reset Formatting", "\u00a7r").setWidth(100);
+		this.addColorFormatButton(formatButY, "§kA", "§k");  // OBFUSCATED
+		this.addColorFormatButton(formatButY, "§lA", "§l");  // BOLD
+		this.addColorFormatButton(formatButY, "§mA", "§m");  // STRIKETHROUGH
+		this.addColorFormatButton(formatButY, "§nA", "§n");  // UNDERLINE
+		this.addColorFormatButton(formatButY, "§oA", "§o");  // ITALIC
+		this.addColorFormatButton(formatButY, "Reset Formatting", "§r").setWidth(100);
 		
 		this.buttonsInitialized = true;
 		this.updateButtons();

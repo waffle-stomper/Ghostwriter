@@ -183,26 +183,61 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 		// any JSON weirdness
 		return new ArrayList<>(this.pages);
 	}
-	
-	
-	@Override  // From IGhostBook
-	public void insertText(String text) {
-		if (this.isSigning) {
-			// Put the text into the title
-			this.titleEdit.insertText(text);
-			return;
-		}
-		// Put the text into the page
-		this.pageEdit.insertText(text);
-	}
-	
-	
+
+
 	@Override  // From IGhostBook
 	public void bookChanged(boolean setModifiedFlag) {
 		if (setModifiedFlag) this.isModified = true;
 		this.clearDisplayCache();  // TODO: is this all we need to do now?
 	}
-	
+
+
+	@Override  // From IGhostBook
+	public void addFormattingCode(String formattingCode) {
+		// Get a reference to the appropriate editor (title or page, depending on whether we're signing)
+		TextFieldHelper editor = this.isSigning ? this.titleEdit : this.pageEdit;
+
+		// If text is selected, we need to temporarily remove the selection so the text isn't replaced by the
+		// formatting character
+		int cursorPos = editor.getCursorPos();
+		int selectionPos = editor.getSelectionPos();
+		if (cursorPos != selectionPos){
+			// Note that when text is selected right to left, selectionPos will be lower than cursorPos.
+			// The second argument to this function controls whether the selectionPos should be preserved. When
+			// set to false, the selectionPos will be set to the new cursorPos
+			editor.setCursorPos(Math.min(cursorPos, selectionPos), false);
+		}
+
+		// Next we add the formatting character at the start of the selection (which will also be to the left
+		// of the cursor in the case that no text is selected)
+		editor.insertText(formattingCode);
+
+		// If text was selected, we need to re-select the text (optionally adding a reset sequence at the end
+		// of the selection if the character we're inserting isn't a reset char
+		if (cursorPos != selectionPos){
+			int extraCharCount = 2;
+
+			// Optionally add reset character at the end of selection
+			if (!formattingCode.equals("§r")){
+				editor.setCursorPos(Math.max(cursorPos, selectionPos) + extraCharCount, false);
+				editor.insertText("§r");
+				extraCharCount = 4;
+			}
+
+			// Re-select the text (note that it's two characters longer and we have to deal with the case where
+			// the text was selected right-to-left
+			if (cursorPos < selectionPos){
+				editor.setSelectionRange(cursorPos, selectionPos + extraCharCount);
+			}
+			else{
+				editor.setSelectionRange(selectionPos, cursorPos + extraCharCount);
+			}
+		}
+
+		// Mark the book as changed, which will also update the display
+		this.bookChanged(true);
+	}
+
 	
 	@Override  // From IGhostBook
 	public boolean isBookBeingSigned() {

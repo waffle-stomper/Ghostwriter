@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '2.3.7'
+version = '2.4.2'
 group = 'wafflestomper'
 archivesBaseName = '1.18.2-Ghostwriter'
 

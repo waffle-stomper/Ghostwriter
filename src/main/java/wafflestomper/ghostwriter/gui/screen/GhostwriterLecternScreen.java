@@ -116,7 +116,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	}
 	
 	@Override  // From IGhostBook
-	public void insertText(String insertChars) {
+	public void addFormattingCode(String formattingCode) {
 	}
 	
 	@Override  // From IGhostBook
