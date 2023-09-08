@@ -2,37 +2,35 @@
 modLoader="javafml"
 
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[45,)"  # 45 = 1.19.4
+loaderVersion="${loader_version_range}"
 
 # The license for you mod. This is mandatory metadata and allows for easier comprehension of your redistributive properties.
-license="GNU GPL v3"
+license="${mod_license}"
 
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/waffle-stomper/Ghostwriter/issues"
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]]
-    modId="ghostwriter"
-    version="${file.jarVersion}"
-    displayName="Ghostwriter" 
+    modId="${mod_id}"
+    version="${mod_version}"
+    displayName="${mod_name}"
     updateJSONURL="https://raw.githubusercontent.com/waffle-stomper/Ghostwriter/master/update.json"
-    displayURL="https://github.com/waffle-stomper/Ghostwriter" 
+    displayURL="https://github.com/waffle-stomper/Ghostwriter"
     logoFile="icon.png"
     credits="maester_flaminius, SortByNode, Lodish, and all of the other wonderful people I've met through Minecraft"
-    authors="waffle_stomper and maester_flaminius"
-    description='''
-    Utility for dealing with books (backup, restore, copy, paste, etc.).
-    '''
+    authors="${mod_authors}"
+    description='''${mod_description}'''
 
 [[dependencies.ghostwriter]]
     modId="forge"
     mandatory=true
-    versionRange="[45,)"
+    versionRange="${forge_version_range}"
     ordering="NONE"
     side="CLIENT"
 [[dependencies.ghostwriter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4,1.20)"
+    versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="CLIENT"

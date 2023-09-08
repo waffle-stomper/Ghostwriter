@@ -1,16 +1,15 @@
 package wafflestomper.ghostwriter.gui.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import wafflestomper.ghostwriter.*;
+import wafflestomper.ghostwriter.Ghostwriter;
+import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.GuiUtils;
 import wafflestomper.ghostwriter.gui.widget.FileSelectionList;
-import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.widget.SelectableFilenameField;
 import wafflestomper.ghostwriter.utilities.Clipboard;
 import wafflestomper.ghostwriter.utilities.FileHandler;
@@ -249,11 +248,11 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	@Override
 	@ParametersAreNonnullByDefault
-	public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
 		this.btnSave.active = this.isFilenameValid();
 		this.hoveringText = null;
-		this.fileSelectionList.render(PoseStack, mouseX, mouseY, partialTicks);
-		super.render(PoseStack, mouseX, mouseY, partialTicks);
+		this.fileSelectionList.render(guiGraphics, mouseX, mouseY, partialTicks);
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 		
 		// Render the current directory, truncating the left side if it becomes too long
 		String displayPath = this.FILE_HANDLER.currentPath.getAbsolutePath();
@@ -265,17 +264,17 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			reversed = this.font.getSplitter().plainHeadByWidth(reversed, allowedSize, Style.EMPTY);
 			displayPath = "..." + new StringBuilder(reversed).reverse();
 		}
-		GuiComponent.drawCenteredString(PoseStack, this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
+		guiGraphics.drawCenteredString(this.font, displayPath, this.width / 2, 20, 0xDDDDDD);
 		
-		this.filenameField.render(PoseStack, mouseX, mouseY, partialTicks);
+		this.filenameField.render(guiGraphics, mouseX, mouseY, partialTicks);
 		
 		// Draw tooltip if the path is hovered
 		if (mouseX >= this.width / 2 - 100 && mouseX <= this.width / 2 + 100 && mouseY >= 20 && mouseY <= 27) {
-			this.renderTooltip(PoseStack, Component.translatable(displayPath), 0, 0);
+			guiGraphics.renderTooltip(this.font, Component.translatable(displayPath), 0, 0);
 		}
 		// Draw any other hover text
 		else if (this.hoveringText != null) {
-			this.renderTooltip(PoseStack, Component.translatable(this.hoveringText), mouseX, mouseY);
+			guiGraphics.renderTooltip(this.font, Component.translatable(this.hoveringText), mouseX, mouseY);
 		}
 	}
 	

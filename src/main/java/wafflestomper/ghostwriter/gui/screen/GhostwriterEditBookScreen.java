@@ -1,20 +1,19 @@
 package wafflestomper.ghostwriter.gui.screen;
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.font.TextFieldHelper;
-import net.minecraft.client.gui.screens.inventory.BookEditScreen;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import wafflestomper.ghostwriter.*;
+import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.IGhostBook;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
@@ -113,8 +112,8 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 	 */
 	@Override  // From BookEditScreen
 	@ParametersAreNonnullByDefault
-	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-		super.render(poseStack, mouseX, mouseY, partialTicks);
+	public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		super.render(guiGraphics, mouseX, mouseY, partialTicks);
 		
 		// Render long title and warning (if necessary)
 		if (this.isSigning && this.title.length() > 15) {
@@ -122,7 +121,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			String textLen = "Title length: " + this.title.length();
 			// params are PoseStack, x, y, color
 			// this was drawString() in the old money
-			this.font.draw(poseStack, textLen, 169, 20, 0xFF3333);
+			guiGraphics.drawString(this.font, textLen, 169, 20, 0xFF3333);
 			
 			// Add extra background width amd re-render the title because the new background covers up the vanilla title
 			String textTitle = this.title;
@@ -132,15 +131,15 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			int titleMinX = bookLeftSide + 36 + (114 - titleWidth) / 2;
 			int titleMaxX = titleMinX + titleWidth;
 			// color for the fill() method is MSB->LSB: alpha, r, g, b, (each 8 bits)
-			GuiComponent.fill(poseStack, titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
-			this.font.draw(poseStack, textTitle, (float) (titleMinX), 50.0F, 0);
+			guiGraphics.fill(titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
+			guiGraphics.drawString(this.font, textTitle, titleMinX, 50, 0);
 			
 			// Show the long title warning
 			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
 					"Set longer titles at your own risk";
 			Component lengthWarning = Component.translatable(s);
 			// params are text, x, y, width, color
-			this.font.drawWordWrap(poseStack, lengthWarning, 153, 116, 114, 0xFF3333);
+			guiGraphics.drawWordWrap(this.font, lengthWarning, 153, 116, 114, 0xFF3333);
 		}
 		
 		// Add warnings about character and line limits
@@ -154,8 +153,8 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			}
 			
 			if (!warning.isEmpty()) {
-				this.font.draw(poseStack, "Warning:", 5, 176, 0xFF3333);
-				this.font.draw(poseStack, warning, 5, 185, 0xFF3333);
+				guiGraphics.drawString(this.font, "Warning:", 5, 176, 0xFF3333);
+				guiGraphics.drawString(this.font, warning, 5, 185, 0xFF3333);
 			}
 		}
 	}

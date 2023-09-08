@@ -1,10 +1,10 @@
 package wafflestomper.ghostwriter.gui.widget;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -64,9 +64,9 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 		
 		@Override
 		@ParametersAreNonnullByDefault
-		public void render(PoseStack PoseStack, int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
+		public void render(GuiGraphics guiGraphics, int p_render_1_, int p_render_2_, int p_render_3_, int p_render_4_, int p_render_5_,
 						   int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
-			this.mc.font.draw(PoseStack, "..", (float) (p_render_3_), (float) (p_render_2_ + 1), 0x00FF00); // Params are string, x, y, color
+			guiGraphics.drawString(this.mc.font, "..", p_render_3_, p_render_2_ + 1, 0x00FF00); // Params are string, x, y, color
 		}
 		
 		
@@ -112,7 +112,7 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 		 */
 		@Override
 		@ParametersAreNonnullByDefault
-		public void render(PoseStack PoseStack, int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
+		public void render(GuiGraphics guiGraphics, int p_render_1_, int p_render_2_, int slotX, int slotWidth, int p_render_5_,
 						   int mouseX, int mouseY, boolean mouseIsOver, float partialTicks) {
 			
 			int color = 0xFFFFFF;
@@ -126,9 +126,9 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 			}
 			
 			// Draw the trimmed filename in the slot
-			// I think func_238412_a_ is the new trimStringToWidth but I'm not sure
+			// I think func_238412_a_ is the new trimStringToWidth, but I'm not sure
 			String s = this.mc.font.plainSubstrByWidth(this.path.getName(), slotWidth);
-			this.mc.font.draw(PoseStack, s, (float) (slotX), (float) (p_render_2_ + 1), color);
+			guiGraphics.drawString(this.mc.font, s, slotX, p_render_2_ + 1, color);
 			
 			// Set up the hover text if the mouse is hovering over this slot
 			if (mouseIsOver) {

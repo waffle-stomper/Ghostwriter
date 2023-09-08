@@ -22,26 +22,20 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 #                                                                       #
 #########################################################################
 
-1) build.gradle
- + Update version (check all releases to make sure you don't re-use a version number from another branch)
- + Update archivesBaseName
- + Update minecraft > mappings channel
- + Update dependencies > minecraft
+1) gradle.properties [Forge v1.20 onwards, previously it was in build.gradle]
+ + Update all of the Minecraft/Forge versions. The easiest thing is to just grab an MDK and diff against its
+   gradle.properties to see what the correct values should be.
 
-2) mods.toml
- + Update loaderVersion
- + Update dependency version ranges
-
-3) update.json
+2) update.json
  + Add new version info
 
-4) In IDEA
+3) In IDEA
  + Gradle > build > clean (if you get a 'ProjectScopeServices has been closed' error, run ./gradlew --stop)
  + Reload Gradle project
  + Gradle > forgegradle runs > genIntellijRuns
 If any of these steps fail, try restarting IDEA.
 
-5) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
+4) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
 
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
