@@ -148,7 +148,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 			this.filenameField.setValue(defaultFilename);
 			
 			// Focus on the filename field and highlight the filename (without the extension)
-			this.filenameField.setFocus(true);
+			this.filenameField.setFocused(true);
 			this.filenameField.highlightFilename();
 			
 			// Prevent re-initializing element on resize
@@ -243,7 +243,7 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	private boolean isFilenameValid() {
 		String fn = this.filenameField.getValue();
-		return !fn.equals("");
+		return !fn.isEmpty();
 	}
 	
 	

@@ -106,15 +106,15 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 	
 	/**
 	 * Visual patches:
-	 * - Warn when the title is over the vanilla 15 character limit
+	 * - Warn when the title is over the vanilla 15-character limit
 	 * - Warn when the page is over the vanilla 14 line limit
-	 * - Warn when the page is over the multiplayer 256 character limit
+	 * - Warn when the page is over the multiplayer 256-character limit
 	 * - Add a high contrast background behind extended length titles
 	 */
 	@Override  // From BookEditScreen
 	@ParametersAreNonnullByDefault
-	public void render(PoseStack PoseStack, int mouseX, int mouseY, float partialTicks) {
-		super.render(PoseStack, mouseX, mouseY, partialTicks);
+	public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+		super.render(poseStack, mouseX, mouseY, partialTicks);
 		
 		// Render long title and warning (if necessary)
 		if (this.isSigning && this.title.length() > 15) {
@@ -122,7 +122,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			String textLen = "Title length: " + this.title.length();
 			// params are PoseStack, x, y, color
 			// this was drawString() in the old money
-			this.font.draw(PoseStack, textLen, 169, 20, 0xFF3333);
+			this.font.draw(poseStack, textLen, 169, 20, 0xFF3333);
 			
 			// Add extra background width amd re-render the title because the new background covers up the vanilla title
 			String textTitle = this.title;
@@ -132,15 +132,15 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 			int titleMinX = bookLeftSide + 36 + (114 - titleWidth) / 2;
 			int titleMaxX = titleMinX + titleWidth;
 			// color for the fill() method is MSB->LSB: alpha, r, g, b, (each 8 bits)
-			GuiComponent.fill(PoseStack, titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
-			this.font.draw(PoseStack, textTitle, (float) (titleMinX), 50.0F, 0);
+			GuiComponent.fill(poseStack, titleMinX - 5, 48, titleMaxX + 5, 60, 0xFFFFF9EC);
+			this.font.draw(poseStack, textTitle, (float) (titleMinX), 50.0F, 0);
 			
 			// Show the long title warning
 			String s = "Warning: the vanilla client restricts titles to 15 characters. " +
 					"Set longer titles at your own risk";
 			Component lengthWarning = Component.translatable(s);
 			// params are text, x, y, width, color
-			this.font.drawWordWrap(lengthWarning, 153, 116, 114, 0xFF3333);
+			this.font.drawWordWrap(poseStack, lengthWarning, 153, 116, 114, 0xFF3333);
 		}
 		
 		// Add warnings about character and line limits
@@ -153,9 +153,9 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 				warning = "Over " + SharedConstants.BOOK_MAX_LINES + " line limit!";
 			}
 			
-			if (warning.length() > 0) {
-				this.font.draw(PoseStack, "Warning:", 5, 176, 0xFF3333);
-				this.font.draw(PoseStack, warning, 5, 185, 0xFF3333);
+			if (!warning.isEmpty()) {
+				this.font.draw(poseStack, "Warning:", 5, 176, 0xFF3333);
+				this.font.draw(poseStack, warning, 5, 185, 0xFF3333);
 			}
 		}
 	}
@@ -179,7 +179,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 	 */
 	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
-		// As of 1.16.1, unsigned books just use plain strings for book pages so we don't need to remove
+		// As of 1.16.1, unsigned books just use plain strings for book pages, so we don't need to remove
 		// any JSON weirdness
 		return new ArrayList<>(this.pages);
 	}
@@ -224,7 +224,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 				extraCharCount = 4;
 			}
 
-			// Re-select the text (note that it's two characters longer and we have to deal with the case where
+			// Re-select the text (note that it's two characters longer, and we have to deal with the case where
 			// the text was selected right-to-left
 			if (cursorPos < selectionPos){
 				editor.setSelectionRange(cursorPos, selectionPos + extraCharCount);
@@ -293,7 +293,7 @@ public class GhostwriterEditBookScreen extends BookEditScreen implements IGhostB
 		
 		this.pages.remove(pageNum);
 		// Add a blank page if the book is empty
-		if (this.pages.size() == 0) this.pages.add("");
+		if (this.pages.isEmpty()) this.pages.add("");
 		this.bookChanged(true);
 	}
 	
