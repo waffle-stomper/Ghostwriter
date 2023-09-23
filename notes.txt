@@ -22,20 +22,25 @@ NNNNNNNN         NNNNNNN     OOOOOOOOO           TTTTTTTTTTT      EEEEEEEEEEEEEE
 #                                                                       #
 #########################################################################
 
-1) gradle.properties [Forge v1.20 onwards, previously it was in build.gradle]
- + Update all of the Minecraft/Forge versions. The easiest thing is to just grab an MDK and diff against its
+1) Update your gradle directory with the one from the MDK you're targeting
+
+2) gradle.properties
+ + Update all Minecraft/Forge versions. The easiest thing is to just grab an MDK and diff against its
    gradle.properties to see what the correct values should be.
 
-2) update.json
+3) build.gradle
+ + Update with the one from the MDK. Make sure you preserve your custom archivesName
+
+3) update.json
  + Add new version info
 
-3) In IDEA
+4) In IDEA
  + Gradle > build > clean (if you get a 'ProjectScopeServices has been closed' error, run ./gradlew --stop)
  + Reload Gradle project
  + Gradle > forgegradle runs > genIntellijRuns
 If any of these steps fail, try restarting IDEA.
 
-4) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
+5) Update the code to fix anything broken by the update. Note that you might need to update the access transformers
 
 Key codes can be found at the bottom of net.minecraft.client.util.InputMappings (in 1.16 at least)
 
