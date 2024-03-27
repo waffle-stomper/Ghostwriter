@@ -300,7 +300,6 @@ public class GhostwriterFileBrowserScreen extends Screen {
 	
 	@Override
 	public void tick() {
-		this.filenameField.tick();
 		this.btnSave.active = this.isFilenameValid();
 		if (this.FILE_HANDLER.currentPath != this.cachedPath) {
 			this.directoryDirty = true; // This probably isn't necessary - it forces a refresh

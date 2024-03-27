@@ -53,17 +53,8 @@ public class SelectableFilenameField extends EditBox {
 	 * Selects the filename
 	 */
 	public void highlightFilename() {
-		this.moveCursorToStart();
+		this.moveCursorToStart(false);
 		this.setHighlightPos(this.getEditableLength());
-	}
-	
-	
-	/**
-	 * This field in EditBox was causing the bug where single clicking after using the shift key
-	 * to type upper case text would erroneously select text
-	 */
-	public void updateShiftKeyStatus() {
-		this.shiftPressed = Screen.hasShiftDown();
 	}
 	
 	
@@ -73,8 +64,6 @@ public class SelectableFilenameField extends EditBox {
 	 */
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
 		if (!this.canConsumeInput()) return false;
-		
-		this.updateShiftKeyStatus();
 		
 		// Handle select all
 		if (Screen.isSelectAll(keyCode)) {
@@ -91,32 +80,21 @@ public class SelectableFilenameField extends EditBox {
 			
 			case SharedConstants.KEY_DOWN:
 			case SharedConstants.KEY_END:
-				this.setCursorPosition(this.getEditableLength());
+				this.moveCursorTo(this.getEditableLength(), Screen.hasShiftDown());
 				return true;
 			
 			case SharedConstants.KEY_UP:
-				this.moveCursorToStart();
+				this.moveCursorToStart(Screen.hasShiftDown());
 				return true;
 		}
 		
 		return super.keyPressed(keyCode, scanCode, modifiers);
 	}
-	
-	
+
 	/**
 	 * Selects the editable part of the filename on double-click and cancels text selection on single click
-	 * <p>
-	 * This also fixes a bug where single clicking will cause text to be selected
-	 * Steps to reproduce (with this method disabled):
-	 * 1) Hold shift and type S, then release shift
-	 * 2) Click somewhere in the text field.
-	 * 3) Note that text is erroneously selected
-	 * Moving the cursor with the arrow keys seems to fix it
 	 */
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		// This should fix the bug described above
-		this.updateShiftKeyStatus();
-		
 		if (super.mouseClicked(mouseX, mouseY, button)) {
 			// Mouse was clicked within this component
 			if (Util.getMillis() - this.lastClickTime < 250L) {
