@@ -10,6 +10,7 @@ import wafflestomper.ghostwriter.Ghostwriter;
 import wafflestomper.ghostwriter.utilities.BookUtilities;
 import wafflestomper.ghostwriter.gui.GhostLayer;
 import wafflestomper.ghostwriter.gui.IGhostBook;
+import wafflestomper.ghostwriter.utilities.Printer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	private final GhostLayer ghostLayer;
 	private final LecternMenu lecternContainer;
+	private final Printer printer;
 	
 	
 	public GhostwriterLecternScreen(ItemStack currStack, LecternMenu lecternContainer, Inventory playerInventory) {
@@ -27,21 +29,26 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 		this.ghostLayer = new GhostLayer(this, this, false);
 		this.lecternContainer = lecternContainer;
 		this.ghostLayer.extractTitleAuthor(currStack);
+		this.printer = new Printer();
+		this.printer.gamePrint("WARNING! LECTERNS ARE NOT CURRENTLY SUPPORTED!!");
 	}
 	
 	
-	@Override  // From ReadBookScreen
-	public void updateButtonVisibility() {
+	@Override  // From LecternScreen
+	public void createMenuControls() {
 		this.ghostLayer.updateButtons();
-	}
+	} // TODO: Is this the correct override?
 	
 	
 	@Override  // From IGhostBook
 	public List<String> pagesAsList() {
+		ItemStack book = this.menu.getBook();
 		List<String> pages = new ArrayList<>();
-		for (int i = 0; i < this.getNumPages(); i++) {
-			pages.add(BookUtilities.deJSONify(this.bookAccess.getPage(i).getString()));
-		}
+		this.printer.gamePrint("WARNING! DEV VERSION - CAN'T GET PAGES!");
+		// TODO: FIX AND ENABLE THIS BEFORE RELEASE
+//		for (int i = 0; i < this.lecternContainer.lecternData.getCount(); i++) {
+//			pages.add(BookUtilities.deJSONify(this.lecternContainer.lecternData.get(i).getString()));
+//		}
 		return pages;
 	}
 	
@@ -69,13 +76,18 @@ public class GhostwriterLecternScreen extends LecternScreen implements IGhostBoo
 	
 	@Override  // From IGhostBook
 	public void updateVanillaButtons() {
+		// TODO: This is causing a crash when opening a book because forwardButton is null on the lectern
 		super.updateButtonVisibility();
 	}
 	
 	
 	@Override  // From IGhostBook
 	public String getPageText(int pageNum) {
-		return this.bookAccess.getPage(pageNum).getString();
+
+		this.printer.gamePrint("WARNING! DEV VERSION - CAN'T GET PAGE TEXT!");
+		// TODO: REMOVE THIS TEMPORARY WORKAROUND ONCE YOU FIGURE OUT HOW TO GET PAGES!
+		return "";
+		//return this.lecternContainer.lecternData.get(pageNum).getString();
 	}
 	
 	

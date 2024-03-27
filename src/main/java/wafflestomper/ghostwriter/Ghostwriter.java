@@ -120,7 +120,8 @@ public class Ghostwriter {
 			return;
 		} else if (eventGui instanceof LecternScreen) {
 			LOG.info("Aborting early GUI replacement (target is a lectern). Setting lectern swap flag");
-			lecternArmed = true;
+			LOG.warn("Lectern support has temporarily been disabled until I have more time to debug it.");
+			//lecternArmed = true;
 			return;
 		}
 		
