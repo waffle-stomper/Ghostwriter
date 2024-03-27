@@ -25,7 +25,7 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 	
 	
 	public FileSelectionList(GhostwriterFileBrowserScreen ownerIn, Minecraft mcIn, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn) {
-		super(mcIn, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
+		super(mcIn, widthIn, heightIn, topIn, slotHeightIn);
 		this.owner = ownerIn;
 		this.parentDir = new ParentDirEntry(this.owner);
 	}
@@ -43,8 +43,13 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 			this.addEntry(n);
 		}
 	}
-	
-	
+
+	// TODO: Figure out how to use this to allow filenames to use the full width available
+//	@Override
+//	public int getRowWidth() {
+//		return super.getRowWidth() + XXX;
+//	}
+
 	@OnlyIn(Dist.CLIENT)
 	public static abstract class Entry extends ObjectSelectionList.Entry<FileSelectionList.Entry> {
 	}
@@ -68,7 +73,7 @@ public class FileSelectionList extends ObjectSelectionList<FileSelectionList.Ent
 						   int mouseX, int mouseY, boolean mouseIsOver, float p_render_9_) {
 			guiGraphics.drawString(this.mc.font, "..", p_render_3_, p_render_2_ + 1, 0x00FF00); // Params are string, x, y, color
 		}
-		
+
 		
 		public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
 			this.owner.setSelectedSlot(this);

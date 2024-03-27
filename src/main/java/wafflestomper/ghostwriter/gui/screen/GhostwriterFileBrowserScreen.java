@@ -205,8 +205,9 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		this.children.add(this.fileSelectionList);
 		this.populateFileList();
 		
-		// Make sure everything is in place in case the window was resized
-		this.fileSelectionList.updateSize(this.width, this.height, 32, this.height - 64);
+		// Make sure everything is in place in case the window was resized.
+		// Note that ObjectSectionList (superclass of FileSelectionList) no longer has an updateSize()
+		// function so we just skip that call hope it happens automatically
 		this.filenameField.x = this.width / 2 - 125;
 		this.filenameField.y = this.height - BORDER_HEIGHT * 2 - BUTTON_HEIGHT * 2;
 		
@@ -276,6 +277,12 @@ public class GhostwriterFileBrowserScreen extends Screen {
 		else if (this.hoveringText != null) {
 			guiGraphics.renderTooltip(this.font, Component.translatable(this.hoveringText), mouseX, mouseY);
 		}
+
+
+	}
+
+	public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+		guiGraphics.fill(0, 0, this.width, this.height, 0xFF000000);
 	}
 	
 	
